@@ -1496,7 +1496,7 @@
                     
                     regPtr = [self getRegPointer:mrm.reg opSize:32];
                     
-                    self->state.cf = *regPtr & (1 << rmReadValue % 32);
+                    self->state.cf = (rmReadValue & (1 << *(uint32_t *)regPtr % 32)) ? 1 : 0;
                     break;
                 case 0xa4:
                     // SHLD    r/m16/32    r16/32    imm8                o..szapc    o..sz.pc    o....a.c        Double Precision Shift Left
