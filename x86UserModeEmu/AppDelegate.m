@@ -39,7 +39,7 @@ static void establish_signal_handlers() {
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
     
-    
+    ishTrace = @{@"1": [[NSMutableDictionary alloc] init], @"2": [[NSMutableDictionary alloc] init]};
     CPUStepLock = [[NSLock alloc] init];
     // pids = [[NSMutableArray alloc] initWithCapacity:MAX_PID];
     pids = [NSMutableDictionary new];

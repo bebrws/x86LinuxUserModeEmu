@@ -42,9 +42,9 @@ if (mrm.type == modrm_register) {
     }
 }
 
-// IMMV(RM_SZ) = (GP1INT(RM_SZ))(GP1UINT(RM_SZ))((GP1INT(IMM_SZ))IMMV(IMM_SZ));
+IMMV(RM_SZ) = (GP1INT(RM_SZ))(GP1UINT(RM_SZ))((GP1INT(IMM_SZ))IMMV(IMM_SZ));
 
-imm32 = (GP1INT(RM_SZ))(GP1UINT(RM_SZ))((GP1INT(IMM_SZ))IMMV(IMM_SZ));
+//imm32 = (GP1INT(RM_SZ))(GP1UINT(RM_SZ))((GP1INT(IMM_SZ))IMMV(IMM_SZ));
 
 switch (mrm.reg) {
         // TODO Implement all logic under http://ref.x86asm.net/coder32.html#x83

@@ -349,7 +349,10 @@
     uint64_t temp64 = 0;
     uint64_t *temp64ptr = 0;
     uint8_t divisor8;
+    uint8_t dividend8;
     uint32_t divisor32;
+    uint32_t dividend32;
+    uint16_t divisor16;
     uint16_t dividend16;
     uint32_t *rmReadPtr;
     uint32_t rmReadValue;
@@ -3043,7 +3046,7 @@
             // Otherwise just check the last zf flag
             if (!(self->state.zf_res ? self->state.res == 0 : self->state.zf)) {
                 // TODO: Possibly cast this as int16_t to work with 16 bit instructions
-                self->state.eip += (int8_t)imm8;
+                self->state.eip += (int32_t)(int8_t)imm8;
             }
             break;
         case 0x76:
@@ -5175,10 +5178,10 @@
                         __debugbreak();
 
                         // Combine al and dl back into one 16 bit unsigned int
-                        dividend16 = (*(uint32_t *)[self getRegPointer:reg_eax opSize:32]) | ((*(uint32_t *)[self getRegPointer:reg_edx opSize:32]) << 8);
+                        dividend32 = (*(uint32_t *)[self getRegPointer:reg_eax opSize:32]) | ((*(uint32_t *)[self getRegPointer:reg_edx opSize:32]) << 32);
 
-                        *(uint32_t *)[self getRegPointer:reg_edx opSize:32] = dividend16 % (uint32_t)rmReadValue;
-                        *(uint32_t *)[self getRegPointer:reg_eax opSize:32] = dividend16 / (uint32_t)rmReadValue;
+                        *(uint32_t *)[self getRegPointer:reg_edx opSize:32] = dividend32 % (uint32_t)rmReadValue;
+                        *(uint32_t *)[self getRegPointer:reg_eax opSize:32] = dividend32 / (uint32_t)rmReadValue;
                     } while (0);
                     break;
                 case 0x7:
