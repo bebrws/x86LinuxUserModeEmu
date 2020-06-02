@@ -151,8 +151,8 @@ switch (mrm.reg) {
     case 0x4:
         // AND
 //        CLog(@"AND rm %x imm %x\n", RM_SZ, IMM_SZ);
-        // self->state.res = *((GP1UINT(RM_SZ) *)rmWritePtr) = *((GP1UINT(RM_SZ) *)rmReadPtr) & (GP1UINT(RM_SZ))IMMV(RM_SZ);
-        self->state.res = *((GP1UINT(RM_SZ) *)rmWritePtr) = *((GP1UINT(RM_SZ) *)rmReadPtr) & (uint32_t)imm32;
+        self->state.res = *((GP1UINT(RM_SZ) *)rmWritePtr) = *((GP1UINT(RM_SZ) *)rmReadPtr) & (GP1UINT(RM_SZ))IMMV(RM_SZ);
+        // self->state.res = *((GP1UINT(RM_SZ) *)rmWritePtr) = *((GP1UINT(RM_SZ) *)rmReadPtr) & (uint32_t)imm32;
         // Clears the carry flag, overflow flag, auxillary flag
         self->state.cf = 0;
         self->state.of = 0;

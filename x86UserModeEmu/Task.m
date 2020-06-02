@@ -942,7 +942,7 @@ int get_random(char *buf, size_t len)
 
     char *memory = mmap(NULL, (numPages * PAGE_SIZE) + correction,
                         mmapProtectionFlags, mmap_flags, fd.realFD, real_offset);
-    FFLog(@"Tsk MMAP: Mapping memory ptr %x to page %x  real offset %x", memory, pageStart, real_offset);
+    FFLog(@"Task MMAP: Mapping memory ptr %x to page %x  real offset %x", memory, pageStart, real_offset);
     if (numPages) {
         FFLog(@"Task MMAP - First bytes from mmap %x %x %x %x %x %x", memory[0], memory[1], memory[2], memory[3], memory[4], memory[5]);
     } else {

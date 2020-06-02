@@ -270,7 +270,6 @@
     uint8_t secondOpByte;
     [self readByteIncIP:&firstOpByte];
     
-    
     // # ifdef BDEBUG
     //if (self.task.pid.id == 2) {
         printf("\n\n");
@@ -281,9 +280,8 @@
     
     // if (self.task.pid.id == 1)
     // JSON Comparison debugging code
-    NSDictionary * parsedData;
-    
-    parsedData = self.ishDebugState[[NSString stringWithFormat:@"%d", self->instructionCount + 1]];
+    NSString *dsk = [NSString stringWithFormat:@"%d", self->instructionCount + 1];
+    NSDictionary * parsedData = parsedData = self.ishDebugState[dsk]; // (Task *)([Pid getTask:self.task.pid.id includeZombie:true]).cpu.ishDebugState[dsk];
 
     CPULog("%x\t%x\t%x\t%x\t%x\t%x\t%x\t%x\t%x\t%x\t%x\tflags\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%x - X86\n", self->state.eax, self->state.ebx, self->state.ecx, self->state.edx, self->state.esi, self->state.edi, self->state.ebp, self->state.esp, self->state.eip, self->state.eflags, self->state.res, self->state.cf_bit, self->state.pf, self->state.af, self->state.zf, self->state.sf, self->state.tf, self->state.if_, self->state.df, self->state.of_bit, self->state.iopl, self->state.pf_res, self->state.sf_res, self->state.af_ops, self->state.cf, firstOpByte);
     
@@ -311,7 +309,6 @@
                   [parsedData[@"res"] isEqualTo:[NSString stringWithFormat:@"%x", self->state.res]] )) {
                 
                 CPULog("~~~ ERROR: Ish/X86 TRACE MISMATCH - Instruction number %d. EIP: %x\n", self->instructionCount, self->state.eip);
-                // __debugbreak();
             } else {
                 CPULog("ISH and x86 match registers - Instruction number %d. EIP: %x\n", self->instructionCount, self->state.eip);
             }
@@ -5181,7 +5178,6 @@
                         }
 
                         FFLog(@"\n\n\n  Check this op! \n\n\n");
-                        __debugbreak();
 
                         // Combine al and dl back into one 16 bit unsigned int
                         dividend32 = (*(uint32_t *)[self getRegPointer:reg_eax opSize:32]) | ((*(uint32_t *)[self getRegPointer:reg_edx opSize:32]) << 32);
@@ -5625,36 +5621,37 @@
 }
 
 - (void)runloop {
-    // FOR DEBUGGING
-    // Load up an ish trace to compare registers against:
-    NSString *debugFilename = [NSString stringWithFormat:@"/Users/bbarrows/ishtrace-%d.json", self.task.pid.id];
-    NSString *debugFileContents = [NSString stringWithContentsOfFile:debugFilename encoding:NSUTF8StringEncoding error:nil];
-    
-    // first, separate by new line
-    self.debugJsonStringsLineSeperated = [debugFileContents componentsSeparatedByCharactersInSet: [NSCharacterSet newlineCharacterSet]];
-    self->instructionCount = 0;
-    
-    self.ishDebugState = [[NSMutableDictionary alloc] init];;
-    
-    for (NSString *l in self.debugJsonStringsLineSeperated) {
-            NSData * jsonTraceData = [l dataUsingEncoding:NSUTF8StringEncoding];
-            NSError * error=nil;
-            NSDictionary *td = [NSJSONSerialization JSONObjectWithData:jsonTraceData options:kNilOptions error:&error];
-            //self.ishOut[td[@"num"]] = td;
-            NSString *k = td[@"num"];
-            if (k) {
-                [self.ishDebugState setValue:td forKey:k];
-            }
-    }
-    
-    
-    
 
     // Now that we are in the runloop grab the pthread that OSX is using underneath so I can send singals to this thread later..
     // TOOD: Just use pthreads themselves
     self.task->thread = pthread_self();
 
-    //FFLog(@"Exec: Initiating run loop with IP:%d and Entry Point:%d", self->state.eip, self.task->elfEntryPoint);
+    FFLog(@"Exec: Initiating run loop with IP:%d and Entry Point:%d", self.task.pid.id, self.task->elfEntryPoint);
+    
+    
+    // FOR DEBUGGING
+    // Load up an ish trace to compare registers against:
+    NSString *debugFilename = [NSString stringWithFormat:@"/Users/bbarrows/ishtrace-%d.json", self.task.pid.id];
+    CPULog(@"Tracing with file: %@\n", debugFilename);
+    NSString *debugFileContents = [NSString stringWithContentsOfFile:debugFilename encoding:NSUTF8StringEncoding error:nil];
+    
+    // first, separate by new line
+    NSArray *debugJsonStringsLineSeperated = [debugFileContents componentsSeparatedByCharactersInSet: [NSCharacterSet newlineCharacterSet]];
+    
+    self.ishDebugState = [[NSMutableDictionary alloc] init];;
+    
+    for (NSString *l in debugJsonStringsLineSeperated) {
+        NSData * jsonTraceData = [l dataUsingEncoding:NSUTF8StringEncoding];
+        NSError * error=nil;
+        NSDictionary *td = [NSJSONSerialization JSONObjectWithData:jsonTraceData options:kNilOptions error:&error];
+        //self.ishOut[td[@"num"]] = td;
+        NSString *k = td[@"num"];
+        if (k) {
+            [self.ishDebugState setValue:td forKey:k];
+        }
+    }
+    self->instructionCount = 0;
+    // END TRACING
 
     // Loop
     while (![self.thread isCancelled]) {
