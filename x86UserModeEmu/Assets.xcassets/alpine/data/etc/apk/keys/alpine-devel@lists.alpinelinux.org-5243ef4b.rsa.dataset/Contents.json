@@ -1,0 +1,12 @@
+{
+  "info" : {
+    "version" : 1,
+    "author" : "xcode"
+  },
+  "data" : [
+    {
+      "idiom" : "universal",
+      "filename" : "alpine-devel@lists.alpinelinux.org-5243ef4b.rsa.pub"
+    }
+  ]
+}

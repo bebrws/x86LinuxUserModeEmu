@@ -1,0 +1,26 @@
+{
+    "workspace": "${workspaceRoot}/x86UserModeEmu.xcworkspace",
+    "scheme": "x86UserModeEmu",
+    "variables": {
+        "ARG1": "argument1"
+    },
+    "postBuildTasks": [
+        {
+            "name": "Sleep for a few seconds",
+            "program": "sleep",
+            "args": [ "0" ],
+            "cwd": "${workspaceRoot}"
+        }
+    ],
+    "debugConfigurations": [
+        {
+            "name": "test",
+            "cwd": "${workspaceRoot}",
+            "program": "${buildPath}/project",
+            "args": [
+                "${ARG1}",
+                "${ARG2}"
+            ]
+        }
+    ] 
+}

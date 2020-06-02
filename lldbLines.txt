@@ -1,0 +1,36 @@
+(lldb) e  (void *) (tlb_ent->data_minus_addr + addr);
+(void *) $0 = 0x000000010d8763ee
+
+
+
+
+
+currently i am pointot about 
+
+file offset 0
+
+6020
+
+shoudlbe 76e8
+
+0x76e8 - 0x6020 =
+0x16C8 = 5832
+
+
+From step loop
+
+p/x ((char *)mm.data)[0x3ee]
+
+
+
+p/x [self.task.mem getPageTableEntry:(self->state.eip & 0xFFF)].pageIndex
+
+e [self.task.mem getPageTableEntry:(self->state.eip & 0xFFF)].offsetIntoMappedMemory
+
+e ((char *)[self.task.mem getPageTableEntry:1048515].mappedMemory.data)[1006]
+
+e ((char *)entry.mappedMemory.data)[0]
+
+
+e ((pt_entry *)mem_pt(current->mem, state->ip & 0xFFF))->data
+

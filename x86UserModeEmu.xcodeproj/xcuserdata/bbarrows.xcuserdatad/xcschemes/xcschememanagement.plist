@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>SchemeUserState</key>
+	<dict>
+		<key>CmdLineTest.xcscheme_^#shared#^_</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>2</integer>
+		</dict>
+		<key>emuTestResources.xcscheme_^#shared#^_</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>4</integer>
+		</dict>
+		<key>float.xcscheme_^#shared#^_</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>3</integer>
+		</dict>
+		<key>vdso.xcscheme_^#shared#^_</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>1</integer>
+		</dict>
+		<key>x86UserModeEmu.xcscheme_^#shared#^_</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>0</integer>
+		</dict>
+	</dict>
+	<key>SuppressBuildableAutocreation</key>
+	<dict>
+		<key>B14222C3241BD3AF00DA60AE</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>B14222D8241BD66F00DA60AE</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>B1E6B359242811360082F690</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>FA443A5223F8983D00AE4A51</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>FA443A6823F8984000AE4A51</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>FA443A7323F8984000AE4A51</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+	</dict>
+</dict>
+</plist>
