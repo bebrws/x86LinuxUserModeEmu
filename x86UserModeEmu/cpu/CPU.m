@@ -1,3 +1,8 @@
+// For debugging in lldb:
+// e (Task *)([Pid getTask:1 includeZombie:true]).cpu.ishDebugState
+// po (Task *)([Pid getTask:1 includeZombie:true]).cpu.ishDebugState[@"63"]
+//
+
 #include <signal.h>
 #import "CPU.h"
 #import "Task.h"
@@ -277,6 +282,7 @@
     // if (self.task.pid.id == 1)
     // JSON Comparison debugging code
     NSDictionary * parsedData;
+    
     parsedData = self.ishDebugState[[NSString stringWithFormat:@"%d", self->instructionCount + 1]];
 
     CPULog("%x\t%x\t%x\t%x\t%x\t%x\t%x\t%x\t%x\t%x\t%x\tflags\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%x - X86\n", self->state.eax, self->state.ebx, self->state.ecx, self->state.edx, self->state.esi, self->state.edi, self->state.ebp, self->state.esp, self->state.eip, self->state.eflags, self->state.res, self->state.cf_bit, self->state.pf, self->state.af, self->state.zf, self->state.sf, self->state.tf, self->state.if_, self->state.df, self->state.of_bit, self->state.iopl, self->state.pf_res, self->state.sf_res, self->state.af_ops, self->state.cf, firstOpByte);
