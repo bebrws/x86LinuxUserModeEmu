@@ -324,6 +324,8 @@ static inline const char *reg32_name(enum reg32 reg) {
     @public long instructionCount;
 }
 
+- (int)step16;
+- (int)step;
 - (void)collapseFlags;
 - (id)initWithTask:(Task *)task;
 - (void)start;
