@@ -3859,7 +3859,7 @@
             break;
             
         case 0xcd:
-            // INT   imm8
+            // INT   imm8 - The SYSCALL Op - http://ref.x86asm.net/geek.html#xCD
             [self readByteIncIP:&imm8];
             return imm8;
             break;
@@ -8018,7 +8018,8 @@
 
         case 0x6a:
             [self readByteIncIP:&imm8];
-            [self.task userWrite:(self->state.esp - 4) buf:&imm8 count:1];
+            imm32 = (uint32_t)imm8;
+            [self.task userWrite:(self->state.esp - 4) buf:&imm32 count:4];
             self->state.esp -= 4;
             break;
         case 0x6b:
@@ -8998,7 +8999,7 @@
             break;
 
         case 0xcd:
-            // INT   imm8
+            // INT   imm8 - THIS IS THE SYSCALL Op
             [self readByteIncIP:&imm8];
             return imm8;
             break;
