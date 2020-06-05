@@ -2879,8 +2879,9 @@
             
         case 0x6a:
             [self readByteIncIP:&imm8];
-            [self.task userWrite:self->state.eip buf:&imm8 count:1];
-            self->state.esp -= 1;
+            [self.task userWrite:(self->state.esp - 4) buf:&imm8 count:1];
+            self->state.esp -= 4;
+            break;
         case 0x6b:
             // IMUL
             [self readByteIncIP:&modRMByte];
@@ -5324,12 +5325,12 @@
     uint8_t secondOpByte;
     [self readByteIncIP:&firstOpByte];
     
-    /*
+    
     
     // # ifdef BDEBUG
     //if (self.task.pid.id == 2) {
-        printf("\n\n");
-        [self printState:firstOpByte];
+        // printf("\n\n");
+        // [self printState:firstOpByte];
     //}
     // CLog(@"P: %d OpCode: 0x%x\n", self.task.pid.id, firstOpByte);
     // # endif
@@ -5339,10 +5340,10 @@
     NSString *dsk = [NSString stringWithFormat:@"%d", self->instructionCount + 1];
     NSDictionary * parsedData = parsedData = self.ishDebugState[dsk]; // (Task *)([Pid getTask:self.task.pid.id includeZombie:true]).cpu.ishDebugState[dsk];
 
-    CPULog("%x\t%x\t%x\t%x\t%x\t%x\t%x\t%x\t%x\t%x\t%x\tflags\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%x - X86\n", self->state.eax, self->state.ebx, self->state.ecx, self->state.edx, self->state.esi, self->state.edi, self->state.ebp, self->state.esp, self->state.eip, self->state.eflags, self->state.res, self->state.cf_bit, self->state.pf, self->state.af, self->state.zf, self->state.sf, self->state.tf, self->state.if_, self->state.df, self->state.of_bit, self->state.iopl, self->state.pf_res, self->state.sf_res, self->state.af_ops, self->state.cf, firstOpByte);
+    // CPULog("%x\t%x\t%x\t%x\t%x\t%x\t%x\t%x\t%x\t%x\t%x\tflags\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%x - X86\n", self->state.eax, self->state.ebx, self->state.ecx, self->state.edx, self->state.esi, self->state.edi, self->state.ebp, self->state.esp, self->state.eip, self->state.eflags, self->state.res, self->state.cf_bit, self->state.pf, self->state.af, self->state.zf, self->state.sf, self->state.tf, self->state.if_, self->state.df, self->state.of_bit, self->state.iopl, self->state.pf_res, self->state.sf_res, self->state.af_ops, self->state.cf, firstOpByte);
     
         if (parsedData) {
-            CPULog("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\tflags\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s - ISH\n", [parsedData[@"eax"] UTF8String], [parsedData[@"ebx"] UTF8String], [parsedData[@"ecx"] UTF8String], [parsedData[@"edx"] UTF8String], [parsedData[@"esi"] UTF8String], [parsedData[@"edi"] UTF8String], [parsedData[@"ebp"] UTF8String], [parsedData[@"esp"] UTF8String], [parsedData[@"eip"] UTF8String], [parsedData[@"eflags"] UTF8String], [parsedData[@"res"] UTF8String], [parsedData[@"cf_bit"] UTF8String], [parsedData[@"pf"] UTF8String], [parsedData[@"af"] UTF8String], [parsedData[@"zf"] UTF8String], [parsedData[@"sf"] UTF8String], [parsedData[@"tf"] UTF8String], [parsedData[@"if_"] UTF8String], [parsedData[@"df"] UTF8String], [parsedData[@"of_bit"] UTF8String], [parsedData[@"iopl"] UTF8String], [parsedData[@"pf_res"] UTF8String], [parsedData[@"sf_res"] UTF8String], [parsedData[@"af_ops"] UTF8String], [parsedData[@"cf"] UTF8String], [parsedData[@"insn"] UTF8String]);
+            // CPULog("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\tflags\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s - ISH\n", [parsedData[@"eax"] UTF8String], [parsedData[@"ebx"] UTF8String], [parsedData[@"ecx"] UTF8String], [parsedData[@"edx"] UTF8String], [parsedData[@"esi"] UTF8String], [parsedData[@"edi"] UTF8String], [parsedData[@"ebp"] UTF8String], [parsedData[@"esp"] UTF8String], [parsedData[@"eip"] UTF8String], [parsedData[@"eflags"] UTF8String], [parsedData[@"res"] UTF8String], [parsedData[@"cf_bit"] UTF8String], [parsedData[@"pf"] UTF8String], [parsedData[@"af"] UTF8String], [parsedData[@"zf"] UTF8String], [parsedData[@"sf"] UTF8String], [parsedData[@"tf"] UTF8String], [parsedData[@"if_"] UTF8String], [parsedData[@"df"] UTF8String], [parsedData[@"of_bit"] UTF8String], [parsedData[@"iopl"] UTF8String], [parsedData[@"pf_res"] UTF8String], [parsedData[@"sf_res"] UTF8String], [parsedData[@"af_ops"] UTF8String], [parsedData[@"cf"] UTF8String], [parsedData[@"insn"] UTF8String]);
             
             
             // CPULog("x86 insn #:%d Ish insn #:%s :\n", self->instructionCount, [parsedData[@"num"] UTF8String]);
@@ -5350,7 +5351,7 @@
             // CPULog("%s %s %s %s %s %s %s %s %s %s %s %s\n", [parsedData[@"eax"] UTF8String], [parsedData[@"ebx"] UTF8String], [parsedData[@"ecx"] UTF8String], [parsedData[@"edx"] UTF8String], [parsedData[@"esi"] UTF8String], [parsedData[@"edi"] UTF8String], [parsedData[@"ebp"] UTF8String], [parsedData[@"esp"] UTF8String], [parsedData[@"eip"] UTF8String], [parsedData[@"eflags"] UTF8String], [parsedData[@"res"] UTF8String], [parsedData[@"insn"] UTF8String]);
             
             // Compare against the current state
-            if (!([parsedData[@"eax"] isEqualTo:[NSString stringWithFormat:@"%x", self->state.eax]] &&
+            if (self->instructionCount != 0 && !([parsedData[@"eax"] isEqualTo:[NSString stringWithFormat:@"%x", self->state.eax]] &&
                   [parsedData[@"ebx"] isEqualTo:[NSString stringWithFormat:@"%x", self->state.ebx]] &&
                   [parsedData[@"ecx"] isEqualTo:[NSString stringWithFormat:@"%x", self->state.ecx]] &&
                   [parsedData[@"edx"] isEqualTo:[NSString stringWithFormat:@"%x", self->state.edx]] &&
@@ -5364,16 +5365,19 @@
                   [parsedData[@"eflags"] isEqualTo:[NSString stringWithFormat:@"%x", self->state.eflags]] &&
                   [parsedData[@"res"] isEqualTo:[NSString stringWithFormat:@"%x", self->state.res]] )) {
                 
+                CPULog("%x\t%x\t%x\t%x\t%x\t%x\t%x\t%x\t%x\t%x\t%x\tflags\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%x - X86\n", self->state.eax, self->state.ebx, self->state.ecx, self->state.edx, self->state.esi, self->state.edi, self->state.ebp, self->state.esp, self->state.eip, self->state.eflags, self->state.res, self->state.cf_bit, self->state.pf, self->state.af, self->state.zf, self->state.sf, self->state.tf, self->state.if_, self->state.df, self->state.of_bit, self->state.iopl, self->state.pf_res, self->state.sf_res, self->state.af_ops, self->state.cf, firstOpByte);
+                CPULog("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\tflags\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s - ISH\n", [parsedData[@"eax"] UTF8String], [parsedData[@"ebx"] UTF8String], [parsedData[@"ecx"] UTF8String], [parsedData[@"edx"] UTF8String], [parsedData[@"esi"] UTF8String], [parsedData[@"edi"] UTF8String], [parsedData[@"ebp"] UTF8String], [parsedData[@"esp"] UTF8String], [parsedData[@"eip"] UTF8String], [parsedData[@"eflags"] UTF8String], [parsedData[@"res"] UTF8String], [parsedData[@"cf_bit"] UTF8String], [parsedData[@"pf"] UTF8String], [parsedData[@"af"] UTF8String], [parsedData[@"zf"] UTF8String], [parsedData[@"sf"] UTF8String], [parsedData[@"tf"] UTF8String], [parsedData[@"if_"] UTF8String], [parsedData[@"df"] UTF8String], [parsedData[@"of_bit"] UTF8String], [parsedData[@"iopl"] UTF8String], [parsedData[@"pf_res"] UTF8String], [parsedData[@"sf_res"] UTF8String], [parsedData[@"af_ops"] UTF8String], [parsedData[@"cf"] UTF8String], [parsedData[@"insn"] UTF8String]);
+                
                 CPULog("~~~ ERROR: Ish/X86 TRACE MISMATCH - Instruction number %d. EIP: %x\n", self->instructionCount, self->state.eip);
             } else {
-                CPULog("ISH and x86 match registers - Instruction number %d. EIP: %x\n", self->instructionCount, self->state.eip);
+                // CPULog("ISH and x86 match registers - Instruction number %d. EIP: %x\n", self->instructionCount, self->state.eip);
             }
             
         } else {
             CPULog("No comparison data for this instruction. insn #:%d\n", self->instructionCount);
         }
     
-    */
+    
 
 
     self->instructionCount += 1;
@@ -8011,8 +8015,9 @@
 
         case 0x6a:
             [self readByteIncIP:&imm8];
-            [self.task userWrite:self->state.eip buf:&imm8 count:1];
-            self->state.esp -= 1;
+            [self.task userWrite:(self->state.esp - 4) buf:&imm8 count:1];
+            self->state.esp -= 4;
+            break;
         case 0x6b:
             // IMUL
             [self readByteIncIP:&modRMByte];
@@ -8416,7 +8421,7 @@
                 addr_t modrmAddress = [self getModRMAddress:mrm opSize:32];
                 rmWritePtr = [self.task.mem getPointer:modrmAddress type:MEM_WRITE];
             }
-            *((dword_t *)rmWritePtr) = *((dword_t *)regPtr);
+            *((uint32_t *)rmWritePtr) = *((uint32_t *)regPtr);
             break;
         case 0x8a:
             // MOV    r8    r/m8

@@ -72,7 +72,7 @@ switch (mrm.reg) {
         break;
     case 0x1:
         // OR
-        CLog(@"OR rm(%d):%x imm(%d):%x\n", RM_SZ, *((GP1UINT(RM_SZ) *)rmReadPtr), IMM_SZ, (uint32_t)imm32);
+        // CLog(@"OR rm(%d):%x imm(%d):%x\n", RM_SZ, *((GP1UINT(RM_SZ) *)rmReadPtr), IMM_SZ, (uint32_t)imm32);
         // self->state.res = *((GP1UINT(RM_SZ) *)rmWritePtr) = *((GP1UINT(RM_SZ) *)rmReadPtr) | (GP1UINT(IMM_SZ))IMMV(RM_SZ);
         self->state.res = *((GP1UINT(RM_SZ) *)rmWritePtr) = *((GP1UINT(RM_SZ) *)rmReadPtr) | (uint32_t)imm32;
         
