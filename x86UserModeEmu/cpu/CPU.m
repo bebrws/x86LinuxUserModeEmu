@@ -2488,7 +2488,6 @@
                             return 13;
                         }
                         memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
-                        rmWritePtr = [self.task.mem getPointer:modrmAddress type:MEM_WRITE];
                     }
 
                     regPtr =  [self getRegPointer:mrm.reg opSize:32];
@@ -3361,17 +3360,21 @@
             mrm = [self decodeModRMByte:modRMByte];
             regPtr = [self getRegPointer:mrm.reg opSize:8];
             if (mrm.type == modrm_register) {
-                rmWritePtr = [self getRegPointer:mrm.base opSize:8];
+                // rmWritePtr = [self getRegPointer:mrm.base opSize:8];
                 rmReadPtr = [self getRegPointer:mrm.base opSize:8];
                 memcpy(&rmReadValue, rmReadPtr, sizeof(uint8_t));
             } else {
                 addr_t modrmAddress = [self getModRMAddress:mrm opSize:8];
+                /*
                 if (!(rmReadPtr = [self.task.mem getPointer:modrmAddress type:MEM_READ])) {
                     return 13;
                 }
                 memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                */
+                rmReadValue = [self.task userReadOneBytes:modrmAddress];
             }
-            memcpy(regPtr, rmReadPtr, sizeof(uint32_t));
+            // memcpy(regPtr, rmReadPtr, sizeof(uint32_t));
+            *(uint8_t *)regPtr = (uint8_t)rmReadValue;
             break;
         case 0x8b:
             // MOV    r16/32    r/m16/32
@@ -3385,13 +3388,15 @@
                 //CLog(@"P: %d 0x8b Mov %@, %@\n", self.task.pid.id, [CPU getRegisterString:mrm.base], [CPU getRegisterString:mrm.base]);
             } else {
                 addr_t modrmAddress = [self getModRMAddress:mrm opSize:32];
+                rmReadValue = [self.task userReadFourBytes:modrmAddress];
+                /*
                 if (!(rmReadPtr = [self.task.mem getPointer:modrmAddress type:MEM_READ])) {
                     return 13;
                 }
                 memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                */
                 //CLog(@"P: %d 0x8b Mov %@, [%x] = %x\n", self.task.pid.id, [CPU getRegisterString:mrm.reg], modrmAddress, *((dword_t *)rmReadPtr));
             }
-            // memcpy(regPtr, rmReadPtr, sizeof(uint32_t));
             *regPtr = rmReadValue;
             break;
         case 0x8c:
@@ -5177,7 +5182,7 @@
                             return 0;
                         }
 
-                        FFLog(@"\n\n\n  Check this op! \n\n\n");
+                        
 
                         // Combine al and dl back into one 16 bit unsigned int
                         dividend32 = (*(uint32_t *)[self getRegPointer:reg_eax opSize:32]) | ((*(uint32_t *)[self getRegPointer:reg_edx opSize:32]) << 32);
@@ -5369,7 +5374,7 @@
             // [sib]
             // [sib]+disp8
             // [sib]+disp32
-            rmAddr += [self getRegisterValue:modrm.index opSize:opSize] << modrm.shift;
+            rmAddr += [self getRegisterValue:modrm.index opSize:32] << modrm.shift; // rmAddr += [self getRegisterValue:modrm.index opSize:opSize] << modrm.shift;
         }
     }
     return rmAddr;
