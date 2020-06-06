@@ -77,6 +77,9 @@
                 case 243:
                     result = [self sysSetThreadArea:self->state.ebx];
                     break;
+                case 258:
+                    result = [self sysSetTIDAddress:self->state.ebx];
+                    break;
                 default:
                     result = -1;
                     CLog(@"Unimplemented syscall attempted.");
