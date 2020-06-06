@@ -276,11 +276,6 @@
     
     uint8_t firstOpByte;
     uint8_t secondOpByte;
-    [self readByteIncIP:&firstOpByte];
-    
-    
-    // printf("\n\n16 bit mode -\n");
-    // [self printState:firstOpByte];
     
     uint16_t addr = 0;
     
@@ -318,6 +313,10 @@
     uint16_t *rmWritePtr;
     enum reg32 opReg;
     
+restart16:    
+    [self readByteIncIP:&firstOpByte];
+    // printf("\n\n16 bit mode -\n");
+    // [self printState:firstOpByte];
     
     switch (firstOpByte) {
             // TODO: Implement a group
@@ -565,6 +564,7 @@
             break;
             
         case 0x0f:
+            multibyterestart16:
             [self readByteIncIP:&secondOpByte];
             switch(secondOpByte) {
                 case 0x18 ... 0x1f:
@@ -945,6 +945,10 @@
                     // XORPS    xmm    xmm/m128            sse1                        Bitwise Logical XOR for Single-FP Values
                     // A NOP
                     break;
+                case 0x65:
+                    addr += self->state.tls_ptr;
+                    goto multibyterestart16;
+                    break;                                   
                 case 0x6e:
                     // MOVD    mm    r/m32            mmx                        Move Doubleword
                     // A NOP
@@ -2855,9 +2859,8 @@
             break;
             
         case 0x65:
-            // TODO: Why? Research why some of these opcodes skip the interrup checking step and just restart up here
-            // This should be a goto to the top of this step function
-            die("Hit an opcode that was not expected");
+            addr += self->state.tls_ptr;
+            goto restart16;
             break;
         case 0x66:
             die("Hit an opcode that should just call the 16 bit cpu step");
@@ -5348,6 +5351,9 @@
     
     uint8_t firstOpByte;
     uint8_t secondOpByte;
+
+restart32:
+
     [self readByteIncIP:&firstOpByte];
     
     
@@ -5700,6 +5706,7 @@
             break;
 
         case 0x0f:
+multibyterestart32:
             [self readByteIncIP:&secondOpByte];
             switch(secondOpByte) {
                 case 0x18 ... 0x1f:
@@ -6080,6 +6087,10 @@
                     // XORPS    xmm    xmm/m128            sse1                        Bitwise Logical XOR for Single-FP Values
                     // A NOP
                     break;
+                case 0x65:
+                    addr += self->state.tls_ptr;
+                    goto multibyterestart32;
+                    break;                    
                 case 0x6e:
                     // MOVD    mm    r/m32            mmx                        Move Doubleword
                     // A NOP
@@ -7990,12 +8001,8 @@
             break;
 
         case 0x65:
-            // TODO: Why? Research why some of these opcodes skip the interrup checking step and just restart up here
-            // This should be a goto to the top of this step function
-            // This is where I add addr + self->state.tls_ptr and
-            // goto restart;
-            
-            die("Hit an opcode that was not expected");
+            addr += self->state.tls_ptr;
+            goto restart;
             break;
         case 0x66:
             return [self step16];
