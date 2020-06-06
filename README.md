@@ -30,8 +30,6 @@ I also decided to ditch the classic page table hiearchy of multi layered page di
 
 This way my address lookup times are fast. To lookup a page I just cut off the first 12 bits and index into my PageTableEntry array to find the correct page table entry. No need to hassle with state of the TLB which is nice and save some time (and I would love to find out if it was much of a speed improvement).
 
-I actually had thought this through a little more but as I am writing this know I am forgetting some other specifics I wanted to mention. I will try to update this later.
-
 ## Anything else?
 
 There is really only a handful of opcodes I broke down and used Macros for. And that could be helpful for learning macros for someone anyway if they were having a hard time finding a project they could read through easily.
