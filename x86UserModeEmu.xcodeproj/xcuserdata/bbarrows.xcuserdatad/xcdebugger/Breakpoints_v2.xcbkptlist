@@ -2379,7 +2379,7 @@
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
             uuid = "A705DBE2-CA57-425E-A207-50EF2D04435E"
-            shouldBeEnabled = "Yes"
+            shouldBeEnabled = "No"
             condition = "self-&gt;instructionCount &gt;= 11806"
             ignoreCount = "0"
             continueAfterRunningActions = "No"

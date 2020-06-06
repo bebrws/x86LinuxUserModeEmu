@@ -2844,8 +2844,8 @@
             die("Hit an opcode that was not expected");
             break;
         case 0x68:
-            [self readByteIncIP:&imm32];
-            [self.task userWrite:self->state.eip buf:&imm32 count:4];
+            [self readFourBytesIncIP:&imm32];
+            [self.task userWrite:self->state.esp - 4 buf:&imm32 count:4];
             self->state.esp -= 4;
             break;
         case 0x69:
@@ -7981,8 +7981,8 @@
             die("Hit an opcode that was not expected");
             break;
         case 0x68:
-            [self readByteIncIP:&imm32];
-            [self.task userWrite:self->state.eip buf:&imm32 count:4];
+            [self readFourBytesIncIP:&imm32];
+            [self.task userWrite:self->state.esp - 4 buf:&imm32 count:4];
             self->state.esp -= 4;
             break;
         case 0x69:
