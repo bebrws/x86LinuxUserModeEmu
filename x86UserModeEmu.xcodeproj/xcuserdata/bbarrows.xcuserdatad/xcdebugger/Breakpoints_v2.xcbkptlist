@@ -2339,7 +2339,7 @@
                   endingColumnNumber = "9223372036854775807"
                   startingLineNumber = "77"
                   endingLineNumber = "77"
-                  offsetFromSymbolStart = "83328">
+                  offsetFromSymbolStart = "84406">
                </Location>
                <Location
                   uuid = "2B2A2BAF-718F-490D-993A-75DF150B9C6E - 3908e8d7f490d397"
@@ -3005,39 +3005,6 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "ED8D117D-7AAB-4AD6-9BE0-F0E3ECC075F3"
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "x86UserModeEmu/cpu/CPU.m"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "294"
-            endingLineNumber = "294"
-            landmarkName = "-step16"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            uuid = "E9E54F2A-2801-468A-829F-45C626823F7F"
-            shouldBeEnabled = "No"
-            condition = "self-&gt;instructionCount &gt;= 11499"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "x86UserModeEmu/cpu/CPU.m"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "293"
-            endingLineNumber = "293"
-            landmarkName = "-step16"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
             uuid = "F0805F3C-0B54-4818-A48E-4404E6EBB0A1"
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
@@ -3048,22 +3015,6 @@
             startingLineNumber = "9001"
             endingLineNumber = "9001"
             landmarkName = "-step"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            uuid = "EDC5B7BC-7958-4918-AFF1-241D76B86403"
-            shouldBeEnabled = "Yes"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "x86UserModeEmu/cpu/CPU.m"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "3863"
-            endingLineNumber = "3863"
-            landmarkName = "-step16"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>

@@ -251,13 +251,14 @@
     uint8_t secondOpByte;
     [self readByteIncIP:&firstOpByte];
     
-
+    
     // printf("\n\n16 bit mode -\n");
     // [self printState:firstOpByte];
-
-    uint32_t addr = 0;
+    
+    uint16_t addr = 0;
     
     uint8_t *moffs8;
+    uint16_t *moffs16;
     uint32_t *moffs32;
     
     enum reg32 tmpReg;
@@ -276,18 +277,18 @@
     uint8_t *temp8ptr = 0;
     uint16_t temp16 = 0;
     uint32_t temp32 = 0;
-    uint32_t *temp32ptr = 0;
+    uint16_t *temp16ptr = 0;
     uint64_t temp64 = 0;
     uint64_t *temp64ptr = 0;
     uint8_t divisor8;
     uint8_t dividend8;
-    uint32_t divisor32;
-    uint32_t dividend32;
+    uint16_t divisor32;
+    uint16_t dividend32;
     uint16_t divisor16;
     uint16_t dividend16;
-    uint32_t *rmReadPtr;
-    uint32_t rmReadValue;
-    uint32_t *rmWritePtr;
+    uint16_t *rmReadPtr;
+    uint16_t rmReadValue;
+    uint16_t *rmWritePtr;
     enum reg32 opReg;
     
     
@@ -317,7 +318,7 @@
                         if (!(rmReadPtr = [self.task.mem getPointer:modrmAddress type:MEM_READ])) {
                             return 13;
                         }
-                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                         rmWritePtr = [self.task.mem getPointer:modrmAddress type:MEM_WRITE];
                     }
                     
@@ -331,25 +332,25 @@
                 case 0x1:
                     [self readByteIncIP:&modRMByte];
                     mrm = [self decodeModRMByte:modRMByte];
-                    regPtr = [self getRegPointer:mrm.reg opSize:32];
+                    regPtr = [self getRegPointer:mrm.reg opSize:16];
                     if (mrm.type == modrm_register) {
-                        rmWritePtr = rmReadPtr = [self getRegPointer:mrm.base opSize:32];
-                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                        rmWritePtr = rmReadPtr = [self getRegPointer:mrm.base opSize:16];
+                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                     } else {
-                        addr_t modrmAddress = [self getModRMAddress:mrm opSize:32];
+                        addr_t modrmAddress = [self getModRMAddress:mrm opSize:16];
                         if (!(rmReadPtr = [self.task.mem getPointer:modrmAddress type:MEM_READ])) {
                             return 13;
                         }
-                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                         rmWritePtr = [self.task.mem getPointer:modrmAddress type:MEM_WRITE];
                     }
                     
-                    regPtr = [self getRegPointer:mrm.reg opSize:32];
+                    regPtr = [self getRegPointer:mrm.reg opSize:16];
                     
-                    self->state.cf = __builtin_add_overflow((uint32_t)rmReadValue, *(uint32_t *)regPtr, (uint32_t *)&self->state.res);
-                    self->state.of = __builtin_add_overflow((int32_t)rmReadValue, *(int32_t *)regPtr, (int32_t *)&self->state.res);
+                    self->state.cf = __builtin_add_overflow((uint16_t)rmReadValue, *(uint16_t *)regPtr, (uint16_t *)&self->state.res);
+                    self->state.of = __builtin_add_overflow((int16_t)rmReadValue, *(int16_t *)regPtr, (int16_t *)&self->state.res);
                     
-                    *(int32_t *)rmWritePtr = self->state.res;
+                    *(int16_t *)rmWritePtr = self->state.res;
                     self->state.zf_res = self->state.sf_res = self->state.pf_res = 1;
                     break;
                 case 0x2:
@@ -364,7 +365,7 @@
                         if (!(rmReadPtr = [self.task.mem getPointer:modrmAddress type:MEM_READ])) {
                             return 13;
                         }
-                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                         rmWritePtr = [self.task.mem getPointer:modrmAddress type:MEM_WRITE];
                     }
                     
@@ -378,23 +379,23 @@
                 case 0x3:
                     [self readByteIncIP:&modRMByte];
                     mrm = [self decodeModRMByte:modRMByte];
-                    regPtr = [self getRegPointer:mrm.reg opSize:32];
+                    regPtr = [self getRegPointer:mrm.reg opSize:16];
                     if (mrm.type == modrm_register) {
-                        rmReadPtr = [self getRegPointer:mrm.base opSize:32];
-                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                        rmReadPtr = [self getRegPointer:mrm.base opSize:16];
+                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                     } else {
-                        addr_t modrmAddress = [self getModRMAddress:mrm opSize:32];
+                        addr_t modrmAddress = [self getModRMAddress:mrm opSize:16];
                         if (!(rmReadPtr = [self.task.mem getPointer:modrmAddress type:MEM_READ])) {
                             return 13;
                         }
-                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                     }
                     
-                    regPtr =  [self getRegPointer:mrm.reg opSize:32];
+                    regPtr =  [self getRegPointer:mrm.reg opSize:16];
                     
-                    self->state.of = __builtin_add_overflow((int32_t)rmReadValue, *(int32_t *)regPtr, (int32_t *)&self->state.res);
-                    self->state.cf = __builtin_add_overflow((uint32_t)rmReadValue, *(uint32_t *)regPtr, (uint32_t *)&self->state.res);
-                    *(int32_t *)regPtr = self->state.res;
+                    self->state.of = __builtin_add_overflow((int16_t)rmReadValue, *(int16_t *)regPtr, (int16_t *)&self->state.res);
+                    self->state.cf = __builtin_add_overflow((uint16_t)rmReadValue, *(uint16_t *)regPtr, (uint16_t *)&self->state.res);
+                    *(int16_t *)regPtr = self->state.res;
                     self->state.zf_res = self->state.sf_res = self->state.pf_res = 1;
                     break;
                 case 0x4:
@@ -407,12 +408,12 @@
                     self->state.zf_res = self->state.sf_res = self->state.pf_res = 1;
                     break;
                 case 0x5:
-                    [self readFourBytesIncIP:&imm32];
-                    regPtr =  [self getRegPointer:reg_eax opSize:32];
+                    [self readTwoBytesIncIP:&imm16];
+                    regPtr =  [self getRegPointer:reg_eax opSize:16];
                     
-                    self->state.of = __builtin_add_overflow((int32_t)rmReadValue, (int32_t)imm32, (int32_t *)&self->state.res);
-                    self->state.cf = __builtin_add_overflow((uint32_t)rmReadValue, (uint32_t)imm32, (uint32_t *)&self->state.res);
-                    *(int32_t *)regPtr = self->state.res;
+                    self->state.of = __builtin_add_overflow((int16_t)rmReadValue, (int16_t)imm16, (int16_t *)&self->state.res);
+                    self->state.cf = __builtin_add_overflow((uint16_t)rmReadValue, (uint16_t)imm16, (uint16_t *)&self->state.res);
+                    *(int16_t *)regPtr = self->state.res;
                     self->state.zf_res = self->state.sf_res = self->state.pf_res = 1;
                     break;
             }
@@ -437,7 +438,7 @@
                         if (!(rmReadPtr = [self.task.mem getPointer:modrmAddress type:MEM_READ])) {
                             return 13;
                         }
-                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                         rmWritePtr = [self.task.mem getPointer:modrmAddress type:MEM_WRITE];
                     }
                     
@@ -451,22 +452,22 @@
                 case 0x1:
                     [self readByteIncIP:&modRMByte];
                     mrm = [self decodeModRMByte:modRMByte];
-                    regPtr = [self getRegPointer:mrm.reg opSize:32];
+                    regPtr = [self getRegPointer:mrm.reg opSize:16];
                     if (mrm.type == modrm_register) {
-                        rmWritePtr = rmReadPtr = [self getRegPointer:mrm.base opSize:32];
-                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                        rmWritePtr = rmReadPtr = [self getRegPointer:mrm.base opSize:16];
+                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                     } else {
-                        addr_t modrmAddress = [self getModRMAddress:mrm opSize:32];
+                        addr_t modrmAddress = [self getModRMAddress:mrm opSize:16];
                         if (!(rmReadPtr = [self.task.mem getPointer:modrmAddress type:MEM_READ])) {
                             return 13;
                         }
-                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                         rmWritePtr = [self.task.mem getPointer:modrmAddress type:MEM_WRITE];
                     }
                     
-                    regPtr =  [self getRegPointer:mrm.reg opSize:32];
+                    regPtr =  [self getRegPointer:mrm.reg opSize:16];
                     
-                    self->state.res = *(uint32_t *)rmWritePtr = *(uint32_t *)regPtr | (uint32_t)rmReadValue;
+                    self->state.res = *(uint16_t *)rmWritePtr = *(uint16_t *)regPtr | (uint16_t)rmReadValue;
                     
                     self->state.cf = self->state.of = self->state.af = self->state.af_ops = 0;
                     self->state.zf_res = self->state.sf_res = self->state.pf_res = 1;
@@ -483,7 +484,7 @@
                         if (!(rmReadPtr = [self.task.mem getPointer:modrmAddress type:MEM_READ])) {
                             return 13;
                         }
-                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                         rmWritePtr = [self.task.mem getPointer:modrmAddress type:MEM_WRITE];
                     }
                     
@@ -497,22 +498,22 @@
                 case 0x3:
                     [self readByteIncIP:&modRMByte];
                     mrm = [self decodeModRMByte:modRMByte];
-                    regPtr = [self getRegPointer:mrm.reg opSize:32];
+                    regPtr = [self getRegPointer:mrm.reg opSize:16];
                     if (mrm.type == modrm_register) {
-                        rmWritePtr = rmReadPtr = [self getRegPointer:mrm.base opSize:32];
-                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                        rmWritePtr = rmReadPtr = [self getRegPointer:mrm.base opSize:16];
+                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                     } else {
-                        addr_t modrmAddress = [self getModRMAddress:mrm opSize:32];
+                        addr_t modrmAddress = [self getModRMAddress:mrm opSize:16];
                         if (!(rmReadPtr = [self.task.mem getPointer:modrmAddress type:MEM_READ])) {
                             return 13;
                         }
-                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                         rmWritePtr = [self.task.mem getPointer:modrmAddress type:MEM_WRITE];
                     }
                     
-                    regPtr =  [self getRegPointer:mrm.reg opSize:32];
+                    regPtr =  [self getRegPointer:mrm.reg opSize:16];
                     
-                    self->state.res = *(uint32_t *)regPtr = *(uint32_t *)regPtr | (uint32_t)rmReadValue;
+                    self->state.res = *(uint16_t *)regPtr = *(uint16_t *)regPtr | (uint16_t)rmReadValue;
                     
                     self->state.cf = self->state.of = self->state.af = self->state.af_ops = 0;
                     self->state.zf_res = self->state.sf_res = self->state.pf_res = 1;
@@ -526,9 +527,9 @@
                     self->state.zf_res = self->state.sf_res = self->state.pf_res = 1;
                     break;
                 case 0x5:
-                    [self readFourBytesIncIP:&imm32];
-                    regPtr =  [self getRegPointer:reg_eax opSize:32];
-                    self->state.res = *(int32_t *)regPtr = *(int32_t *)regPtr | (uint32_t)imm32;
+                    [self readTwoBytesIncIP:&imm16];
+                    regPtr =  [self getRegPointer:reg_eax opSize:16];
+                    self->state.res = *(int16_t *)regPtr = *(int16_t *)regPtr | (uint16_t)imm16;
                     
                     self->state.cf = self->state.of = self->state.af = self->state.af_ops = 0;
                     self->state.zf_res = self->state.sf_res = self->state.pf_res = 1;
@@ -557,7 +558,7 @@
                     break;
                 case 0x31:
                     /*
-                     imm64 = ({ uint32_t low, high; __asm__ volatile("rdtsc" : "=a" (high), "=d" (low)); ((uint64_t) high) << 32 | low; });
+                     imm64 = ({ uint16_t low, high; __asm__ volatile("rdtsc" : "=a" (high), "=d" (low)); ((uint64_t) high) << 32 | low; });
                      self->state.eax = imm64 & 0xffffffff;
                      self->state.edx = imm64 >> 32;
                      */
@@ -568,20 +569,20 @@
                     [self readByteIncIP:&modRMByte];
                     mrm = [self decodeModRMByte:modRMByte];
                     if (mrm.type == modrm_register) {
-                        rmWritePtr = rmReadPtr = [self getRegPointer:mrm.base opSize:32];
-                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                        rmWritePtr = rmReadPtr = [self getRegPointer:mrm.base opSize:16];
+                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                     } else {
-                        addr_t modrmAddress = [self getModRMAddress:mrm opSize:32];
+                        addr_t modrmAddress = [self getModRMAddress:mrm opSize:16];
                         if (!(rmReadPtr = [self.task.mem getPointer:modrmAddress type:MEM_READ])) {
                             return 13;
                         }
-                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                         rmWritePtr = [self.task.mem getPointer:modrmAddress type:MEM_WRITE];
                     }
                     
-                    regPtr = [self getRegPointer:mrm.reg opSize:32];
+                    regPtr = [self getRegPointer:mrm.reg opSize:16];
                     if (self->state.of) {
-                        *(uint32_t *)regPtr = (uint32_t)rmReadValue;
+                        *(uint16_t *)regPtr = (uint16_t)rmReadValue;
                     }
                     break;
                 case 0x41:
@@ -589,20 +590,20 @@
                     [self readByteIncIP:&modRMByte];
                     mrm = [self decodeModRMByte:modRMByte];
                     if (mrm.type == modrm_register) {
-                        rmWritePtr = rmReadPtr = [self getRegPointer:mrm.base opSize:32];
-                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                        rmWritePtr = rmReadPtr = [self getRegPointer:mrm.base opSize:16];
+                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                     } else {
-                        addr_t modrmAddress = [self getModRMAddress:mrm opSize:32];
+                        addr_t modrmAddress = [self getModRMAddress:mrm opSize:16];
                         if (!(rmReadPtr = [self.task.mem getPointer:modrmAddress type:MEM_READ])) {
                             return 13;
                         }
-                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                         rmWritePtr = [self.task.mem getPointer:modrmAddress type:MEM_WRITE];
                     }
                     
-                    regPtr = [self getRegPointer:mrm.reg opSize:32];
+                    regPtr = [self getRegPointer:mrm.reg opSize:16];
                     if (!self->state.of) {
-                        *(uint32_t *)regPtr = (uint32_t)rmReadValue;
+                        *(uint16_t *)regPtr = (uint16_t)rmReadValue;
                     }
                     break;
                 case 0x42:
@@ -612,20 +613,20 @@
                     [self readByteIncIP:&modRMByte];
                     mrm = [self decodeModRMByte:modRMByte];
                     if (mrm.type == modrm_register) {
-                        rmWritePtr = rmReadPtr = [self getRegPointer:mrm.base opSize:32];
-                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                        rmWritePtr = rmReadPtr = [self getRegPointer:mrm.base opSize:16];
+                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                     } else {
-                        addr_t modrmAddress = [self getModRMAddress:mrm opSize:32];
+                        addr_t modrmAddress = [self getModRMAddress:mrm opSize:16];
                         if (!(rmReadPtr = [self.task.mem getPointer:modrmAddress type:MEM_READ])) {
                             return 13;
                         }
-                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                         rmWritePtr = [self.task.mem getPointer:modrmAddress type:MEM_WRITE];
                     }
                     
-                    regPtr = [self getRegPointer:mrm.reg opSize:32];
+                    regPtr = [self getRegPointer:mrm.reg opSize:16];
                     if (self->state.cf) {
-                        *(uint32_t *)regPtr = (uint32_t)rmReadValue;
+                        *(uint16_t *)regPtr = (uint16_t)rmReadValue;
                     }
                     break;
                 case 0x43:
@@ -635,20 +636,20 @@
                     [self readByteIncIP:&modRMByte];
                     mrm = [self decodeModRMByte:modRMByte];
                     if (mrm.type == modrm_register) {
-                        rmWritePtr = rmReadPtr = [self getRegPointer:mrm.base opSize:32];
-                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                        rmWritePtr = rmReadPtr = [self getRegPointer:mrm.base opSize:16];
+                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                     } else {
-                        addr_t modrmAddress = [self getModRMAddress:mrm opSize:32];
+                        addr_t modrmAddress = [self getModRMAddress:mrm opSize:16];
                         if (!(rmReadPtr = [self.task.mem getPointer:modrmAddress type:MEM_READ])) {
                             return 13;
                         }
-                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                         rmWritePtr = [self.task.mem getPointer:modrmAddress type:MEM_WRITE];
                     }
                     
-                    regPtr = [self getRegPointer:mrm.reg opSize:32];
+                    regPtr = [self getRegPointer:mrm.reg opSize:16];
                     if (!self->state.cf) {
-                        *(uint32_t *)regPtr = (uint32_t)rmReadValue;
+                        *(uint16_t *)regPtr = (uint16_t)rmReadValue;
                     }
                     break;
                 case 0x44:
@@ -657,20 +658,20 @@
                     [self readByteIncIP:&modRMByte];
                     mrm = [self decodeModRMByte:modRMByte];
                     if (mrm.type == modrm_register) {
-                        rmWritePtr = rmReadPtr = [self getRegPointer:mrm.base opSize:32];
-                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                        rmWritePtr = rmReadPtr = [self getRegPointer:mrm.base opSize:16];
+                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                     } else {
-                        addr_t modrmAddress = [self getModRMAddress:mrm opSize:32];
+                        addr_t modrmAddress = [self getModRMAddress:mrm opSize:16];
                         if (!(rmReadPtr = [self.task.mem getPointer:modrmAddress type:MEM_READ])) {
                             return 13;
                         }
-                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                         rmWritePtr = [self.task.mem getPointer:modrmAddress type:MEM_WRITE];
                     }
                     
-                    regPtr = [self getRegPointer:mrm.reg opSize:32];
+                    regPtr = [self getRegPointer:mrm.reg opSize:16];
                     if (self->state.zf_res ? (self->state.res == 0) : self->state.zf) {
-                        *(uint32_t *)regPtr = (uint32_t)rmReadValue;
+                        *(uint16_t *)regPtr = (uint16_t)rmReadValue;
                     }
                     break;
                 case 0x45:
@@ -679,20 +680,20 @@
                     [self readByteIncIP:&modRMByte];
                     mrm = [self decodeModRMByte:modRMByte];
                     if (mrm.type == modrm_register) {
-                        rmWritePtr = rmReadPtr = [self getRegPointer:mrm.base opSize:32];
-                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                        rmWritePtr = rmReadPtr = [self getRegPointer:mrm.base opSize:16];
+                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                     } else {
-                        addr_t modrmAddress = [self getModRMAddress:mrm opSize:32];
+                        addr_t modrmAddress = [self getModRMAddress:mrm opSize:16];
                         if (!(rmReadPtr = [self.task.mem getPointer:modrmAddress type:MEM_READ])) {
                             return 13;
                         }
-                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                         rmWritePtr = [self.task.mem getPointer:modrmAddress type:MEM_WRITE];
                     }
                     
-                    regPtr = [self getRegPointer:mrm.reg opSize:32];
+                    regPtr = [self getRegPointer:mrm.reg opSize:16];
                     if (!(self->state.zf_res ? (self->state.res == 0) : self->state.zf)) {
-                        *(uint32_t *)regPtr = (uint32_t)rmReadValue;
+                        *(uint16_t *)regPtr = (uint16_t)rmReadValue;
                     }
                     break;
                 case 0x46:
@@ -701,20 +702,20 @@
                     [self readByteIncIP:&modRMByte];
                     mrm = [self decodeModRMByte:modRMByte];
                     if (mrm.type == modrm_register) {
-                        rmWritePtr = rmReadPtr = [self getRegPointer:mrm.base opSize:32];
-                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                        rmWritePtr = rmReadPtr = [self getRegPointer:mrm.base opSize:16];
+                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                     } else {
-                        addr_t modrmAddress = [self getModRMAddress:mrm opSize:32];
+                        addr_t modrmAddress = [self getModRMAddress:mrm opSize:16];
                         if (!(rmReadPtr = [self.task.mem getPointer:modrmAddress type:MEM_READ])) {
                             return 13;
                         }
-                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                         rmWritePtr = [self.task.mem getPointer:modrmAddress type:MEM_WRITE];
                     }
                     
-                    regPtr = [self getRegPointer:mrm.reg opSize:32];
+                    regPtr = [self getRegPointer:mrm.reg opSize:16];
                     if (self->state.cf | (self->state.zf_res ? (self->state.res == 0) : self->state.zf)) {
-                        *(uint32_t *)regPtr = (uint32_t)rmReadValue;
+                        *(uint16_t *)regPtr = (uint16_t)rmReadValue;
                     }
                     break;
                 case 0x47:
@@ -723,20 +724,20 @@
                     [self readByteIncIP:&modRMByte];
                     mrm = [self decodeModRMByte:modRMByte];
                     if (mrm.type == modrm_register) {
-                        rmWritePtr = rmReadPtr = [self getRegPointer:mrm.base opSize:32];
-                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                        rmWritePtr = rmReadPtr = [self getRegPointer:mrm.base opSize:16];
+                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                     } else {
-                        addr_t modrmAddress = [self getModRMAddress:mrm opSize:32];
+                        addr_t modrmAddress = [self getModRMAddress:mrm opSize:16];
                         if (!(rmReadPtr = [self.task.mem getPointer:modrmAddress type:MEM_READ])) {
                             return 13;
                         }
-                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                         rmWritePtr = [self.task.mem getPointer:modrmAddress type:MEM_WRITE];
                     }
                     
-                    regPtr = [self getRegPointer:mrm.reg opSize:32];
+                    regPtr = [self getRegPointer:mrm.reg opSize:16];
                     if (!(self->state.cf | (self->state.zf_res ? (self->state.res == 0) : self->state.zf))) {
-                        *(uint32_t *)regPtr = (uint32_t)rmReadValue;
+                        *(uint16_t *)regPtr = (uint16_t)rmReadValue;
                     }
                     break;
                 case 0x48:
@@ -744,20 +745,20 @@
                     [self readByteIncIP:&modRMByte];
                     mrm = [self decodeModRMByte:modRMByte];
                     if (mrm.type == modrm_register) {
-                        rmWritePtr = rmReadPtr = [self getRegPointer:mrm.base opSize:32];
-                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                        rmWritePtr = rmReadPtr = [self getRegPointer:mrm.base opSize:16];
+                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                     } else {
-                        addr_t modrmAddress = [self getModRMAddress:mrm opSize:32];
+                        addr_t modrmAddress = [self getModRMAddress:mrm opSize:16];
                         if (!(rmReadPtr = [self.task.mem getPointer:modrmAddress type:MEM_READ])) {
                             return 13;
                         }
-                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                         rmWritePtr = [self.task.mem getPointer:modrmAddress type:MEM_WRITE];
                     }
                     
-                    regPtr = [self getRegPointer:mrm.reg opSize:32];
+                    regPtr = [self getRegPointer:mrm.reg opSize:16];
                     if ((self->state.sf_res ? (self->state.res < 0) : self->state.sf)) {
-                        *(uint32_t *)regPtr = (uint32_t)rmReadValue;
+                        *(uint16_t *)regPtr = (uint16_t)rmReadValue;
                     }
                     break;
                 case 0x49:
@@ -765,20 +766,20 @@
                     [self readByteIncIP:&modRMByte];
                     mrm = [self decodeModRMByte:modRMByte];
                     if (mrm.type == modrm_register) {
-                        rmWritePtr = rmReadPtr = [self getRegPointer:mrm.base opSize:32];
-                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                        rmWritePtr = rmReadPtr = [self getRegPointer:mrm.base opSize:16];
+                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                     } else {
-                        addr_t modrmAddress = [self getModRMAddress:mrm opSize:32];
+                        addr_t modrmAddress = [self getModRMAddress:mrm opSize:16];
                         if (!(rmReadPtr = [self.task.mem getPointer:modrmAddress type:MEM_READ])) {
                             return 13;
                         }
-                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                         rmWritePtr = [self.task.mem getPointer:modrmAddress type:MEM_WRITE];
                     }
                     
-                    regPtr = [self getRegPointer:mrm.reg opSize:32];
+                    regPtr = [self getRegPointer:mrm.reg opSize:16];
                     if (!(self->state.sf_res ? (self->state.res < 0) : self->state.sf)) {
-                        *(uint32_t *)regPtr = (uint32_t)rmReadValue;
+                        *(uint16_t *)regPtr = (uint16_t)rmReadValue;
                     }
                     break;
                 case 0x4a:
@@ -787,20 +788,20 @@
                     [self readByteIncIP:&modRMByte];
                     mrm = [self decodeModRMByte:modRMByte];
                     if (mrm.type == modrm_register) {
-                        rmWritePtr = rmReadPtr = [self getRegPointer:mrm.base opSize:32];
-                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                        rmWritePtr = rmReadPtr = [self getRegPointer:mrm.base opSize:16];
+                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                     } else {
-                        addr_t modrmAddress = [self getModRMAddress:mrm opSize:32];
+                        addr_t modrmAddress = [self getModRMAddress:mrm opSize:16];
                         if (!(rmReadPtr = [self.task.mem getPointer:modrmAddress type:MEM_READ])) {
                             return 13;
                         }
-                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                         rmWritePtr = [self.task.mem getPointer:modrmAddress type:MEM_WRITE];
                     }
                     
-                    regPtr = [self getRegPointer:mrm.reg opSize:32];
+                    regPtr = [self getRegPointer:mrm.reg opSize:16];
                     if ((self->state.pf_res ? (!__builtin_parity(self->state.res & 0xff)) : self->state.pf)) {
-                        *(uint32_t *)regPtr = (uint32_t)rmReadValue;
+                        *(uint16_t *)regPtr = (uint16_t)rmReadValue;
                     }
                     break;
                 case 0x4b:
@@ -809,20 +810,20 @@
                     [self readByteIncIP:&modRMByte];
                     mrm = [self decodeModRMByte:modRMByte];
                     if (mrm.type == modrm_register) {
-                        rmWritePtr = rmReadPtr = [self getRegPointer:mrm.base opSize:32];
-                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                        rmWritePtr = rmReadPtr = [self getRegPointer:mrm.base opSize:16];
+                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                     } else {
-                        addr_t modrmAddress = [self getModRMAddress:mrm opSize:32];
+                        addr_t modrmAddress = [self getModRMAddress:mrm opSize:16];
                         if (!(rmReadPtr = [self.task.mem getPointer:modrmAddress type:MEM_READ])) {
                             return 13;
                         }
-                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                         rmWritePtr = [self.task.mem getPointer:modrmAddress type:MEM_WRITE];
                     }
                     
-                    regPtr = [self getRegPointer:mrm.reg opSize:32];
+                    regPtr = [self getRegPointer:mrm.reg opSize:16];
                     if (!(self->state.pf_res ? (!__builtin_parity(self->state.res & 0xff)) : self->state.pf)) {
-                        *(uint32_t *)regPtr = (uint32_t)rmReadValue;
+                        *(uint16_t *)regPtr = (uint16_t)rmReadValue;
                     }
                     break;
                 case 0x4c:
@@ -831,20 +832,20 @@
                     [self readByteIncIP:&modRMByte];
                     mrm = [self decodeModRMByte:modRMByte];
                     if (mrm.type == modrm_register) {
-                        rmWritePtr = rmReadPtr = [self getRegPointer:mrm.base opSize:32];
-                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                        rmWritePtr = rmReadPtr = [self getRegPointer:mrm.base opSize:16];
+                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                     } else {
-                        addr_t modrmAddress = [self getModRMAddress:mrm opSize:32];
+                        addr_t modrmAddress = [self getModRMAddress:mrm opSize:16];
                         if (!(rmReadPtr = [self.task.mem getPointer:modrmAddress type:MEM_READ])) {
                             return 13;
                         }
-                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                         rmWritePtr = [self.task.mem getPointer:modrmAddress type:MEM_WRITE];
                     }
                     
-                    regPtr = [self getRegPointer:mrm.reg opSize:32];
-                    if (((self->state.sf_res ? (int32_t)self->state.res < 0 : self->state.sf) ^ (self->state.of))) {
-                        *(uint32_t *)regPtr = (uint32_t)rmReadValue;
+                    regPtr = [self getRegPointer:mrm.reg opSize:16];
+                    if (((self->state.sf_res ? (int16_t)self->state.res < 0 : self->state.sf) ^ (self->state.of))) {
+                        *(uint16_t *)regPtr = (uint16_t)rmReadValue;
                     }
                     break;
                 case 0x4d:
@@ -853,20 +854,20 @@
                     [self readByteIncIP:&modRMByte];
                     mrm = [self decodeModRMByte:modRMByte];
                     if (mrm.type == modrm_register) {
-                        rmWritePtr = rmReadPtr = [self getRegPointer:mrm.base opSize:32];
-                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                        rmWritePtr = rmReadPtr = [self getRegPointer:mrm.base opSize:16];
+                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                     } else {
-                        addr_t modrmAddress = [self getModRMAddress:mrm opSize:32];
+                        addr_t modrmAddress = [self getModRMAddress:mrm opSize:16];
                         if (!(rmReadPtr = [self.task.mem getPointer:modrmAddress type:MEM_READ])) {
                             return 13;
                         }
-                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                         rmWritePtr = [self.task.mem getPointer:modrmAddress type:MEM_WRITE];
                     }
                     
-                    regPtr = [self getRegPointer:mrm.reg opSize:32];
-                    if (!((self->state.sf_res ? (int32_t)self->state.res < 0 : self->state.sf) ^ (self->state.of))) {
-                        *(uint32_t *)regPtr = (uint32_t)rmReadValue;
+                    regPtr = [self getRegPointer:mrm.reg opSize:16];
+                    if (!((self->state.sf_res ? (int16_t)self->state.res < 0 : self->state.sf) ^ (self->state.of))) {
+                        *(uint16_t *)regPtr = (uint16_t)rmReadValue;
                     }
                     break;
                 case 0x4e:
@@ -875,20 +876,20 @@
                     [self readByteIncIP:&modRMByte];
                     mrm = [self decodeModRMByte:modRMByte];
                     if (mrm.type == modrm_register) {
-                        rmWritePtr = rmReadPtr = [self getRegPointer:mrm.base opSize:32];
-                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                        rmWritePtr = rmReadPtr = [self getRegPointer:mrm.base opSize:16];
+                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                     } else {
-                        addr_t modrmAddress = [self getModRMAddress:mrm opSize:32];
+                        addr_t modrmAddress = [self getModRMAddress:mrm opSize:16];
                         if (!(rmReadPtr = [self.task.mem getPointer:modrmAddress type:MEM_READ])) {
                             return 13;
                         }
-                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                         rmWritePtr = [self.task.mem getPointer:modrmAddress type:MEM_WRITE];
                     }
                     
-                    regPtr = [self getRegPointer:mrm.reg opSize:32];
-                    if ((((self->state.sf_res ? (int32_t)self->state.res < 0 : self->state.sf) ^ (self->state.of)) | (self->state.zf_res ? self->state.res == 0 : self->state.zf))) {
-                        *(uint32_t *)regPtr = (uint32_t)rmReadValue;
+                    regPtr = [self getRegPointer:mrm.reg opSize:16];
+                    if ((((self->state.sf_res ? (int16_t)self->state.res < 0 : self->state.sf) ^ (self->state.of)) | (self->state.zf_res ? self->state.res == 0 : self->state.zf))) {
+                        *(uint16_t *)regPtr = (uint16_t)rmReadValue;
                     }
                     break;
                 case 0x4f:
@@ -897,20 +898,20 @@
                     [self readByteIncIP:&modRMByte];
                     mrm = [self decodeModRMByte:modRMByte];
                     if (mrm.type == modrm_register) {
-                        rmWritePtr = rmReadPtr = [self getRegPointer:mrm.base opSize:32];
-                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                        rmWritePtr = rmReadPtr = [self getRegPointer:mrm.base opSize:16];
+                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                     } else {
-                        addr_t modrmAddress = [self getModRMAddress:mrm opSize:32];
+                        addr_t modrmAddress = [self getModRMAddress:mrm opSize:16];
                         if (!(rmReadPtr = [self.task.mem getPointer:modrmAddress type:MEM_READ])) {
                             return 13;
                         }
-                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                         rmWritePtr = [self.task.mem getPointer:modrmAddress type:MEM_WRITE];
                     }
                     
-                    regPtr = [self getRegPointer:mrm.reg opSize:32];
-                    if (!(((self->state.sf_res ? (int32_t)self->state.res < 0 : self->state.sf) ^ (self->state.of)) | (self->state.zf_res ? self->state.res == 0 : self->state.zf))) {
-                        *(uint32_t *)regPtr = (uint32_t)rmReadValue;
+                    regPtr = [self getRegPointer:mrm.reg opSize:16];
+                    if (!(((self->state.sf_res ? (int16_t)self->state.res < 0 : self->state.sf) ^ (self->state.of)) | (self->state.zf_res ? self->state.res == 0 : self->state.zf))) {
+                        *(uint16_t *)regPtr = (uint16_t)rmReadValue;
                     }
                     break;
                 case 0x57:
@@ -931,14 +932,14 @@
                     [self readByteIncIP:&modRMByte];
                     mrm = [self decodeModRMByte:modRMByte];
                     if (mrm.type == modrm_register) {
-                        rmWritePtr = rmReadPtr = [self getRegPointer:mrm.base opSize:32];
-                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                        rmWritePtr = rmReadPtr = [self getRegPointer:mrm.base opSize:16];
+                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                     } else {
-                        addr_t modrmAddress = [self getModRMAddress:mrm opSize:32];
+                        addr_t modrmAddress = [self getModRMAddress:mrm opSize:16];
                         if (!(rmReadPtr = [self.task.mem getPointer:modrmAddress type:MEM_READ])) {
                             return 13;
                         }
-                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                         rmWritePtr = [self.task.mem getPointer:modrmAddress type:MEM_WRITE];
                     }
                     switch(mrm.opcode) {
@@ -966,144 +967,144 @@
                     break;
                 case 0x80:
                     // JO    rel16/32                    o.......                    Jump near if overflow (OF=1)
-                    [self readFourBytesIncIP:&imm32];
+                    [self readTwoBytesIncIP:&imm16];
                     
                     if (self->state.of) {
-                        self->state.eip += imm32;
+                        self->state.eip += imm16;
                     }
                     break;
                 case 0x81:
                     // JNO    rel16/32                    o.......                    Jump near if not overflow (OF=0)
-                    [self readFourBytesIncIP:&imm32];
+                    [self readTwoBytesIncIP:&imm16];
                     
                     if (!self->state.of) {
-                        self->state.eip += imm32;
+                        self->state.eip += imm16;
                     }
                     break;
                 case 0x82:
                     // JB    rel16/32                    .......c                    Jump near if below/not above or equal/carry (CF=1)
                     // JNAE    rel16/32
                     // JC    rel16/32
-                    [self readFourBytesIncIP:&imm32];
+                    [self readTwoBytesIncIP:&imm16];
                     
                     if (self->state.cf) {
-                        self->state.eip += imm32;
+                        self->state.eip += imm16;
                     }
                     break;
                 case 0x83:
                     // JNB    rel16/32                    .......c                    Jump near if not below/above or equal/not carry (CF=0)
                     // JAE    rel16/32
                     // JNC    rel16/32
-                    [self readFourBytesIncIP:&imm32];
+                    [self readTwoBytesIncIP:&imm16];
                     
                     if (!self->state.cf) {
-                        self->state.eip += imm32;
+                        self->state.eip += imm16;
                     }
                     break;
                 case 0x84:
                     // JZ    rel16/32                    ....z...                    Jump near if zero/equal (ZF=1)
                     // JE    rel16/32
-                    [self readFourBytesIncIP:&imm32];
+                    [self readTwoBytesIncIP:&imm16];
                     
                     if ((self->state.zf_res ? self->state.res == 0 : self->state.zf)) {
-                        self->state.eip += imm32;
+                        self->state.eip += imm16;
                     }
                     break;
                 case 0x85:
                     // JNZ    rel16/32                    ....z...                    Jump near if not zero/not equal (ZF=0)
                     // JNE    rel16/32
-                    [self readFourBytesIncIP:&imm32];
+                    [self readTwoBytesIncIP:&imm16];
                     
                     if (!(self->state.zf_res ? self->state.res == 0 : self->state.zf)) {
-                        self->state.eip += imm32;
+                        self->state.eip += imm16;
                     }
                     break;
                 case 0x86:
                     // JBE    rel16/32                    ....z..c                    Jump near if below or equal/not above (CF=1 OR ZF=1)
                     // JNA    rel16/32
-                    [self readFourBytesIncIP:&imm32];
+                    [self readTwoBytesIncIP:&imm16];
                     
                     if (self->state.cf | (self->state.zf_res ? self->state.res == 0 : self->state.zf)) {
-                        self->state.eip += imm32;
+                        self->state.eip += imm16;
                     }
                     break;
                 case 0x87:
                     // JNBE    rel16/32                    ....z..c                    Jump near if not below or equal/above (CF=0 AND ZF=0)
                     // JA    rel16/32
-                    [self readFourBytesIncIP:&imm32];
+                    [self readTwoBytesIncIP:&imm16];
                     
                     if (!(self->state.cf | (self->state.zf_res ? self->state.res == 0 : self->state.zf))) {
-                        self->state.eip += imm32;
+                        self->state.eip += imm16;
                     }
                     break;
                 case 0x88:
                     // JS    rel16/32                    ...s....                    Jump near if sign (SF=1)
-                    [self readFourBytesIncIP:&imm32];
+                    [self readTwoBytesIncIP:&imm16];
                     
-                    if (self->state.sf_res ? (int32_t)self->state.res < 0 : self->state.sf) {
-                        self->state.eip += imm32;
+                    if (self->state.sf_res ? (int16_t)self->state.res < 0 : self->state.sf) {
+                        self->state.eip += imm16;
                     }
                     break;
                 case 0x89:
                     // JNS    rel16/32                    ...s....                    Jump near if not sign (SF=0)
-                    [self readFourBytesIncIP:&imm32];
+                    [self readTwoBytesIncIP:&imm16];
                     
-                    if (!(self->state.sf_res ? (int32_t)self->state.res < 0 : self->state.sf)) {
-                        self->state.eip += imm32;
+                    if (!(self->state.sf_res ? (int16_t)self->state.res < 0 : self->state.sf)) {
+                        self->state.eip += imm16;
                     }
                     break;
                 case 0x8a:
                     // JP    rel16/32                    ......p.                    Jump near if parity/parity even (PF=1)
                     // JPE    rel16/32
-                    [self readFourBytesIncIP:&imm32];
+                    [self readTwoBytesIncIP:&imm16];
                     
                     if ((self->state.pf_res ? !__builtin_parity(self->state.res & 0xff): self->state.pf)) {
-                        self->state.eip += imm32;
+                        self->state.eip += imm16;
                     }
                     break;
                 case 0x8b:
                     // JNP    rel16/32                    ......p.                    Jump near if not parity/parity odd (PF=0)
                     // JPO    rel16/32
-                    [self readFourBytesIncIP:&imm32];
+                    [self readTwoBytesIncIP:&imm16];
                     
                     if (!(self->state.pf_res ? !__builtin_parity(self->state.res & 0xff): self->state.pf)) {
-                        self->state.eip += imm32;
+                        self->state.eip += imm16;
                     }
                     break;
                 case 0x8c:
                     // JL    rel16/32                    o..s....                    Jump near if less/not greater (SF!=OF)
                     // JNGE    rel16/32
-                    [self readFourBytesIncIP:&imm32];
+                    [self readTwoBytesIncIP:&imm16];
                     
-                    if ((self->state.sf_res ? (int32_t)self->state.res < 0 : self->state.sf) ^ self->state.of) {
-                        self->state.eip += imm32;
+                    if ((self->state.sf_res ? (int16_t)self->state.res < 0 : self->state.sf) ^ self->state.of) {
+                        self->state.eip += imm16;
                     }
                     break;
                 case 0x8d:
                     // JNL    rel16/32                    o..s....                    Jump near if not less/greater or equal (SF=OF)
                     // JGE    rel16/32
-                    [self readFourBytesIncIP:&imm32];
+                    [self readTwoBytesIncIP:&imm16];
                     
-                    if (!(self->state.sf_res ? (int32_t)self->state.res < 0 : self->state.sf) ^ self->state.of) {
-                        self->state.eip += imm32;
+                    if (!(self->state.sf_res ? (int16_t)self->state.res < 0 : self->state.sf) ^ self->state.of) {
+                        self->state.eip += imm16;
                     }
                     break;
                 case 0x8e:
                     // JLE    rel16/32                    o..sz...                    Jump near if less or equal/not greater ((ZF=1) OR (SF!=OF))
                     // JNG    rel16/32
-                    [self readFourBytesIncIP:&imm32];
+                    [self readTwoBytesIncIP:&imm16];
                     
                     if ((self->state.zf_res ? self->state.res == 0 : self->state.zf) | (self->state.zf_res ? self->state.res == 0 : self->state.zf)) {
-                        self->state.eip += imm32;
+                        self->state.eip += imm16;
                     }
                     break;
                 case 0x8f:
                     // JNLE    rel16/32                    o..sz...                    Jump near if not less nor equal/greater ((ZF=0) AND (SF=OF))
                     // 2JG    rel16/32
-                    [self readFourBytesIncIP:&imm32];
+                    [self readTwoBytesIncIP:&imm16];
                     
                     if (!((self->state.zf_res ? self->state.res == 0 : self->state.zf) | (self->state.zf_res ? self->state.res == 0 : self->state.zf))) {
-                        self->state.eip += imm32;
+                        self->state.eip += imm16;
                     }
                     break;
                 case 0x90:
@@ -1417,45 +1418,45 @@
                     [self readByteIncIP:&modRMByte];
                     mrm = [self decodeModRMByte:modRMByte];
                     if (mrm.type == modrm_register) {
-                        rmReadPtr = [self getRegPointer:mrm.base opSize:32];
-                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                        rmReadPtr = [self getRegPointer:mrm.base opSize:16];
+                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                     } else {
-                        addr_t modrmAddress = [self getModRMAddress:mrm opSize:32];
+                        addr_t modrmAddress = [self getModRMAddress:mrm opSize:16];
                         // The register contains a byte offset added to the address
-                        if (!(rmReadPtr = [self.task.mem getPointer:(modrmAddress + ([self getRegisterValue:mrm.reg opSize:32] / 8)) type:MEM_READ])) {
+                        if (!(rmReadPtr = [self.task.mem getPointer:(modrmAddress + ([self getRegisterValue:mrm.reg opSize:16] / 8)) type:MEM_READ])) {
                             return 13;
                         }
-                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                     }
                     
-                    regPtr = [self getRegPointer:mrm.reg opSize:32];
+                    regPtr = [self getRegPointer:mrm.reg opSize:16];
                     
-                    self->state.cf = (rmReadValue & (1 << *(uint32_t *)regPtr % 32)) ? 1 : 0;
+                    self->state.cf = (rmReadValue & (1 << *(uint16_t *)regPtr % 16)) ? 1 : 0;
                     break;
                 case 0xa4:
                     // SHLD    r/m16/32    r16/32    imm8                o..szapc    o..sz.pc    o....a.c        Double Precision Shift Left
                     [self readByteIncIP:&modRMByte];
                     mrm = [self decodeModRMByte:modRMByte];
                     if (mrm.type == modrm_register) {
-                        rmWritePtr = rmReadPtr = [self getRegPointer:mrm.base opSize:32];
-                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                        rmWritePtr = rmReadPtr = [self getRegPointer:mrm.base opSize:16];
+                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                     } else {
-                        addr_t modrmAddress = [self getModRMAddress:mrm opSize:32];
+                        addr_t modrmAddress = [self getModRMAddress:mrm opSize:16];
                         if (!(rmReadPtr = [self.task.mem getPointer:modrmAddress type:MEM_READ])) {
                             return 13;
                         }
-                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                         rmWritePtr = [self.task.mem getPointer:modrmAddress type:MEM_WRITE];
                     }
                     
                     [self readByteIncIP:&imm8];
                     
-                    regPtr = [self getRegPointer:mrm.reg opSize:32];
+                    regPtr = [self getRegPointer:mrm.reg opSize:16];
                     
-                    // temp8 = (uint8_t)imm8 % 32;
-                    if ((uint8_t)imm8 % 32 != 0) {
-                        self->state.res = rmReadValue << ((uint8_t)imm8 % 32) | *(uint32_t *)regPtr >> (32 - ((uint8_t)imm8 % 32));
-                        *(uint32_t *)rmWritePtr = self->state.res;
+                    // temp8 = (uint8_t)imm8 % 16;
+                    if ((uint8_t)imm8 % 16 != 0) {
+                        self->state.res = rmReadValue << ((uint8_t)imm8 % 16) | *(uint16_t *)regPtr >> (16 - ((uint8_t)imm8 % 16));
+                        *(uint16_t *)rmWritePtr = self->state.res;
                         
                         self->state.zf_res = self->state.sf_res = self->state.pf_res = 1;
                     }
@@ -1465,22 +1466,22 @@
                     [self readByteIncIP:&modRMByte];
                     mrm = [self decodeModRMByte:modRMByte];
                     if (mrm.type == modrm_register) {
-                        rmWritePtr = rmReadPtr = [self getRegPointer:mrm.base opSize:32];
-                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                        rmWritePtr = rmReadPtr = [self getRegPointer:mrm.base opSize:16];
+                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                     } else {
-                        addr_t modrmAddress = [self getModRMAddress:mrm opSize:32];
+                        addr_t modrmAddress = [self getModRMAddress:mrm opSize:16];
                         if (!(rmReadPtr = [self.task.mem getPointer:modrmAddress type:MEM_READ])) {
                             return 13;
                         }
-                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                         rmWritePtr = [self.task.mem getPointer:modrmAddress type:MEM_WRITE];
                     }
                     
-                    regPtr = [self getRegPointer:mrm.reg opSize:32];
+                    regPtr = [self getRegPointer:mrm.reg opSize:16];
                     
-                    if ((uint8_t)self->state.cl % 32 != 0) {
-                        self->state.res = rmReadValue << ((uint8_t)self->state.cl % 32) | *(uint32_t *)regPtr >> (32 - ((uint8_t)self->state.cl % 32));
-                        *(uint32_t *)rmWritePtr = self->state.res;
+                    if ((uint8_t)self->state.cl % 16 != 0) {
+                        self->state.res = rmReadValue << ((uint8_t)self->state.cl % 16) | *(uint16_t *)regPtr >> (16 - ((uint8_t)self->state.cl % 16));
+                        *(uint16_t *)rmWritePtr = self->state.res;
                         
                         self->state.zf_res = self->state.sf_res = self->state.pf_res = 1;
                     }
@@ -1490,47 +1491,47 @@
                     [self readByteIncIP:&modRMByte];
                     mrm = [self decodeModRMByte:modRMByte];
                     if (mrm.type == modrm_register) {
-                        rmWritePtr = rmReadPtr = [self getRegPointer:mrm.base opSize:32];
-                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                        rmWritePtr = rmReadPtr = [self getRegPointer:mrm.base opSize:16];
+                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                     } else {
-                        addr_t modrmAddress = [self getModRMAddress:mrm opSize:32];
+                        addr_t modrmAddress = [self getModRMAddress:mrm opSize:16];
                         // The register contains a byte offset added to the address
-                        if (!(rmReadPtr = [self.task.mem getPointer:(modrmAddress + ([self getRegisterValue:mrm.reg opSize:32] / 8)) type:MEM_READ])) {
+                        if (!(rmReadPtr = [self.task.mem getPointer:(modrmAddress + ([self getRegisterValue:mrm.reg opSize:16] / 8)) type:MEM_READ])) {
                             return 13;
                         }
-                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                         rmWritePtr = [self.task.mem getPointer:modrmAddress type:MEM_WRITE];
                     }
                     
-                    regPtr = [self getRegPointer:mrm.reg opSize:32];
+                    regPtr = [self getRegPointer:mrm.reg opSize:16];
                     
-                    self->state.cf = *regPtr & (1 << rmReadValue % 32);
-                    *(uint32_t *)rmWritePtr = rmReadValue | (1 << *(uint32_t *)regPtr % 32);
+                    self->state.cf = *regPtr & (1 << rmReadValue % 16);
+                    *(uint16_t *)rmWritePtr = rmReadValue | (1 << *(uint16_t *)regPtr % 16);
                     break;
                 case 0xac:
                     // SHRD    r/m16/32    r16/32    imm8                o..szapc    o..sz.pc    o....a.c        Double Precision Shift Right
                     [self readByteIncIP:&modRMByte];
                     mrm = [self decodeModRMByte:modRMByte];
                     if (mrm.type == modrm_register) {
-                        rmWritePtr = rmReadPtr = [self getRegPointer:mrm.base opSize:32];
-                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                        rmWritePtr = rmReadPtr = [self getRegPointer:mrm.base opSize:16];
+                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                     } else {
-                        addr_t modrmAddress = [self getModRMAddress:mrm opSize:32];
+                        addr_t modrmAddress = [self getModRMAddress:mrm opSize:16];
                         if (!(rmReadPtr = [self.task.mem getPointer:modrmAddress type:MEM_READ])) {
                             return 13;
                         }
-                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                         rmWritePtr = [self.task.mem getPointer:modrmAddress type:MEM_WRITE];
                     }
                     
                     [self readByteIncIP:&imm8];
                     
-                    regPtr = [self getRegPointer:mrm.reg opSize:32];
+                    regPtr = [self getRegPointer:mrm.reg opSize:16];
                     
-                    // temp8 = (uint8_t)imm8 % 32;
-                    if ((uint8_t)imm8 % 32 != 0) {
-                        self->state.res = rmReadValue >> ((uint8_t)imm8 % 32) | *(uint32_t *)regPtr << (32 - ((uint8_t)imm8 % 32));
-                        *(uint32_t *)rmWritePtr = self->state.res;
+                    // temp8 = (uint8_t)imm8 % 16;
+                    if ((uint8_t)imm8 % 16 != 0) {
+                        self->state.res = rmReadValue >> ((uint8_t)imm8 % 16) | *(uint16_t *)regPtr << (16 - ((uint8_t)imm8 % 16));
+                        *(uint16_t *)rmWritePtr = self->state.res;
                         
                         self->state.zf_res = self->state.sf_res = self->state.pf_res = 1;
                     }
@@ -1540,22 +1541,22 @@
                     [self readByteIncIP:&modRMByte];
                     mrm = [self decodeModRMByte:modRMByte];
                     if (mrm.type == modrm_register) {
-                        rmWritePtr = rmReadPtr = [self getRegPointer:mrm.base opSize:32];
-                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                        rmWritePtr = rmReadPtr = [self getRegPointer:mrm.base opSize:16];
+                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                     } else {
-                        addr_t modrmAddress = [self getModRMAddress:mrm opSize:32];
+                        addr_t modrmAddress = [self getModRMAddress:mrm opSize:16];
                         if (!(rmReadPtr = [self.task.mem getPointer:modrmAddress type:MEM_READ])) {
                             return 13;
                         }
-                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                         rmWritePtr = [self.task.mem getPointer:modrmAddress type:MEM_WRITE];
                     }
                     
-                    regPtr = [self getRegPointer:mrm.reg opSize:32];
+                    regPtr = [self getRegPointer:mrm.reg opSize:16];
                     
-                    if ((uint8_t)self->state.cl % 32 != 0) {
-                        self->state.res = rmReadValue >> ((uint8_t)self->state.cl % 32) | *(uint32_t *)regPtr << (32 - ((uint8_t)self->state.cl % 32));
-                        *(uint32_t *)rmWritePtr = self->state.res;
+                    if ((uint8_t)self->state.cl % 16 != 0) {
+                        self->state.res = rmReadValue >> ((uint8_t)self->state.cl % 16) | *(uint16_t *)regPtr << (16 - ((uint8_t)self->state.cl % 16));
+                        *(uint16_t *)rmWritePtr = self->state.res;
                         
                         self->state.zf_res = self->state.sf_res = self->state.pf_res = 1;
                     }
@@ -1565,21 +1566,21 @@
                     [self readByteIncIP:&modRMByte];
                     mrm = [self decodeModRMByte:modRMByte];
                     if (mrm.type == modrm_register) {
-                        rmWritePtr = rmReadPtr = [self getRegPointer:mrm.base opSize:32];
-                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                        rmWritePtr = rmReadPtr = [self getRegPointer:mrm.base opSize:16];
+                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                     } else {
-                        addr_t modrmAddress = [self getModRMAddress:mrm opSize:32];
+                        addr_t modrmAddress = [self getModRMAddress:mrm opSize:16];
                         if (!(rmReadPtr = [self.task.mem getPointer:modrmAddress type:MEM_READ])) {
                             return 13;
                         }
-                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                         rmWritePtr = [self.task.mem getPointer:modrmAddress type:MEM_WRITE];
                     }
                     
-                    regPtr = [self getRegPointer:mrm.reg opSize:32];
+                    regPtr = [self getRegPointer:mrm.reg opSize:16];
                     
-                    self->state.cf = self->state.of = __builtin_mul_overflow(*(int32_t *)regPtr, (int32_t)rmReadValue, (int32_t *)&self->state.res);
-                    *(uint32_t *)regPtr = self->state.res;
+                    self->state.cf = self->state.of = __builtin_mul_overflow(*(int16_t *)regPtr, (int16_t)rmReadValue, (int16_t *)&self->state.res);
+                    *(uint16_t *)regPtr = self->state.res;
                     self->state.zf_res = self->state.sf_res = self->state.pf_res = 1;
                     break;
                 case 0xb0:
@@ -1614,26 +1615,26 @@
                     [self readByteIncIP:&modRMByte];
                     mrm = [self decodeModRMByte:modRMByte];
                     if (mrm.type == modrm_register) {
-                        rmWritePtr = rmReadPtr = [self getRegPointer:mrm.base opSize:32];
-                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                        rmWritePtr = rmReadPtr = [self getRegPointer:mrm.base opSize:16];
+                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                     } else {
-                        addr_t modrmAddress = [self getModRMAddress:mrm opSize:32];
+                        addr_t modrmAddress = [self getModRMAddress:mrm opSize:16];
                         if (!(rmReadPtr = [self.task.mem getPointer:modrmAddress type:MEM_READ])) {
                             return 13;
                         }
-                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                         rmWritePtr = [self.task.mem getPointer:modrmAddress type:MEM_WRITE];
                     }
                     
-                    self->state.cf = __builtin_sub_overflow((uint32_t)rmReadValue, (uint32_t)self->state.eax, (uint32_t *) &self->state.res);
-                    self->state.of = __builtin_sub_overflow((uint32_t)rmReadValue,  (int32_t)self->state.eax,  (int32_t *) &self->state.res);
+                    self->state.cf = __builtin_sub_overflow((uint16_t)rmReadValue, (uint16_t)self->state.eax, (uint16_t *) &self->state.res);
+                    self->state.of = __builtin_sub_overflow((uint16_t)rmReadValue,  (int16_t)self->state.eax,  (int16_t *) &self->state.res);
                     self->state.zf_res = self->state.sf_res = self->state.pf_res = 1;
                     
                     if (self->state.res == 0) {
-                        regPtr = [self getRegPointer:mrm.reg opSize:32];
-                        *(uint32_t *)rmWritePtr = *(uint32_t *)regPtr;
+                        regPtr = [self getRegPointer:mrm.reg opSize:16];
+                        *(uint16_t *)rmWritePtr = *(uint16_t *)regPtr;
                     } else {
-                        *(uint32_t *)&self->state.eax = (uint32_t)rmReadValue;
+                        *(uint16_t *)&self->state.eax = (uint16_t)rmReadValue;
                     }
                     break;
                 case 0xb3:
@@ -1641,22 +1642,22 @@
                     [self readByteIncIP:&modRMByte];
                     mrm = [self decodeModRMByte:modRMByte];
                     if (mrm.type == modrm_register) {
-                        rmWritePtr = rmReadPtr = [self getRegPointer:mrm.base opSize:32];
-                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                        rmWritePtr = rmReadPtr = [self getRegPointer:mrm.base opSize:16];
+                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                     } else {
-                        addr_t modrmAddress = [self getModRMAddress:mrm opSize:32];
+                        addr_t modrmAddress = [self getModRMAddress:mrm opSize:16];
                         // The register contains a byte offset added to the address
-                        if (!(rmReadPtr = [self.task.mem getPointer:(modrmAddress + ([self getRegisterValue:mrm.reg opSize:32] / 8)) type:MEM_READ])) {
+                        if (!(rmReadPtr = [self.task.mem getPointer:(modrmAddress + ([self getRegisterValue:mrm.reg opSize:16] / 8)) type:MEM_READ])) {
                             return 13;
                         }
-                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                         rmWritePtr = [self.task.mem getPointer:modrmAddress type:MEM_WRITE];
                     }
                     
-                    regPtr = [self getRegPointer:mrm.reg opSize:32];
+                    regPtr = [self getRegPointer:mrm.reg opSize:16];
                     
-                    self->state.cf = *regPtr & ~(1 << rmReadValue % 32);
-                    *(uint32_t *)rmWritePtr = rmReadValue | (1 << *(uint32_t *)regPtr % 32);
+                    self->state.cf = *regPtr & ~(1 << rmReadValue % 16);
+                    *(uint16_t *)rmWritePtr = rmReadValue | (1 << *(uint16_t *)regPtr % 16);
                     break;
                 case 0xb6:
                     // MOVZX    r16/32    r/m8                                    Move with Zero-Extend
@@ -1673,8 +1674,8 @@
                         memcpy(&rmReadValue, rmReadPtr, sizeof(uint8_t));
                     }
                     
-                    regPtr = [self getRegPointer:mrm.reg opSize:32];
-                    *(uint32_t *)regPtr = (uint8_t)rmReadValue;
+                    regPtr = [self getRegPointer:mrm.reg opSize:16];
+                    *(uint16_t *)regPtr = (uint8_t)rmReadValue;
                     break;
                 case 0xb7:
                     // http://ref.x86asm.net/coder32.html#x0FB7
@@ -1692,8 +1693,8 @@
                         memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                     }
                     
-                    regPtr = [self getRegPointer:mrm.reg opSize:32];
-                    *(uint32_t *)regPtr = (uint16_t)rmReadValue; // might want to ditch this cast this is supposed to be a move of 16bit into a 32 bit reg with 0 extend
+                    regPtr = [self getRegPointer:mrm.reg opSize:16];
+                    *(uint16_t *)regPtr = (uint16_t)rmReadValue; // might want to ditch this cast this is supposed to be a move of 16bit into a 32 bit reg with 0 extend
                     break;
                 case 0xba:
                     // BT     r/m16/32    imm8                      o..szapc    .......c    o..szap.        Bit Test
@@ -1705,33 +1706,33 @@
                     
                     mrm = [self decodeModRMByte:modRMByte];
                     if (mrm.type == modrm_register) {
-                        rmWritePtr = rmReadPtr = [self getRegPointer:mrm.base opSize:32];
-                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                        rmWritePtr = rmReadPtr = [self getRegPointer:mrm.base opSize:16];
+                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                     } else {
-                        addr_t modrmAddress = [self getModRMAddress:mrm opSize:32];
+                        addr_t modrmAddress = [self getModRMAddress:mrm opSize:16];
                         // The register contains a byte offset added to the address
                         if (!(rmReadPtr = [self.task.mem getPointer:(modrmAddress + (imm8 / 8)) type:MEM_READ])) {
                             return 13;
                         }
-                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                         rmWritePtr = [self.task.mem getPointer:modrmAddress type:MEM_WRITE];
                     }
                     
                     switch(mrm.opcode) {
                         case 4:
-                            self->state.cf = rmReadValue & (1 << imm8 % 32);
+                            self->state.cf = rmReadValue & (1 << imm8 % 16);
                             break;
                         case 5:
-                            self->state.cf = rmReadValue & (1 << imm8 % 32);
-                            *(uint32_t *)rmWritePtr = rmReadValue | (1 << imm8 % 32);
+                            self->state.cf = rmReadValue & (1 << imm8 % 16);
+                            *(uint16_t *)rmWritePtr = rmReadValue | (1 << imm8 % 16);
                             break;
                         case 6:
-                            self->state.cf = rmReadValue & (1 << imm8 % 32);
-                            *(uint32_t *)rmWritePtr = rmReadValue | ~(1 << imm8 % 32);
+                            self->state.cf = rmReadValue & (1 << imm8 % 16);
+                            *(uint16_t *)rmWritePtr = rmReadValue | ~(1 << imm8 % 16);
                             break;
                         case 7:
-                            self->state.cf = rmReadValue & (1 << imm8 % 32);
-                            *(uint32_t *)rmWritePtr = rmReadValue ^ (1 << imm8 % 32);
+                            self->state.cf = rmReadValue & (1 << imm8 % 16);
+                            *(uint16_t *)rmWritePtr = rmReadValue ^ (1 << imm8 % 16);
                             break;
                         default:
                             self->state.eip = saved_ip;
@@ -1739,53 +1740,53 @@
                             break;
                     }
                     
-                    self->state.cf = *regPtr & (1 << imm8 % 32);
+                    self->state.cf = *regPtr & (1 << imm8 % 16);
                     break;
                 case 0xbb:
                     // BTC    r/m16/32    r16/32                    o..szapc    .......c    o..szap.        Bit Test and Complement
                     [self readByteIncIP:&modRMByte];
                     mrm = [self decodeModRMByte:modRMByte];
                     if (mrm.type == modrm_register) {
-                        rmWritePtr = rmReadPtr = [self getRegPointer:mrm.base opSize:32];
-                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                        rmWritePtr = rmReadPtr = [self getRegPointer:mrm.base opSize:16];
+                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                     } else {
-                        addr_t modrmAddress = [self getModRMAddress:mrm opSize:32];
+                        addr_t modrmAddress = [self getModRMAddress:mrm opSize:16];
                         // The register contains a byte offset added to the address
-                        if (!(rmReadPtr = [self.task.mem getPointer:(modrmAddress + ([self getRegisterValue:mrm.reg opSize:32] / 8)) type:MEM_READ])) {
+                        if (!(rmReadPtr = [self.task.mem getPointer:(modrmAddress + ([self getRegisterValue:mrm.reg opSize:16] / 8)) type:MEM_READ])) {
                             return 13;
                         }
-                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                         rmWritePtr = [self.task.mem getPointer:modrmAddress type:MEM_WRITE];
                     }
                     
-                    regPtr = [self getRegPointer:mrm.reg opSize:32];
-                    self->state.cf = rmReadValue & (1 << *(uint32_t *)regPtr % 32);
-                    *(uint32_t *)rmWritePtr = rmReadValue ^ (1 << *(uint32_t *)regPtr % 32);
+                    regPtr = [self getRegPointer:mrm.reg opSize:16];
+                    self->state.cf = rmReadValue & (1 << *(uint16_t *)regPtr % 16);
+                    *(uint16_t *)rmWritePtr = rmReadValue ^ (1 << *(uint16_t *)regPtr % 16);
                     break;
                 case 0xbc:
                     // BSF    r16/32    r/m16/32                    o..szapc    ....z...    o..s.apc        Bit Scan Forward
                     [self readByteIncIP:&modRMByte];
                     mrm = [self decodeModRMByte:modRMByte];
                     if (mrm.type == modrm_register) {
-                        rmWritePtr = rmReadPtr = [self getRegPointer:mrm.base opSize:32];
-                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                        rmWritePtr = rmReadPtr = [self getRegPointer:mrm.base opSize:16];
+                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                     } else {
-                        addr_t modrmAddress = [self getModRMAddress:mrm opSize:32];
+                        addr_t modrmAddress = [self getModRMAddress:mrm opSize:16];
                         // The register contains a byte offset added to the address
-                        if (!(rmReadPtr = [self.task.mem getPointer:(modrmAddress + ([self getRegisterValue:mrm.reg opSize:32] / 8)) type:MEM_READ])) {
+                        if (!(rmReadPtr = [self.task.mem getPointer:(modrmAddress + ([self getRegisterValue:mrm.reg opSize:16] / 8)) type:MEM_READ])) {
                             return 13;
                         }
-                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                         rmWritePtr = [self.task.mem getPointer:modrmAddress type:MEM_WRITE];
                     }
                     
-                    regPtr = [self getRegPointer:mrm.reg opSize:32];
+                    regPtr = [self getRegPointer:mrm.reg opSize:16];
                     
                     self->state.zf = rmReadValue == 0;
                     self->state.zf_res = 0;
                     
                     if (!self->state.zf) {
-                        *(uint32_t *)regPtr = __builtin_ctz(rmReadValue);
+                        *(uint16_t *)regPtr = __builtin_ctz(rmReadValue);
                     }
                     break;
                 case 0xbd:
@@ -1793,25 +1794,25 @@
                     [self readByteIncIP:&modRMByte];
                     mrm = [self decodeModRMByte:modRMByte];
                     if (mrm.type == modrm_register) {
-                        rmWritePtr = rmReadPtr = [self getRegPointer:mrm.base opSize:32];
-                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                        rmWritePtr = rmReadPtr = [self getRegPointer:mrm.base opSize:16];
+                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                     } else {
-                        addr_t modrmAddress = [self getModRMAddress:mrm opSize:32];
+                        addr_t modrmAddress = [self getModRMAddress:mrm opSize:16];
                         // The register contains a byte offset added to the address
-                        if (!(rmReadPtr = [self.task.mem getPointer:(modrmAddress + ([self getRegisterValue:mrm.reg opSize:32] / 8)) type:MEM_READ])) {
+                        if (!(rmReadPtr = [self.task.mem getPointer:(modrmAddress + ([self getRegisterValue:mrm.reg opSize:16] / 8)) type:MEM_READ])) {
                             return 13;
                         }
-                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                         rmWritePtr = [self.task.mem getPointer:modrmAddress type:MEM_WRITE];
                     }
                     
-                    regPtr = [self getRegPointer:mrm.reg opSize:32];
+                    regPtr = [self getRegPointer:mrm.reg opSize:16];
                     
                     self->state.zf = rmReadValue == 0;
                     self->state.zf_res = 0;
                     
                     if (!self->state.zf) {
-                        *(uint32_t *)regPtr = 32 - __builtin_ctz(rmReadValue);
+                        *(uint16_t *)regPtr = 16 - __builtin_ctz(rmReadValue);
                     }
                     break;
                 case 0xbe:
@@ -1830,9 +1831,9 @@
                         rmWritePtr = [self.task.mem getPointer:modrmAddress type:MEM_WRITE];
                     }
                     
-                    regPtr = [self getRegPointer:mrm.reg opSize:32];
+                    regPtr = [self getRegPointer:mrm.reg opSize:16];
                     
-                    *(uint32_t *)regPtr = (uint32_t)rmReadValue;
+                    *(uint16_t *)regPtr = (uint16_t)rmReadValue;
                     break;
                 case 0xbf:
                     // MOVSX    r16/32    r/m16                                    Move with Sign-Extension
@@ -1850,9 +1851,9 @@
                         rmWritePtr = [self.task.mem getPointer:modrmAddress type:MEM_WRITE];
                     }
                     
-                    regPtr = [self getRegPointer:mrm.reg opSize:32];
+                    regPtr = [self getRegPointer:mrm.reg opSize:16];
                     
-                    *(uint32_t *)regPtr = (uint32_t)rmReadValue;
+                    *(uint16_t *)regPtr = (uint16_t)rmReadValue;
                     break;
                 case 0xc0:
                     // XADD    r/m8    r8                    o..szapc    o..szapc            Exchange and Add
@@ -1885,51 +1886,51 @@
                     [self readByteIncIP:&modRMByte];
                     mrm = [self decodeModRMByte:modRMByte];
                     if (mrm.type == modrm_register) {
-                        rmWritePtr = rmReadPtr = [self getRegPointer:mrm.base opSize:32];
-                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                        rmWritePtr = rmReadPtr = [self getRegPointer:mrm.base opSize:16];
+                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                     } else {
-                        addr_t modrmAddress = [self getModRMAddress:mrm opSize:32];
+                        addr_t modrmAddress = [self getModRMAddress:mrm opSize:16];
                         if (!(rmReadPtr = [self.task.mem getPointer:modrmAddress type:MEM_READ])) {
                             return 13;
                         }
-                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                         rmWritePtr = [self.task.mem getPointer:modrmAddress type:MEM_WRITE];
                     }
                     
-                    regPtr = [self getRegPointer:mrm.reg opSize:32];
+                    regPtr = [self getRegPointer:mrm.reg opSize:16];
                     
-                    temp8 = *(uint32_t *)regPtr;
-                    *(uint32_t *)regPtr = (uint32_t)rmReadValue;
-                    *(uint32_t *)rmWritePtr = (uint32_t)temp8;
-                    self->state.cf = __builtin_add_overflow((uint32_t)rmReadValue, *(uint32_t *)regPtr, (uint32_t *)&self->state.res);
-                    self->state.of = __builtin_add_overflow((int32_t)rmReadValue, *(int32_t *)regPtr, (int32_t *)&self->state.res);
-                    *(uint32_t *)rmWritePtr = (uint32_t)self->state.res;
+                    temp8 = *(uint16_t *)regPtr;
+                    *(uint16_t *)regPtr = (uint16_t)rmReadValue;
+                    *(uint16_t *)rmWritePtr = (uint16_t)temp8;
+                    self->state.cf = __builtin_add_overflow((uint16_t)rmReadValue, *(uint16_t *)regPtr, (uint16_t *)&self->state.res);
+                    self->state.of = __builtin_add_overflow((int16_t)rmReadValue, *(int16_t *)regPtr, (int16_t *)&self->state.res);
+                    *(uint16_t *)rmWritePtr = (uint16_t)self->state.res;
                     self->state.zf_res = self->state.sf_res = self->state.pf_res = 1;
                     break;
                 case 0xc8:
                     // Byte Swap operations:
-                    *(uint32_t *)&self->state.eax = __builtin_bswap32(((uint32_t)self->state.eax));
+                    *(uint16_t *)&self->state.eax = __builtin_bswap32(((uint16_t)self->state.eax));
                     break;
                 case 0xc9:
-                    *(uint32_t *)&self->state.ecx = __builtin_bswap32(((uint32_t)self->state.ecx));
+                    *(uint16_t *)&self->state.ecx = __builtin_bswap32(((uint16_t)self->state.ecx));
                     break;
                 case 0xca:
-                    *(uint32_t *)&self->state.edx = __builtin_bswap32(((uint32_t)self->state.edx));
+                    *(uint16_t *)&self->state.edx = __builtin_bswap32(((uint16_t)self->state.edx));
                     break;
                 case 0xcb:
-                    *(uint32_t *)&self->state.ebx = __builtin_bswap32(((uint32_t)self->state.ebx));
+                    *(uint16_t *)&self->state.ebx = __builtin_bswap32(((uint16_t)self->state.ebx));
                     break;
                 case 0xcc:
-                    *(uint32_t *)&self->state.esp = __builtin_bswap32(((uint32_t)self->state.esp));
+                    *(uint16_t *)&self->state.esp = __builtin_bswap32(((uint16_t)self->state.esp));
                     break;
                 case 0xcd:
-                    *(uint32_t *)&self->state.ebp = __builtin_bswap32(((uint32_t)self->state.ebp));
+                    *(uint16_t *)&self->state.ebp = __builtin_bswap32(((uint16_t)self->state.ebp));
                     break;
                 case 0xce:
-                    *(uint32_t *)&self->state.esi = __builtin_bswap32(((uint32_t)self->state.esi));
+                    *(uint16_t *)&self->state.esi = __builtin_bswap32(((uint16_t)self->state.esi));
                     break;
                 case 0xcf:
-                    *(uint32_t *)&self->state.edi = __builtin_bswap32(((uint32_t)self->state.edi));
+                    *(uint16_t *)&self->state.edi = __builtin_bswap32(((uint16_t)self->state.edi));
                     break;
                 default:
                     die("Unimplemented 2 part opcode 0x0f");
@@ -1957,7 +1958,7 @@
                         if (!(rmReadPtr = [self.task.mem getPointer:modrmAddress type:MEM_READ])) {
                             return 13;
                         }
-                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                         rmWritePtr = [self.task.mem getPointer:modrmAddress type:MEM_WRITE];
                     }
                     
@@ -1973,26 +1974,26 @@
                 case 0x1:
                     [self readByteIncIP:&modRMByte];
                     mrm = [self decodeModRMByte:modRMByte];
-                    regPtr = [self getRegPointer:mrm.reg opSize:32];
+                    regPtr = [self getRegPointer:mrm.reg opSize:16];
                     if (mrm.type == modrm_register) {
-                        rmWritePtr = rmReadPtr = [self getRegPointer:mrm.base opSize:32];
-                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                        rmWritePtr = rmReadPtr = [self getRegPointer:mrm.base opSize:16];
+                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                     } else {
-                        addr_t modrmAddress = [self getModRMAddress:mrm opSize:32];
+                        addr_t modrmAddress = [self getModRMAddress:mrm opSize:16];
                         if (!(rmReadPtr = [self.task.mem getPointer:modrmAddress type:MEM_READ])) {
                             return 13;
                         }
-                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                         rmWritePtr = [self.task.mem getPointer:modrmAddress type:MEM_WRITE];
                     }
                     
-                    regPtr = [self getRegPointer:mrm.reg opSize:32];
+                    regPtr = [self getRegPointer:mrm.reg opSize:16];
                     
-                    __builtin_add_overflow((int32_t)rmReadValue, *(int32_t *)regPtr + self->state.cf, (int32_t *)&self->state.res);
-                    self->state.of = self->state.res || (self->state.cf && *(int8_t *)regPtr == ((uint32_t)-1) / 2); // 0x7f  since uint8_t here is equal to the max value of the type I believe, 0xff
-                    __builtin_add_overflow((uint8_t)rmReadValue, *(uint32_t *)regPtr + self->state.cf, (uint32_t *)&self->state.res);
-                    self->state.cf = self->state.res || (self->state.cf && *(uint8_t *)regPtr == ((uint32_t)-1) / 2);
-                    *(int32_t *)rmWritePtr = self->state.res;
+                    __builtin_add_overflow((int16_t)rmReadValue, *(int16_t *)regPtr + self->state.cf, (int16_t *)&self->state.res);
+                    self->state.of = self->state.res || (self->state.cf && *(int8_t *)regPtr == ((uint16_t)-1) / 2); // 0x7f  since uint8_t here is equal to the max value of the type I believe, 0xff
+                    __builtin_add_overflow((uint8_t)rmReadValue, *(uint16_t *)regPtr + self->state.cf, (uint16_t *)&self->state.res);
+                    self->state.cf = self->state.res || (self->state.cf && *(uint8_t *)regPtr == ((uint16_t)-1) / 2);
+                    *(int16_t *)rmWritePtr = self->state.res;
                     self->state.zf_res = self->state.sf_res = self->state.pf_res = 1;
                     break;
                 case 0x2:
@@ -2007,7 +2008,7 @@
                         if (!(rmReadPtr = [self.task.mem getPointer:modrmAddress type:MEM_READ])) {
                             return 13;
                         }
-                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                         rmWritePtr = [self.task.mem getPointer:modrmAddress type:MEM_WRITE];
                     }
                     
@@ -2023,26 +2024,26 @@
                 case 0x3:
                     [self readByteIncIP:&modRMByte];
                     mrm = [self decodeModRMByte:modRMByte];
-                    regPtr = [self getRegPointer:mrm.reg opSize:32];
+                    regPtr = [self getRegPointer:mrm.reg opSize:16];
                     if (mrm.type == modrm_register) {
-                        rmWritePtr = rmReadPtr = [self getRegPointer:mrm.base opSize:32];
-                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                        rmWritePtr = rmReadPtr = [self getRegPointer:mrm.base opSize:16];
+                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                     } else {
-                        addr_t modrmAddress = [self getModRMAddress:mrm opSize:32];
+                        addr_t modrmAddress = [self getModRMAddress:mrm opSize:16];
                         if (!(rmReadPtr = [self.task.mem getPointer:modrmAddress type:MEM_READ])) {
                             return 13;
                         }
-                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                         rmWritePtr = [self.task.mem getPointer:modrmAddress type:MEM_WRITE];
                     }
                     
-                    regPtr =  [self getRegPointer:mrm.reg opSize:32];
+                    regPtr =  [self getRegPointer:mrm.reg opSize:16];
                     
-                    __builtin_add_overflow(*(int32_t *)regPtr, (int32_t)rmReadValue + self->state.cf, (int32_t *)&self->state.res);
-                    self->state.of = self->state.res || (self->state.cf && *(int8_t *)regPtr == ((uint32_t)-1) / 2); // 0x7f  since uint8_t here is equal to the max value of the type I believe, 0xff
-                    __builtin_add_overflow(*(uint32_t *)regPtr, (uint32_t)rmReadValue + self->state.cf, (uint32_t *)&self->state.res);
-                    self->state.cf = self->state.res || (self->state.cf && *(uint32_t *)regPtr == ((uint32_t)-1) / 2);
-                    *(int32_t *)regPtr = self->state.res;
+                    __builtin_add_overflow(*(int16_t *)regPtr, (int16_t)rmReadValue + self->state.cf, (int16_t *)&self->state.res);
+                    self->state.of = self->state.res || (self->state.cf && *(int8_t *)regPtr == ((uint16_t)-1) / 2); // 0x7f  since uint8_t here is equal to the max value of the type I believe, 0xff
+                    __builtin_add_overflow(*(uint16_t *)regPtr, (uint16_t)rmReadValue + self->state.cf, (uint16_t *)&self->state.res);
+                    self->state.cf = self->state.res || (self->state.cf && *(uint16_t *)regPtr == ((uint16_t)-1) / 2);
+                    *(int16_t *)regPtr = self->state.res;
                     self->state.zf_res = self->state.sf_res = self->state.pf_res = 1;
                     break;
                 case 0x4:
@@ -2057,14 +2058,14 @@
                     self->state.zf_res = self->state.sf_res = self->state.pf_res = 1;
                     break;
                 case 0x5:
-                    [self readFourBytesIncIP:&imm32];
-                    regPtr =  [self getRegPointer:reg_eax opSize:32];
+                    [self readTwoBytesIncIP:&imm16];
+                    regPtr =  [self getRegPointer:reg_eax opSize:16];
                     
-                    __builtin_add_overflow(*(int32_t *)regPtr, (int32_t)imm32 + self->state.cf, (int32_t *)&self->state.res);
-                    self->state.of = self->state.res || (self->state.cf && *(int32_t *)regPtr == ((uint32_t)-1) / 2); // 0x7f  since uint8_t here is equal to the max value of the type I believe, 0xff
-                    __builtin_add_overflow(*(uint32_t *)regPtr, (uint32_t)imm32 + self->state.cf, (uint32_t *)&self->state.res);
-                    self->state.cf = self->state.res || (self->state.cf && *(uint32_t *)regPtr == ((uint32_t)-1) / 2);
-                    *(int32_t *)regPtr = self->state.res;
+                    __builtin_add_overflow(*(int16_t *)regPtr, (int16_t)imm16 + self->state.cf, (int16_t *)&self->state.res);
+                    self->state.of = self->state.res || (self->state.cf && *(int16_t *)regPtr == ((uint16_t)-1) / 2); // 0x7f  since uint8_t here is equal to the max value of the type I believe, 0xff
+                    __builtin_add_overflow(*(uint16_t *)regPtr, (uint16_t)imm16 + self->state.cf, (uint16_t *)&self->state.res);
+                    self->state.cf = self->state.res || (self->state.cf && *(uint16_t *)regPtr == ((uint16_t)-1) / 2);
+                    *(int16_t *)regPtr = self->state.res;
                     self->state.zf_res = self->state.sf_res = self->state.pf_res = 1;
                     break;
             }
@@ -2092,7 +2093,7 @@
                         if (!(rmReadPtr = [self.task.mem getPointer:modrmAddress type:MEM_READ])) {
                             return 13;
                         }
-                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                         rmWritePtr = [self.task.mem getPointer:modrmAddress type:MEM_WRITE];
                     }
                     
@@ -2108,26 +2109,26 @@
                 case 0x1:
                     [self readByteIncIP:&modRMByte];
                     mrm = [self decodeModRMByte:modRMByte];
-                    regPtr = [self getRegPointer:mrm.reg opSize:32];
+                    regPtr = [self getRegPointer:mrm.reg opSize:16];
                     if (mrm.type == modrm_register) {
-                        rmWritePtr = rmReadPtr = [self getRegPointer:mrm.base opSize:32];
-                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                        rmWritePtr = rmReadPtr = [self getRegPointer:mrm.base opSize:16];
+                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                     } else {
-                        addr_t modrmAddress = [self getModRMAddress:mrm opSize:32];
+                        addr_t modrmAddress = [self getModRMAddress:mrm opSize:16];
                         if (!(rmReadPtr = [self.task.mem getPointer:modrmAddress type:MEM_READ])) {
                             return 13;
                         }
-                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                         rmWritePtr = [self.task.mem getPointer:modrmAddress type:MEM_WRITE];
                     }
                     
-                    regPtr = [self getRegPointer:mrm.reg opSize:32];
+                    regPtr = [self getRegPointer:mrm.reg opSize:16];
                     
-                    __builtin_sub_overflow((int32_t)rmReadValue, *(int32_t *)regPtr + self->state.cf, (int32_t *)&self->state.res);
-                    self->state.of = self->state.res || (self->state.cf && *(int8_t *)regPtr == ((uint32_t)-1) / 2); // 0x7f  since uint8_t here is equal to the max value of the type I believe, 0xff
-                    __builtin_sub_overflow((uint8_t)rmReadValue, *(uint32_t *)regPtr + self->state.cf, (uint32_t *)&self->state.res);
-                    self->state.cf = self->state.res || (self->state.cf && *(uint8_t *)regPtr == ((uint32_t)-1) / 2);
-                    *(int32_t *)rmWritePtr = self->state.res;
+                    __builtin_sub_overflow((int16_t)rmReadValue, *(int16_t *)regPtr + self->state.cf, (int16_t *)&self->state.res);
+                    self->state.of = self->state.res || (self->state.cf && *(int8_t *)regPtr == ((uint16_t)-1) / 2); // 0x7f  since uint8_t here is equal to the max value of the type I believe, 0xff
+                    __builtin_sub_overflow((uint8_t)rmReadValue, *(uint16_t *)regPtr + self->state.cf, (uint16_t *)&self->state.res);
+                    self->state.cf = self->state.res || (self->state.cf && *(uint8_t *)regPtr == ((uint16_t)-1) / 2);
+                    *(int16_t *)rmWritePtr = self->state.res;
                     self->state.zf_res = self->state.sf_res = self->state.pf_res = 1;
                     break;
                 case 0x2:
@@ -2142,7 +2143,7 @@
                         if (!(rmReadPtr = [self.task.mem getPointer:modrmAddress type:MEM_READ])) {
                             return 13;
                         }
-                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                         rmWritePtr = [self.task.mem getPointer:modrmAddress type:MEM_WRITE];
                     }
                     
@@ -2158,26 +2159,26 @@
                 case 0x3:
                     [self readByteIncIP:&modRMByte];
                     mrm = [self decodeModRMByte:modRMByte];
-                    regPtr = [self getRegPointer:mrm.reg opSize:32];
+                    regPtr = [self getRegPointer:mrm.reg opSize:16];
                     if (mrm.type == modrm_register) {
-                        rmWritePtr = rmReadPtr = [self getRegPointer:mrm.base opSize:32];
-                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                        rmWritePtr = rmReadPtr = [self getRegPointer:mrm.base opSize:16];
+                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                     } else {
-                        addr_t modrmAddress = [self getModRMAddress:mrm opSize:32];
+                        addr_t modrmAddress = [self getModRMAddress:mrm opSize:16];
                         if (!(rmReadPtr = [self.task.mem getPointer:modrmAddress type:MEM_READ])) {
                             return 13;
                         }
-                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                         rmWritePtr = [self.task.mem getPointer:modrmAddress type:MEM_WRITE];
                     }
                     
-                    regPtr =  [self getRegPointer:mrm.reg opSize:32];
+                    regPtr =  [self getRegPointer:mrm.reg opSize:16];
                     
-                    __builtin_sub_overflow(*(int32_t *)regPtr, (int32_t)rmReadValue + self->state.cf, (int32_t *)&self->state.res);
-                    self->state.of = self->state.res || (self->state.cf && *(int8_t *)regPtr == ((uint32_t)-1) / 2); // 0x7f  since uint8_t here is equal to the max value of the type I believe, 0xff
-                    __builtin_sub_overflow(*(uint32_t *)regPtr, (uint32_t)rmReadValue + self->state.cf, (uint32_t *)&self->state.res);
-                    self->state.cf = self->state.res || (self->state.cf && *(uint32_t *)regPtr == ((uint32_t)-1) / 2);
-                    *(int32_t *)regPtr = self->state.res;
+                    __builtin_sub_overflow(*(int16_t *)regPtr, (int16_t)rmReadValue + self->state.cf, (int16_t *)&self->state.res);
+                    self->state.of = self->state.res || (self->state.cf && *(int8_t *)regPtr == ((uint16_t)-1) / 2); // 0x7f  since uint8_t here is equal to the max value of the type I believe, 0xff
+                    __builtin_sub_overflow(*(uint16_t *)regPtr, (uint16_t)rmReadValue + self->state.cf, (uint16_t *)&self->state.res);
+                    self->state.cf = self->state.res || (self->state.cf && *(uint16_t *)regPtr == ((uint16_t)-1) / 2);
+                    *(int16_t *)regPtr = self->state.res;
                     self->state.zf_res = self->state.sf_res = self->state.pf_res = 1;
                     break;
                 case 0x4:
@@ -2192,14 +2193,14 @@
                     self->state.zf_res = self->state.sf_res = self->state.pf_res = 1;
                     break;
                 case 0x5:
-                    [self readFourBytesIncIP:&imm32];
-                    regPtr =  [self getRegPointer:reg_eax opSize:32];
+                    [self readTwoBytesIncIP:&imm16];
+                    regPtr =  [self getRegPointer:reg_eax opSize:16];
                     
-                    __builtin_sub_overflow(*(int32_t *)regPtr, (int32_t)imm32 + self->state.cf, (int32_t *)&self->state.res);
-                    self->state.of = self->state.res || (self->state.cf && *(int32_t *)regPtr == ((uint32_t)-1) / 2); // 0x7f  since uint8_t here is equal to the max value of the type I believe, 0xff
-                    __builtin_sub_overflow(*(uint32_t *)regPtr, (uint32_t)imm32 + self->state.cf, (uint32_t *)&self->state.res);
-                    self->state.cf = self->state.res || (self->state.cf && *(uint32_t *)regPtr == ((uint32_t)-1) / 2);
-                    *(int32_t *)regPtr = self->state.res;
+                    __builtin_sub_overflow(*(int16_t *)regPtr, (int16_t)imm16 + self->state.cf, (int16_t *)&self->state.res);
+                    self->state.of = self->state.res || (self->state.cf && *(int16_t *)regPtr == ((uint16_t)-1) / 2); // 0x7f  since uint8_t here is equal to the max value of the type I believe, 0xff
+                    __builtin_sub_overflow(*(uint16_t *)regPtr, (uint16_t)imm16 + self->state.cf, (uint16_t *)&self->state.res);
+                    self->state.cf = self->state.res || (self->state.cf && *(uint16_t *)regPtr == ((uint16_t)-1) / 2);
+                    *(int16_t *)regPtr = self->state.res;
                     self->state.zf_res = self->state.sf_res = self->state.pf_res = 1;
                     break;
             }
@@ -2224,7 +2225,7 @@
                         if (!(rmReadPtr = [self.task.mem getPointer:modrmAddress type:MEM_READ])) {
                             return 13;
                         }
-                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                         rmWritePtr = [self.task.mem getPointer:modrmAddress type:MEM_WRITE];
                     }
                     
@@ -2238,22 +2239,22 @@
                 case 0x1:
                     [self readByteIncIP:&modRMByte];
                     mrm = [self decodeModRMByte:modRMByte];
-                    regPtr = [self getRegPointer:mrm.reg opSize:32];
+                    regPtr = [self getRegPointer:mrm.reg opSize:16];
                     if (mrm.type == modrm_register) {
-                        rmWritePtr = rmReadPtr = [self getRegPointer:mrm.base opSize:32];
-                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                        rmWritePtr = rmReadPtr = [self getRegPointer:mrm.base opSize:16];
+                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                     } else {
-                        addr_t modrmAddress = [self getModRMAddress:mrm opSize:32];
+                        addr_t modrmAddress = [self getModRMAddress:mrm opSize:16];
                         if (!(rmReadPtr = [self.task.mem getPointer:modrmAddress type:MEM_READ])) {
                             return 13;
                         }
-                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                         rmWritePtr = [self.task.mem getPointer:modrmAddress type:MEM_WRITE];
                     }
                     
-                    regPtr = [self getRegPointer:mrm.reg opSize:32];
+                    regPtr = [self getRegPointer:mrm.reg opSize:16];
                     
-                    self->state.res = *(uint32_t *)rmWritePtr = (uint32_t)rmReadValue & *(uint32_t *)regPtr;
+                    self->state.res = *(uint16_t *)rmWritePtr = (uint16_t)rmReadValue & *(uint16_t *)regPtr;
                     
                     self->state.cf = self->state.of = self->state.af = self->state.af_ops = 0;
                     self->state.zf_res = self->state.sf_res = self->state.pf_res = 1;
@@ -2270,7 +2271,7 @@
                         if (!(rmReadPtr = [self.task.mem getPointer:modrmAddress type:MEM_READ])) {
                             return 13;
                         }
-                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                         rmWritePtr = [self.task.mem getPointer:modrmAddress type:MEM_WRITE];
                     }
                     
@@ -2282,20 +2283,20 @@
                 case 0x3:
                     [self readByteIncIP:&modRMByte];
                     mrm = [self decodeModRMByte:modRMByte];
-                    regPtr = [self getRegPointer:mrm.reg opSize:32];
+                    regPtr = [self getRegPointer:mrm.reg opSize:16];
                     if (mrm.type == modrm_register) {
-                        rmWritePtr = rmReadPtr = [self getRegPointer:mrm.base opSize:32];
-                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                        rmWritePtr = rmReadPtr = [self getRegPointer:mrm.base opSize:16];
+                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                     } else {
-                        addr_t modrmAddress = [self getModRMAddress:mrm opSize:32];
+                        addr_t modrmAddress = [self getModRMAddress:mrm opSize:16];
                         if (!(rmReadPtr = [self.task.mem getPointer:modrmAddress type:MEM_READ])) {
                             return 13;
                         }
-                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                         rmWritePtr = [self.task.mem getPointer:modrmAddress type:MEM_WRITE];
                     }
                     
-                    self->state.res = *(uint32_t *)regPtr = (uint32_t)rmReadValue & *(uint32_t *)regPtr;
+                    self->state.res = *(uint16_t *)regPtr = (uint16_t)rmReadValue & *(uint16_t *)regPtr;
                     
                     self->state.cf = self->state.of = self->state.af = self->state.af_ops = 0;
                     self->state.zf_res = self->state.sf_res = self->state.pf_res = 1;
@@ -2312,9 +2313,9 @@
                     self->state.zf_res = self->state.sf_res = self->state.pf_res = 1;
                     break;
                 case 0x5:
-                    [self readFourBytesIncIP:&imm32];
-                    regPtr =  [self getRegPointer:reg_eax opSize:32];
-                    self->state.res = *(uint32_t *)regPtr = (uint32_t)imm32 & *(uint32_t *)regPtr;
+                    [self readTwoBytesIncIP:&imm16];
+                    regPtr =  [self getRegPointer:reg_eax opSize:16];
+                    self->state.res = *(uint16_t *)regPtr = (uint16_t)imm16 & *(uint16_t *)regPtr;
                     
                     self->state.cf = self->state.of = self->state.af = self->state.af_ops = 0;
                     self->state.zf_res = self->state.sf_res = self->state.pf_res = 1;
@@ -2346,7 +2347,7 @@
                         if (!(rmReadPtr = [self.task.mem getPointer:modrmAddress type:MEM_READ])) {
                             return 13;
                         }
-                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                         rmWritePtr = [self.task.mem getPointer:modrmAddress type:MEM_WRITE];
                     }
                     
@@ -2360,24 +2361,24 @@
                 case 0x1:
                     [self readByteIncIP:&modRMByte];
                     mrm = [self decodeModRMByte:modRMByte];
-                    regPtr = [self getRegPointer:mrm.reg opSize:32];
+                    regPtr = [self getRegPointer:mrm.reg opSize:16];
                     if (mrm.type == modrm_register) {
-                        rmWritePtr = rmReadPtr = [self getRegPointer:mrm.base opSize:32];
-                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                        rmWritePtr = rmReadPtr = [self getRegPointer:mrm.base opSize:16];
+                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                     } else {
-                        addr_t modrmAddress = [self getModRMAddress:mrm opSize:32];
+                        addr_t modrmAddress = [self getModRMAddress:mrm opSize:16];
                         if (!(rmReadPtr = [self.task.mem getPointer:modrmAddress type:MEM_READ])) {
                             return 13;
                         }
-                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                         rmWritePtr = [self.task.mem getPointer:modrmAddress type:MEM_WRITE];
                     }
                     
-                    regPtr = [self getRegPointer:mrm.reg opSize:32];
+                    regPtr = [self getRegPointer:mrm.reg opSize:16];
                     
-                    self->state.of = __builtin_sub_overflow((int32_t)rmReadValue, *(int32_t *)regPtr, (int32_t *)&self->state.res);
-                    self->state.cf = __builtin_sub_overflow((uint32_t)rmReadValue, *(uint32_t *)regPtr, (uint32_t *)&self->state.res);
-                    *(int32_t *)rmWritePtr = self->state.res;
+                    self->state.of = __builtin_sub_overflow((int16_t)rmReadValue, *(int16_t *)regPtr, (int16_t *)&self->state.res);
+                    self->state.cf = __builtin_sub_overflow((uint16_t)rmReadValue, *(uint16_t *)regPtr, (uint16_t *)&self->state.res);
+                    *(int16_t *)rmWritePtr = self->state.res;
                     self->state.zf_res = self->state.sf_res = self->state.pf_res = 1;
                     break;
                 case 0x2:
@@ -2392,7 +2393,7 @@
                         if (!(rmReadPtr = [self.task.mem getPointer:modrmAddress type:MEM_READ])) {
                             return 13;
                         }
-                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                         rmWritePtr = [self.task.mem getPointer:modrmAddress type:MEM_WRITE];
                     }
                     
@@ -2406,23 +2407,23 @@
                 case 0x3:
                     [self readByteIncIP:&modRMByte];
                     mrm = [self decodeModRMByte:modRMByte];
-                    regPtr = [self getRegPointer:mrm.reg opSize:32];
+                    regPtr = [self getRegPointer:mrm.reg opSize:16];
                     if (mrm.type == modrm_register) {
-                        rmWritePtr = rmReadPtr = [self getRegPointer:mrm.base opSize:32];
-                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                        rmWritePtr = rmReadPtr = [self getRegPointer:mrm.base opSize:16];
+                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                     } else {
-                        addr_t modrmAddress = [self getModRMAddress:mrm opSize:32];
+                        addr_t modrmAddress = [self getModRMAddress:mrm opSize:16];
                         if (!(rmReadPtr = [self.task.mem getPointer:modrmAddress type:MEM_READ])) {
                             return 13;
                         }
-                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                        memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                     }
                     
-                    regPtr =  [self getRegPointer:mrm.reg opSize:32];
+                    regPtr =  [self getRegPointer:mrm.reg opSize:16];
                     
-                    self->state.of = __builtin_sub_overflow(*(int32_t *)regPtr, (int32_t)rmReadValue, (int32_t *)&self->state.res);
-                    self->state.cf = __builtin_sub_overflow(*(uint32_t *)regPtr, (uint32_t)rmReadValue, (uint32_t *)&self->state.res);
-                    *(int32_t *)regPtr = self->state.res;
+                    self->state.of = __builtin_sub_overflow(*(int16_t *)regPtr, (int16_t)rmReadValue, (int16_t *)&self->state.res);
+                    self->state.cf = __builtin_sub_overflow(*(uint16_t *)regPtr, (uint16_t)rmReadValue, (uint16_t *)&self->state.res);
+                    *(int16_t *)regPtr = self->state.res;
                     self->state.zf_res = self->state.sf_res = self->state.pf_res = 1;
                     break;
                 case 0x4:
@@ -2435,12 +2436,12 @@
                     self->state.zf_res = self->state.sf_res = self->state.pf_res = 1;
                     break;
                 case 0x5:
-                    [self readFourBytesIncIP:&imm32];
-                    regPtr =  [self getRegPointer:reg_eax opSize:32];
+                    [self readTwoBytesIncIP:&imm16];
+                    regPtr =  [self getRegPointer:reg_eax opSize:16];
                     
-                    self->state.of = __builtin_sub_overflow(*(int32_t *)regPtr, (int32_t)imm32, (int32_t *)&self->state.res);
-                    self->state.cf = __builtin_sub_overflow(*(uint32_t *)regPtr, (uint32_t)imm32, (uint32_t *)&self->state.res);
-                    *(int32_t *)regPtr = self->state.res;
+                    self->state.of = __builtin_sub_overflow(*(int16_t *)regPtr, (int16_t)imm16, (int16_t *)&self->state.res);
+                    self->state.cf = __builtin_sub_overflow(*(uint16_t *)regPtr, (uint16_t)imm16, (uint16_t *)&self->state.res);
+                    *(int16_t *)regPtr = self->state.res;
                     self->state.zf_res = self->state.sf_res = self->state.pf_res = 1;
                     break;
             }
@@ -2466,7 +2467,7 @@
                 if (!(rmReadPtr = [self.task.mem getPointer:modrmAddress type:MEM_READ])) {
                     return 13;
                 }
-                memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                 rmWritePtr = [self.task.mem getPointer:modrmAddress type:MEM_WRITE];
             }
             self->state.res = *((uint8_t *)rmWritePtr) = *((uint8_t *)rmReadPtr) ^ *((uint8_t *)regPtr);
@@ -2480,16 +2481,16 @@
             //
             [self readByteIncIP:&modRMByte];
             mrm = [self decodeModRMByte:modRMByte];
-            regPtr = [self getRegPointer:mrm.reg opSize:32];
+            regPtr = [self getRegPointer:mrm.reg opSize:16];
             if (mrm.type == modrm_register) {
-                rmWritePtr = rmReadPtr  = [self getRegPointer:mrm.base opSize:32];
-                memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t)); memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                rmWritePtr = rmReadPtr  = [self getRegPointer:mrm.base opSize:16];
+                memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t)); memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
             } else {
-                addr_t modrmAddress = [self getModRMAddress:mrm opSize:32];
+                addr_t modrmAddress = [self getModRMAddress:mrm opSize:16];
                 if (!(rmReadPtr = [self.task.mem getPointer:modrmAddress type:MEM_READ])) {
                     return 13;
                 }
-                memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                 rmWritePtr = [self.task.mem getPointer:modrmAddress type:MEM_WRITE];
             }
             self->state.res = *((dword_t *)rmWritePtr) = *((dword_t *)rmReadPtr) ^ *((dword_t *)regPtr);
@@ -2512,7 +2513,7 @@
                 if (!(rmReadPtr = [self.task.mem getPointer:modrmAddress type:MEM_READ])) {
                     return 13;
                 }
-                memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
             }
             self->state.res = *((uint8_t *)regPtr) = *((uint8_t *)regPtr) ^ *((uint8_t *)rmReadPtr);
             
@@ -2524,17 +2525,17 @@
             //
             [self readByteIncIP:&modRMByte];
             mrm = [self decodeModRMByte:modRMByte];
-            regPtr = [self getRegPointer:mrm.reg opSize:32];
+            regPtr = [self getRegPointer:mrm.reg opSize:16];
             if (mrm.type == modrm_register) {
-                rmWritePtr = [self getRegPointer:mrm.base opSize:32];
-                rmReadPtr = [self getRegPointer:mrm.base opSize:32];
-                memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                rmWritePtr = [self getRegPointer:mrm.base opSize:16];
+                rmReadPtr = [self getRegPointer:mrm.base opSize:16];
+                memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
             } else {
-                addr_t modrmAddress = [self getModRMAddress:mrm opSize:32];
+                addr_t modrmAddress = [self getModRMAddress:mrm opSize:16];
                 if (!(rmReadPtr = [self.task.mem getPointer:modrmAddress type:MEM_READ])) {
                     return 13;
                 }
-                memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
             }
             self->state.res = *((dword_t *)regPtr) = *((dword_t *)regPtr) ^ *((dword_t *)rmReadPtr);
             
@@ -2563,14 +2564,14 @@
             //
             [self readByteIncIP:&modRMByte];
             mrm = [self decodeModRMByte:modRMByte];
-            regPtr = [self getRegPointer:reg_eax opSize:32];
+            regPtr = [self getRegPointer:reg_eax opSize:16];
             
-            if ([self readFourBytesIncIP:&imm32]) {
+            if ([self readTwoBytesIncIP:&imm16]) {
                 SEGFAULT
             }
             
-            *((uint32_t *)regPtr) = *((uint32_t *)regPtr) ^ (uint32_t)imm32;
-            self->state.res = *((int32_t *)regPtr);
+            *((uint16_t *)regPtr) = *((uint16_t *)regPtr) ^ (uint16_t)imm16;
+            self->state.res = *((int16_t *)regPtr);
             
             self->state.zf_res = self->state.sf_res = self->state.pf_res = 1;
             self->state.cf = self->state.of = self->state.af = self->state.af_ops = 0;
@@ -2589,7 +2590,7 @@
                 if (!(rmReadPtr = [self.task.mem getPointer:modrmAddress type:MEM_READ])) {
                     return 13;
                 }
-                memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                 rmWritePtr = [self.task.mem getPointer:modrmAddress type:MEM_WRITE];
             }
             
@@ -2606,21 +2607,21 @@
             //
             [self readByteIncIP:&modRMByte];
             mrm = [self decodeModRMByte:modRMByte];
-            regPtr = [self getRegPointer:mrm.reg opSize:32];
+            regPtr = [self getRegPointer:mrm.reg opSize:16];
             if (mrm.type == modrm_register) {
-                rmWritePtr = rmReadPtr  = [self getRegPointer:mrm.base opSize:32];
-                memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t)); memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                rmWritePtr = rmReadPtr  = [self getRegPointer:mrm.base opSize:16];
+                memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t)); memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
             } else {
-                addr_t modrmAddress = [self getModRMAddress:mrm opSize:32];
+                addr_t modrmAddress = [self getModRMAddress:mrm opSize:16];
                 if (!(rmReadPtr = [self.task.mem getPointer:modrmAddress type:MEM_READ])) {
                     return 13;
                 }
-                memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                 rmWritePtr = [self.task.mem getPointer:modrmAddress type:MEM_WRITE];
             }
-            self->state.cf = __builtin_sub_overflow(*((uint32_t *)rmReadPtr), *((uint32_t *)regPtr), (uint32_t *)&temp32);
-            self->state.of = __builtin_sub_overflow(*((int32_t *)rmReadPtr), *((int32_t *)regPtr), (int32_t *)&temp32);
-            self->state.res = (int32_t)temp32;
+            self->state.cf = __builtin_sub_overflow(*((uint16_t *)rmReadPtr), *((uint16_t *)regPtr), (uint16_t *)&temp16);
+            self->state.of = __builtin_sub_overflow(*((int16_t *)rmReadPtr), *((int16_t *)regPtr), (int16_t *)&temp16);
+            self->state.res = (int16_t)temp16;
             // sets cf and of
             
             self->state.af_ops = 1;
@@ -2640,7 +2641,7 @@
                 if (!(rmReadPtr = [self.task.mem getPointer:modrmAddress type:MEM_READ])) {
                     return 13;
                 }
-                memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                 rmWritePtr = [self.task.mem getPointer:modrmAddress type:MEM_WRITE];
             }
             
@@ -2657,22 +2658,22 @@
             //
             [self readByteIncIP:&modRMByte];
             mrm = [self decodeModRMByte:modRMByte];
-            regPtr = [self getRegPointer:mrm.reg opSize:32];
+            regPtr = [self getRegPointer:mrm.reg opSize:16];
             if (mrm.type == modrm_register) {
-                rmWritePtr = rmReadPtr  = [self getRegPointer:mrm.base opSize:32];
-                memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t)); memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                rmWritePtr = rmReadPtr  = [self getRegPointer:mrm.base opSize:16];
+                memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t)); memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
             } else {
-                addr_t modrmAddress = [self getModRMAddress:mrm opSize:32];
+                addr_t modrmAddress = [self getModRMAddress:mrm opSize:16];
                 if (!(rmReadPtr = [self.task.mem getPointer:modrmAddress type:MEM_READ])) {
                     return 13;
                 }
-                memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                 rmWritePtr = [self.task.mem getPointer:modrmAddress type:MEM_WRITE];
             }
             
-            self->state.cf = __builtin_sub_overflow(*((uint32_t *)regPtr), *((uint32_t *)rmReadPtr), (uint32_t *)&temp32);
-            self->state.of = __builtin_sub_overflow(*((int32_t *)regPtr), *((int32_t *)rmReadPtr), (int32_t *)&temp32);
-            self->state.res = (int32_t)temp32;
+            self->state.cf = __builtin_sub_overflow(*((uint16_t *)regPtr), *((uint16_t *)rmReadPtr), (uint16_t *)&temp16);
+            self->state.of = __builtin_sub_overflow(*((int16_t *)regPtr), *((int16_t *)rmReadPtr), (int16_t *)&temp16);
+            self->state.res = (int16_t)temp16;
             // sets cf and of
             
             self->state.af_ops = 1;
@@ -2702,15 +2703,15 @@
             //
             [self readByteIncIP:&modRMByte];
             mrm = [self decodeModRMByte:modRMByte];
-            regPtr = [self getRegPointer:reg_eax opSize:32];
+            regPtr = [self getRegPointer:reg_eax opSize:16];
             
             if ([self readByteIncIP:&imm8]) {
                 SEGFAULT
             }
             
-            self->state.cf = __builtin_sub_overflow(*((uint32_t *)regPtr), (uint32_t)imm8, (uint32_t *)&temp8);
-            self->state.of = __builtin_sub_overflow(*((int32_t *)regPtr), (int32_t)imm8, (int32_t *)&temp8);
-            self->state.res = (int32_t)temp8;
+            self->state.cf = __builtin_sub_overflow(*((uint16_t *)regPtr), (uint16_t)imm8, (uint16_t *)&temp8);
+            self->state.of = __builtin_sub_overflow(*((int16_t *)regPtr), (int16_t)imm8, (int16_t *)&temp8);
+            self->state.res = (int16_t)temp8;
             // sets cf and of
             
             self->state.af_ops = 1;
@@ -2733,11 +2734,11 @@
         case 0x47:
             // INC    r16/32
             opReg = 0x7 & firstOpByte;
-            regPtr = [self getRegPointer:opReg opSize:32];
+            regPtr = [self getRegPointer:opReg opSize:16];
             //            *regPtr = *regPtr + 1;
             // No carry flag is set
-            // self->state.cf = __builtin_add_overflow(*(uint32_t *)regPtr, (uint32_t)1, (uint32_t *)&self->state.res);
-            self->state.of = __builtin_add_overflow(*(int32_t *)regPtr, (int32_t)1, (int32_t *)&self->state.res);
+            // self->state.cf = __builtin_add_overflow(*(uint16_t *)regPtr, (uint16_t)1, (uint16_t *)&self->state.res);
+            self->state.of = __builtin_add_overflow(*(int16_t *)regPtr, (int16_t)1, (int16_t *)&self->state.res);
             *regPtr = self->state.res;
             // set the auxillary flag
             self->state.af_ops = 1;
@@ -2757,11 +2758,11 @@
         case 0x4f:
             // DEC    r16/32
             opReg = 0x7 & firstOpByte;
-            regPtr = [self getRegPointer:opReg opSize:32];
+            regPtr = [self getRegPointer:opReg opSize:16];
             //            *regPtr = *regPtr + 1;
             // No carry flag is set
-            // self->state.cf = __builtin_add_overflow(*(uint32_t *)regPtr, (uint32_t)1, (uint32_t *)&self->state.res);
-            self->state.of = __builtin_sub_overflow(*(int32_t *)regPtr, (int32_t)1, (int32_t *)&self->state.res);
+            // self->state.cf = __builtin_add_overflow(*(uint16_t *)regPtr, (uint16_t)1, (uint16_t *)&self->state.res);
+            self->state.of = __builtin_sub_overflow(*(int16_t *)regPtr, (int16_t)1, (int16_t *)&self->state.res);
             *regPtr = self->state.res;
             // set the auxillary flag
             self->state.af_ops = 1;
@@ -2781,12 +2782,12 @@
         case 0x57:
             // PUSH    r16/32
             opReg = 0x7 & firstOpByte;
-            regPtr = [self getRegPointer:opReg opSize:32];
-            if ([self.task userWrite:self->state.esp - 4 buf:regPtr count:4]) {
+            regPtr = [self getRegPointer:opReg opSize:16];
+            if ([self.task userWrite:self->state.esp - 2 buf:regPtr count:2]) {
                 SEGFAULT
             }
             // # ifdef BDEBUG
-            // CLog(@"PUSHed %x to [%x]\n", *regPtr, self->state.esp - 4);
+            // CLog(@"PUSHed %x to [%x]\n", *regPtr, self->state.esp - 2);
             // # endif
             self->state.esp -= 4;
             
@@ -2801,8 +2802,8 @@
         case 0x5f:
             // POP    r16/32
             opReg = 0x7 & firstOpByte;
-            regPtr = [self getRegPointer:opReg opSize:32];
-            if ([self.task userRead:self->state.esp buf:regPtr count:4]) {
+            regPtr = [self getRegPointer:opReg opSize:16];
+            if ([self.task userRead:self->state.esp buf:regPtr count:2]) {
                 SEGFAULT
             }
             self->state.esp += 4;
@@ -2812,7 +2813,7 @@
         case 0x60:
             tmpReg = reg_eax;
             do {
-                *(int32_t *)[self.task.mem getPointer:self->state.esp type:32] = [self getRegisterValue:tmpReg opSize:32];
+                *(int16_t *)[self.task.mem getPointer:self->state.esp type:16] = [self getRegisterValue:tmpReg opSize:16];
                 tmpReg += 1;
                 self->state.esp -= 4;
             } while (tmpReg != reg_edi);
@@ -2820,8 +2821,8 @@
         case 0x61:
             tmpReg = reg_edi;
             do {
-                [self readFourBytesIncSP:&imm32];
-                *(int32_t *)[self getRegPointer:tmpReg opSize:32] = imm32;
+                [self readFourBytesIncSP:&imm16];
+                *(int16_t *)[self getRegPointer:tmpReg opSize:16] = imm16;
                 tmpReg -= 1;
             } while (tmpReg != reg_eax);
             break;
@@ -2857,29 +2858,29 @@
                 self->state.eip = saved_ip;
                 return 6;
             }
-            regPtr = [self getRegPointer:mrm.reg opSize:32];
+            regPtr = [self getRegPointer:mrm.reg opSize:16];
             if (mrm.type == modrm_register) {
-                rmWritePtr = [self getRegPointer:mrm.base opSize:32];
-                rmReadPtr = [self getRegPointer:mrm.base opSize:32];
-                memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                rmWritePtr = [self getRegPointer:mrm.base opSize:16];
+                rmReadPtr = [self getRegPointer:mrm.base opSize:16];
+                memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
             } else {
-                addr_t modrmAddress = [self getModRMAddress:mrm opSize:32];
+                addr_t modrmAddress = [self getModRMAddress:mrm opSize:16];
                 if (!(rmReadPtr = [self.task.mem getPointer:modrmAddress type:MEM_READ])) {
                     return 13;
                 }
-                memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                 rmWritePtr = [self.task.mem getPointer:modrmAddress type:MEM_WRITE];
             }
             
-            [self readFourBytesIncSP:&imm32];
+            [self readFourBytesIncSP:&imm16];
             
-            self->state.cf = self->state.of = __builtin_mul_overflow((int32_t)rmReadValue, (int32_t)imm32, (int32_t *)&self->state.res);
+            self->state.cf = self->state.of = __builtin_mul_overflow((int16_t)rmReadValue, (int16_t)imm16, (int16_t *)&self->state.res);
             self->state.zf = self->state.sf = self->state.zf_res = self->state.sf_res = 0;
             break;
             
         case 0x6a:
             [self readByteIncIP:&imm8];
-            [self.task userWrite:(self->state.esp - 4) buf:&imm8 count:1];
+            [self.task userWrite:(self->state.esp - 2) buf:&imm8 count:1];
             self->state.esp -= 4;
             break;
         case 0x6b:
@@ -2891,23 +2892,23 @@
                 self->state.eip = saved_ip;
                 return 6;
             }
-            regPtr = [self getRegPointer:mrm.reg opSize:32];
+            regPtr = [self getRegPointer:mrm.reg opSize:16];
             if (mrm.type == modrm_register) {
-                rmWritePtr = [self getRegPointer:mrm.base opSize:32];
-                rmReadPtr = [self getRegPointer:mrm.base opSize:32];
-                memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                rmWritePtr = [self getRegPointer:mrm.base opSize:16];
+                rmReadPtr = [self getRegPointer:mrm.base opSize:16];
+                memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
             } else {
-                addr_t modrmAddress = [self getModRMAddress:mrm opSize:32];
+                addr_t modrmAddress = [self getModRMAddress:mrm opSize:16];
                 if (!(rmReadPtr = [self.task.mem getPointer:modrmAddress type:MEM_READ])) {
                     return 13;
                 }
-                memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                 rmWritePtr = [self.task.mem getPointer:modrmAddress type:MEM_WRITE];
             }
             
             [self readByteIncIP:&imm8];
             
-            self->state.cf = self->state.of = __builtin_mul_overflow((int32_t)rmReadValue, (int8_t)imm8, (int32_t *)&self->state.res);
+            self->state.cf = self->state.of = __builtin_mul_overflow((int16_t)rmReadValue, (int8_t)imm8, (int16_t *)&self->state.res);
             self->state.zf = self->state.sf = self->state.zf_res = self->state.sf_res = 0;
             break;
             
@@ -2955,7 +2956,7 @@
             }
             if (!self->state.cf) {
                 // TODO: Possibly cast this as int16_t to work with 16 bit instructions
-                self->state.eip += (uint32_t)imm8;
+                self->state.eip += (uint16_t)imm8;
             }
             break;
         case 0x74:
@@ -2981,7 +2982,7 @@
             // Otherwise just check the last zf flag
             if (!(self->state.zf_res ? self->state.res == 0 : self->state.zf)) {
                 // TODO: Possibly cast this as int16_t to work with 16 bit instructions
-                self->state.eip += (int32_t)(int8_t)imm8;
+                self->state.eip += (int16_t)(int8_t)imm8;
             }
             break;
         case 0x76:
@@ -3088,7 +3089,7 @@
             if ([self readByteIncIP:&imm8]) {
                 SEGFAULT
             }
-            if (!((self->state.sf_res ? (int32_t)self->state.res < 0 : self->state.sf) ^ self->state.of)) {
+            if (!((self->state.sf_res ? (int16_t)self->state.res < 0 : self->state.sf) ^ self->state.of)) {
                 // TODO: Possibly cast this as int16_t to work with 16 bit instructions
                 self->state.eip += (int8_t)imm8;
             }
@@ -3100,7 +3101,7 @@
             if ([self readByteIncIP:&imm8]) {
                 SEGFAULT
             }
-            if (self->state.zf_res ? self->state.res == 0 : self->state.zf | ((self->state.sf_res ? (int32_t)self->state.res < 0 : self->state.sf) ^ self->state.of)) {
+            if (self->state.zf_res ? self->state.res == 0 : self->state.zf | ((self->state.sf_res ? (int16_t)self->state.res < 0 : self->state.sf) ^ self->state.of)) {
                 // TODO: Possibly cast this as int16_t to work with 16 bit instructions
                 self->state.eip += (int8_t)imm8;
             }
@@ -3114,7 +3115,7 @@
             }
             // Is the "zf flag if res" flag is checked then check the res to determine the zf flag
             // Otherwise just check the last zf flag
-            if (!(((self->state.sf_res ? (int32_t)self->state.res < 0 : self->state.sf) ^ (self->state.of)) | (self->state.zf_res ? self->state.res == 0 : self->state.zf))) {
+            if (!(((self->state.sf_res ? (int16_t)self->state.res < 0 : self->state.sf) ^ (self->state.of)) | (self->state.zf_res ? self->state.res == 0 : self->state.zf))) {
                 // TODO: Possibly cast this as int16_t to work with 16 bit instructions
                 self->state.eip += (int8_t)imm8;
             }
@@ -3143,7 +3144,7 @@
 #define MODRM_VAR       mrm
 #define IMM_SZ          16
 #define RM_SZ           16
-#define IMM_READ_METHOD readFourBytesIncIP
+#define IMM_READ_METHOD readTwoBytesIncIP
 #include "Group1OpCodes.h"
 #undef IMM_READ_METHOD
 #undef MODRM_VAR
@@ -3162,7 +3163,7 @@
 #undef RM_SZ
             break;
         case 0x83:
-//            temp32 = 2;
+            //            temp16 = 2;
 #define MODRM_VAR       mrm
 #define IMM_SZ          8
 #define RM_SZ           16
@@ -3199,20 +3200,20 @@
             // TEST    r/m32    r32
             [self readByteIncIP:&modRMByte];
             mrm = [self decodeModRMByte:modRMByte];
-            regPtr = [self getRegPointer:mrm.reg opSize:32];
+            regPtr = [self getRegPointer:mrm.reg opSize:16];
             if (mrm.type == modrm_register) {
-                rmWritePtr = rmReadPtr  = [self getRegPointer:mrm.base opSize:32];
-                memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                rmWritePtr = rmReadPtr  = [self getRegPointer:mrm.base opSize:16];
+                memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
             } else {
-                addr_t modrmAddress = [self getModRMAddress:mrm opSize:32];
+                addr_t modrmAddress = [self getModRMAddress:mrm opSize:16];
                 if (!(rmReadPtr = [self.task.mem getPointer:modrmAddress type:MEM_READ])) {
                     return 13;
                 }
-                memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                 rmWritePtr = [self.task.mem getPointer:modrmAddress type:MEM_WRITE];
             }
             
-            self->state.res = (uint32_t)rmReadValue & *(uint32_t *)regPtr;
+            self->state.res = (uint16_t)rmReadValue & *(uint16_t *)regPtr;
             
             self->state.zf_res = self->state.sf_res = self->state.pf_res = 1;
             self->state.cf = self->state.of = self->state.af = self->state.af_ops = 0;
@@ -3242,22 +3243,22 @@
             // XCHG    r32    r/m32
             [self readByteIncIP:&modRMByte];
             mrm = [self decodeModRMByte:modRMByte];
-            regPtr = [self getRegPointer:mrm.reg opSize:32];
+            regPtr = [self getRegPointer:mrm.reg opSize:16];
             if (mrm.type == modrm_register) {
-                rmWritePtr = rmReadPtr  = [self getRegPointer:mrm.base opSize:32];
-                memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                rmWritePtr = rmReadPtr  = [self getRegPointer:mrm.base opSize:16];
+                memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
             } else {
-                addr_t modrmAddress = [self getModRMAddress:mrm opSize:32];
+                addr_t modrmAddress = [self getModRMAddress:mrm opSize:16];
                 if (!(rmReadPtr = [self.task.mem getPointer:modrmAddress type:MEM_READ])) {
                     return 13;
                 }
-                memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                 rmWritePtr = [self.task.mem getPointer:modrmAddress type:MEM_WRITE];
             }
             
-            temp32 = *(uint32_t *)regPtr;
-            *(uint32_t *)regPtr = rmReadValue;
-            *(uint32_t *)rmWritePtr = temp32;
+            temp16 = *(uint16_t *)regPtr;
+            *(uint16_t *)regPtr = rmReadValue;
+            *(uint16_t *)rmWritePtr = temp16;
             break;
         case 0x88:
             // MOV    r/m8    r8
@@ -3276,13 +3277,13 @@
             // MOV    r/m16/32/64    r16/32/64
             [self readByteIncIP:&modRMByte];
             mrm = [self decodeModRMByte:modRMByte];
-            regPtr = [self getRegPointer:mrm.reg opSize:32];
+            regPtr = [self getRegPointer:mrm.reg opSize:16];
             if (mrm.type == modrm_register) {
-                rmWritePtr = [self getRegPointer:mrm.base opSize:32];
-                rmReadPtr = [self getRegPointer:mrm.base opSize:32];
-                memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                rmWritePtr = [self getRegPointer:mrm.base opSize:16];
+                rmReadPtr = [self getRegPointer:mrm.base opSize:16];
+                memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
             } else {
-                addr_t modrmAddress = [self getModRMAddress:mrm opSize:32];
+                addr_t modrmAddress = [self getModRMAddress:mrm opSize:16];
                 rmWritePtr = [self.task.mem getPointer:modrmAddress type:MEM_WRITE];
             }
             *((dword_t *)rmWritePtr) = *((dword_t *)regPtr);
@@ -3302,11 +3303,11 @@
                  if (!(rmReadPtr = [self.task.mem getPointer:modrmAddress type:MEM_READ])) {
                  return 13;
                  }
-                 memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                 memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                  */
                 rmReadValue = [self.task userReadOneBytes:modrmAddress];
             }
-            // memcpy(regPtr, rmReadPtr, sizeof(uint32_t));
+            // memcpy(regPtr, rmReadPtr, sizeof(uint16_t));
             *(uint8_t *)regPtr = (uint8_t)rmReadValue;
             break;
         case 0x8b:
@@ -3315,18 +3316,18 @@
             [self readByteIncIP:&modRMByte];
             // CLog(@"MODRM %x\n", modRMByte);
             mrm = [self decodeModRMByte:modRMByte];
-            regPtr = [self getRegPointer:mrm.reg opSize:32];
+            regPtr = [self getRegPointer:mrm.reg opSize:16];
             if (mrm.type == modrm_register) {
-                rmReadPtr = [self getRegPointer:mrm.base opSize:32]; memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                rmReadPtr = [self getRegPointer:mrm.base opSize:16]; memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                 //CLog(@"P: %d 0x8b Mov %@, %@\n", self.task.pid.id, [CPU getRegisterString:mrm.base], [CPU getRegisterString:mrm.base]);
             } else {
-                addr_t modrmAddress = [self getModRMAddress:mrm opSize:32];
+                addr_t modrmAddress = [self getModRMAddress:mrm opSize:16];
                 rmReadValue = [self.task userReadFourBytes:modrmAddress];
                 /*
                  if (!(rmReadPtr = [self.task.mem getPointer:modrmAddress type:MEM_READ])) {
                  return 13;
                  }
-                 memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                 memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                  */
                 //CLog(@"P: %d 0x8b Mov %@, [%x] = %x\n", self.task.pid.id, [CPU getRegisterString:mrm.reg], modrmAddress, *((dword_t *)rmReadPtr));
             }
@@ -3341,17 +3342,17 @@
                 self->state.eip = saved_ip;
                 return 6;
             }
-            regPtr = [self getRegPointer:mrm.reg opSize:32];
+            regPtr = [self getRegPointer:mrm.reg opSize:16];
             if (mrm.type == modrm_register) {
-                rmWritePtr = [self getRegPointer:mrm.base opSize:32];
-                rmReadPtr = [self getRegPointer:mrm.base opSize:32];
-                memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                rmWritePtr = [self getRegPointer:mrm.base opSize:16];
+                rmReadPtr = [self getRegPointer:mrm.base opSize:16];
+                memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
             } else {
-                addr_t modrmAddress = [self getModRMAddress:mrm opSize:32];
+                addr_t modrmAddress = [self getModRMAddress:mrm opSize:16];
                 if (!(rmReadPtr = [self.task.mem getPointer:modrmAddress type:MEM_READ])) {
                     return 13;
                 }
-                memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                 rmWritePtr = [self.task.mem getPointer:modrmAddress type:MEM_WRITE];
             }
             *((dword_t *)rmWritePtr) = self->state.gs;
@@ -3363,13 +3364,13 @@
             [self readByteIncIP:&modRMByte];
             // CLog(@"MODRM %x\n", modRMByte);
             mrm = [self decodeModRMByte:modRMByte];
-            regPtr = [self getRegPointer:mrm.reg opSize:32];
+            regPtr = [self getRegPointer:mrm.reg opSize:16];
             if (mrm.type == modrm_register) {
                 self->state.eip = saved_ip;
                 return 6;
             }
             
-            addr_t modrmAddress = [self getModRMAddress:mrm opSize:32];
+            addr_t modrmAddress = [self getModRMAddress:mrm opSize:16];
             
             *((dword_t *)regPtr) = modrmAddress;
             break;
@@ -3382,25 +3383,25 @@
                 self->state.eip = saved_ip;
                 return 6;
             }
-            regPtr = [self getRegPointer:mrm.reg opSize:32];
+            regPtr = [self getRegPointer:mrm.reg opSize:16];
             if (mrm.type == modrm_register) {
-                rmWritePtr = [self getRegPointer:mrm.base opSize:32];
-                rmReadPtr = [self getRegPointer:mrm.base opSize:32];
-                memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                rmWritePtr = [self getRegPointer:mrm.base opSize:16];
+                rmReadPtr = [self getRegPointer:mrm.base opSize:16];
+                memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
             } else {
-                addr_t modrmAddress = [self getModRMAddress:mrm opSize:32];
+                addr_t modrmAddress = [self getModRMAddress:mrm opSize:16];
                 if (!(rmReadPtr = [self.task.mem getPointer:modrmAddress type:MEM_READ])) {
                     return 13;
                 }
-                memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
             }
             self->state.gs = *((dword_t *)rmReadPtr);
             break;
             
         case 0x8f:
             // POP r/m32
-            // Pop esp into temp32
-            // move temp32 in mrmwriteptr
+            // Pop esp into temp16
+            // move temp16 in mrmwriteptr
             [self readByteIncIP:&modRMByte];
             // CLog(@"MODRM %x\n", modRMByte);
             mrm = [self decodeModRMByte:modRMByte];
@@ -3408,21 +3409,21 @@
                 self->state.eip = saved_ip;
                 return 6;
             }
-            regPtr = [self getRegPointer:mrm.reg opSize:32];
+            regPtr = [self getRegPointer:mrm.reg opSize:16];
             if (mrm.type == modrm_register) {
-                rmWritePtr = [self getRegPointer:mrm.base opSize:32];
-                rmReadPtr = [self getRegPointer:mrm.base opSize:32];
-                memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                rmWritePtr = [self getRegPointer:mrm.base opSize:16];
+                rmReadPtr = [self getRegPointer:mrm.base opSize:16];
+                memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
             } else {
-                addr_t modrmAddress = [self getModRMAddress:mrm opSize:32];
+                addr_t modrmAddress = [self getModRMAddress:mrm opSize:16];
                 if (!(rmReadPtr = [self.task.mem getPointer:modrmAddress type:MEM_READ])) {
                     return 13;
                 }
-                memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                 rmWritePtr = [self.task.mem getPointer:modrmAddress type:MEM_WRITE];
             }
-            [self readFourBytesIncSP:&temp32];
-            *(uint32_t *)rmWritePtr = temp32;
+            [self readFourBytesIncSP:&temp16];
+            *(uint16_t *)rmWritePtr = temp16;
             break;
             
         case 0x90:
@@ -3434,28 +3435,28 @@
         case 0x96:
         case 0x97:
             opReg = 0x7 & firstOpByte;
-            temp32 = [self getRegPointer:opReg opSize:32];
-            *(uint32_t *)[self getRegPointer:opReg opSize:32] = ((uint32_t)self->state.eax);
-            *(uint32_t *)&self->state.eax = temp32;
+            temp16 = [self getRegPointer:opReg opSize:16];
+            *(uint16_t *)[self getRegPointer:opReg opSize:16] = ((uint16_t)self->state.eax);
+            *(uint16_t *)&self->state.eax = temp16;
             break;
         case 0x98:
-            *(uint32_t *)[self getRegPointer:reg_eax opSize:32] = (uint16_t)[self getRegisterValue:reg_eax opSize:16];
+            *(uint16_t *)[self getRegPointer:reg_eax opSize:16] = (uint16_t)[self getRegisterValue:reg_eax opSize:16];
             break;
         case 0x99:
             // TODO: Remove this ternary should b -1 always right?
             // TODO: Why is this here?
-            *(uint32_t *)[self getRegPointer:reg_edx opSize:32] = ([self getRegisterValue:reg_eax opSize:32] & (1 << (32 - 1)) ? (uint32_t)-1 : 0);
+            *(uint16_t *)[self getRegPointer:reg_edx opSize:16] = ([self getRegisterValue:reg_eax opSize:16] & (1 << (16 - 1)) ? (uint16_t)-1 : 0);
             break;
         case 0x9b:
             NO_ERR_UN_IMP
             break;
         case 0x9c:
             collapse_flags(&self->state);
-            [self.task userWrite:(self->state.esp - 4) buf:&self->state.eflags count:4]; // sizeof(self->state.eflags)]
+            [self.task userWrite:(self->state.esp - 2) buf:&self->state.eflags count:2]; // sizeof(self->state.eflags)]
             self->state.esp -= 4;
             break;
         case 0x9d:
-            [self.task userRead:self->state.esp buf:&self->state.eflags count:4];
+            [self.task userRead:self->state.esp buf:&self->state.eflags count:2];
             self->state.esp += 4;
             expand_flags(&self->state);
             break;
@@ -3466,39 +3467,39 @@
             break;
             
         case 0xa0:
-            [self readFourBytesIncIP:&imm32];
+            [self readTwoBytesIncIP:&imm16];
             
-            addr += imm32;
+            addr += imm16;
             
             moffs8 = [self.task.mem getPointer:addr type:MEM_READ];
             *(uint8_t *)[self getRegPointer:reg_eax opSize:8] = *(uint8_t *)moffs8;
             break;
             
         case 0xa1:
-            [self readFourBytesIncIP:&imm32];
+            [self readTwoBytesIncIP:&imm16];
             
-            addr += imm32;
+            addr += imm16;
             
-            moffs32 = [self.task.mem getPointer:addr type:MEM_READ];
-            *(uint32_t *)[self getRegPointer:reg_eax opSize:32] = *(uint32_t *)moffs32;
+            moffs16 = [self.task.mem getPointer:addr type:MEM_READ];
+            *(uint16_t *)[self getRegPointer:reg_eax opSize:16] = *(uint16_t *)moffs16;
             break;
             
         case 0xa2:
-            [self readFourBytesIncIP:&imm32];
+            [self readTwoBytesIncIP:&imm16];
             
-            addr += imm32;
+            addr += imm16;
             
             moffs8 = [self.task.mem getPointer:addr type:MEM_WRITE];
             *((uint8_t *)moffs8) = (uint8_t)[self getRegisterValue:reg_eax opSize:8];
             break;
             
         case 0xa3:
-            [self readFourBytesIncIP:&imm32];
+            [self readTwoBytesIncIP:&imm16];
             
-            addr += imm32;
+            addr += imm16;
             
-            moffs32 = [self.task.mem getPointer:addr type:MEM_WRITE];
-            *moffs32 = [self getRegisterValue:reg_eax opSize:32];
+            moffs16 = [self.task.mem getPointer:addr type:MEM_WRITE];
+            *moffs16 = [self getRegisterValue:reg_eax opSize:16];
             break;
             
         case 0xa4:
@@ -3509,10 +3510,10 @@
             break;
             
         case 0xa5:
-            *(uint32_t *)[self getRegisterPointedMemory:reg_edi registerSize:32 accessType:MEM_WRITE] = *(uint32_t *)[self getRegisterPointedMemory:reg_esi registerSize:32 accessType:MEM_READ];
+            *(uint16_t *)[self getRegisterPointedMemory:reg_edi registerSize:16 accessType:MEM_WRITE] = *(uint16_t *)[self getRegisterPointedMemory:reg_esi registerSize:16 accessType:MEM_READ];
             
-            self->state.esi += self->state.df ? -4 : 4;
-            self->state.edi += self->state.df ? -4 : 4;
+            self->state.esi += self->state.df ? -2 : 2;
+            self->state.edi += self->state.df ? -2 : 2;
             break;
             
         case 0xa6:
@@ -3527,14 +3528,14 @@
             break;
             
         case 0xa7:
-            self->state.cf = __builtin_sub_overflow(*(uint32_t *)[self getRegisterPointedMemory:reg_esi registerSize:32 accessType:MEM_READ], *(uint32_t *)[self getRegisterPointedMemory:reg_edi registerSize:32 accessType:MEM_READ], (uint32_t *)&self->state.res);
-            self->state.of = __builtin_sub_overflow(*(int32_t *)[self getRegisterPointedMemory:reg_esi registerSize:32 accessType:MEM_READ], *(int32_t *)[self getRegisterPointedMemory:reg_edi registerSize:32 accessType:MEM_READ], (int32_t *)&self->state.res);
+            self->state.cf = __builtin_sub_overflow(*(uint16_t *)[self getRegisterPointedMemory:reg_esi registerSize:16 accessType:MEM_READ], *(uint16_t *)[self getRegisterPointedMemory:reg_edi registerSize:16 accessType:MEM_READ], (uint16_t *)&self->state.res);
+            self->state.of = __builtin_sub_overflow(*(int16_t *)[self getRegisterPointedMemory:reg_esi registerSize:16 accessType:MEM_READ], *(int16_t *)[self getRegisterPointedMemory:reg_edi registerSize:16 accessType:MEM_READ], (int16_t *)&self->state.res);
             
             self->state.af_ops = 1;
             self->state.zf_res = self->state.sf_res = self->state.pf_res = 1;
             
-            self->state.esi += self->state.df ? -4 : 4;
-            self->state.edi += self->state.df ? -4 : 4;
+            self->state.esi += self->state.df ? -2 : 2;
+            self->state.edi += self->state.df ? -2 : 2;
             break;
             
         case 0xa8:
@@ -3544,8 +3545,8 @@
             self->state.cf = self->state.of = self->state.af = self->state.af_ops = 0;
             break;
         case 0xa9:
-            [self readFourBytesIncIP:&imm32];
-            self->state.res = [self getRegisterValue:reg_eax opSize:32] & imm32;
+            [self readTwoBytesIncIP:&imm16];
+            self->state.res = [self getRegisterValue:reg_eax opSize:16] & imm16;
             self->state.zf_res = self->state.sf_res = self->state.pf_res = 1;
             self->state.cf = self->state.of = self->state.af = self->state.af_ops = 0;
             break;
@@ -3556,8 +3557,8 @@
             break;
             
         case 0xab:
-            [self.task userWrite:(uint32_t)[self getRegisterValue:reg_edi opSize:32] buf:(uint32_t *)[self getRegPointer:reg_eax opSize:32] count:4];
-            self->state.edi += self->state.df ? -4 : 4;
+            [self.task userWrite:(uint16_t)[self getRegisterValue:reg_edi opSize:16] buf:(uint16_t *)[self getRegPointer:reg_eax opSize:16] count:2];
+            self->state.edi += self->state.df ? -2 : 2;
             break;
             
         case 0xac:
@@ -3566,8 +3567,8 @@
             break;
             
         case 0xad:
-            [self.task userWrite:(uint32_t)[self getRegisterValue:reg_esi opSize:32] buf:(uint32_t *)[self getRegPointer:reg_eax opSize:32] count:4];
-            self->state.edi += self->state.df ? -4 : 4;
+            [self.task userWrite:(uint16_t)[self getRegisterValue:reg_esi opSize:16] buf:(uint16_t *)[self getRegPointer:reg_eax opSize:16] count:2];
+            self->state.edi += self->state.df ? -2 : 2;
             break;
             
         case 0xae:
@@ -3575,7 +3576,7 @@
             // Scan String
             [self readByteIncIP:&modRMByte];
             mrm = [self decodeModRMByte:modRMByte];
-            // regPtr = [self getRegPointer:mrm.reg opSize:32];
+            // regPtr = [self getRegPointer:mrm.reg opSize:16];
             if (mrm.type == modrm_register) {
                 // This shouldnt happen?
                 rmWritePtr = rmReadPtr  = [self getRegPointer:mrm.base opSize:8];
@@ -3586,17 +3587,17 @@
                 if (!(rmReadPtr = [self.task.mem getPointer:modrmAddress type:MEM_READ])) {
                     return 13;
                 }
-                memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                 rmWritePtr = [self.task.mem getPointer:modrmAddress type:MEM_WRITE];
             }
             
-            // temp32 = [edi] == the value of what is in the memory location that edi points to
-            temp32 = [self.task userReadOneBytes:(uint8_t)[self getRegisterValue:reg_edi opSize:8]];
+            // temp16 = [edi] == the value of what is in the memory location that edi points to
+            temp16 = [self.task userReadOneBytes:(uint8_t)[self getRegisterValue:reg_edi opSize:8]];
             
-            self->state.cf = __builtin_sub_overflow((uint8_t)temp32, *((uint8_t *)[self getRegPointer:reg_eax opSize:8]), (uint8_t *)&self->state.res);
-            self->state.of = __builtin_sub_overflow( (int8_t)temp32,  *((int8_t *)[self getRegPointer:reg_eax opSize:8]),  (int8_t *)&self->state.res);
+            self->state.cf = __builtin_sub_overflow((uint8_t)temp16, *((uint8_t *)[self getRegPointer:reg_eax opSize:8]), (uint8_t *)&self->state.res);
+            self->state.of = __builtin_sub_overflow( (int8_t)temp16,  *((int8_t *)[self getRegPointer:reg_eax opSize:8]),  (int8_t *)&self->state.res);
             
-            self->state.edi += self->state.df ? -4 : 4;
+            self->state.edi += self->state.df ? -2 : 2;
             
             self->state.af_ops = 1;
             self->state.zf_res = self->state.sf_res = self->state.pf_res = 1;
@@ -3608,28 +3609,28 @@
             // Scan String
             [self readByteIncIP:&modRMByte];
             mrm = [self decodeModRMByte:modRMByte];
-            // regPtr = [self getRegPointer:mrm.reg opSize:32];
+            // regPtr = [self getRegPointer:mrm.reg opSize:16];
             if (mrm.type == modrm_register) {
                 // This shouldnt happen?
-                rmWritePtr = rmReadPtr  = [self getRegPointer:mrm.base opSize:32];
-                memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t)); memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                rmWritePtr = rmReadPtr  = [self getRegPointer:mrm.base opSize:16];
+                memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t)); memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                 die("Unexpected opcode");
             } else {
-                addr_t modrmAddress = [self getModRMAddress:mrm opSize:32];
+                addr_t modrmAddress = [self getModRMAddress:mrm opSize:16];
                 if (!(rmReadPtr = [self.task.mem getPointer:modrmAddress type:MEM_READ])) {
                     return 13;
                 }
-                memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                 rmWritePtr = [self.task.mem getPointer:modrmAddress type:MEM_WRITE];
             }
             
-            // temp32 = [edi] == the value of what is in the memory location that edi points to
-            temp32 = [self.task userReadFourBytes:(uint32_t)[self getRegisterValue:reg_edi opSize:32]];
+            // temp16 = [edi] == the value of what is in the memory location that edi points to
+            temp16 = [self.task userReadFourBytes:(uint16_t)[self getRegisterValue:reg_edi opSize:16]];
             
-            self->state.cf = __builtin_sub_overflow((uint32_t)temp32, *((uint32_t *)[self getRegPointer:reg_eax opSize:32]), (uint32_t *)&self->state.res);
-            self->state.of = __builtin_sub_overflow( (int32_t)temp32,  *((int32_t *)[self getRegPointer:reg_eax opSize:32]),  (int32_t *)&self->state.res);
+            self->state.cf = __builtin_sub_overflow((uint16_t)temp16, *((uint16_t *)[self getRegPointer:reg_eax opSize:16]), (uint16_t *)&self->state.res);
+            self->state.of = __builtin_sub_overflow( (int16_t)temp16,  *((int16_t *)[self getRegPointer:reg_eax opSize:16]),  (int16_t *)&self->state.res);
             
-            self->state.edi += self->state.df ? -4 : 4;
+            self->state.edi += self->state.df ? -2 : 2;
             
             self->state.af_ops = 1;
             self->state.zf_res = self->state.sf_res = self->state.pf_res = 1;
@@ -3656,9 +3657,9 @@
         case 0xbd:
         case 0xbe:
         case 0xbf:
-            [self readFourBytesIncIP:&imm32];
-            rmWritePtr = [self getRegPointer:(0x7 & firstOpByte) opSize:32];
-            *(uint32_t *)rmWritePtr = (uint32_t)imm32;
+            [self readTwoBytesIncIP:&imm16];
+            rmWritePtr = [self getRegPointer:(0x7 & firstOpByte) opSize:16];
+            *(uint16_t *)rmWritePtr = (uint16_t)imm16;
             break;
             
         case 0xc0:
@@ -3674,13 +3675,13 @@
                 if (!(rmReadPtr = [self.task.mem getPointer:modrmAddress type:MEM_READ])) {
                     return 13;
                 }
-                memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                 rmWritePtr = [self.task.mem getPointer:modrmAddress type:MEM_WRITE];
             }
             
-            // NOTE: In this case I am reading the 4 byte immediate value into the temp32 variable
+            // NOTE: In this case I am reading the 4 byte immediate value into the temp16 variable
             // which is unusal
-            // I am doing this to re use code I wrote earlier for 0xd3 which will use the temp32 variable
+            // I am doing this to re use code I wrote earlier for 0xd3 which will use the temp16 variable
             // as the argument for this operations
             [self readByteIncIP:&temp8];
             
@@ -3738,16 +3739,16 @@
         case 0xc1:
             [self readByteIncIP:&modRMByte];
             mrm = [self decodeModRMByte:modRMByte];
-            regPtr = [self getRegPointer:mrm.reg opSize:32];
+            regPtr = [self getRegPointer:mrm.reg opSize:16];
             if (mrm.type == modrm_register) {
-                rmWritePtr = [self getRegPointer:mrm.base opSize:32];
-                rmReadPtr = [self getRegPointer:mrm.base opSize:32]; memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                rmWritePtr = [self getRegPointer:mrm.base opSize:16];
+                rmReadPtr = [self getRegPointer:mrm.base opSize:16]; memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
             } else {
-                addr_t modrmAddress = [self getModRMAddress:mrm opSize:32];
+                addr_t modrmAddress = [self getModRMAddress:mrm opSize:16];
                 if (!(rmReadPtr = [self.task.mem getPointer:modrmAddress type:MEM_READ])) {
                     return 13;
                 }
-                memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                 rmWritePtr = [self.task.mem getPointer:modrmAddress type:MEM_WRITE];
             }
             
@@ -3839,17 +3840,17 @@
             // MOV    r/m16/32    imm16/32
             [self readByteIncIP:&modRMByte];
             mrm = [self decodeModRMByte:modRMByte];
-            regPtr = [self getRegPointer:mrm.reg opSize:32];
+            regPtr = [self getRegPointer:mrm.reg opSize:16];
             if (mrm.type == modrm_register) {
-                rmWritePtr = [self getRegPointer:mrm.base opSize:32];
-                rmReadPtr = [self getRegPointer:mrm.base opSize:32];
-                memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                rmWritePtr = [self getRegPointer:mrm.base opSize:16];
+                rmReadPtr = [self getRegPointer:mrm.base opSize:16];
+                memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
             } else {
-                addr_t modrmAddress = [self getModRMAddress:mrm opSize:32];
+                addr_t modrmAddress = [self getModRMAddress:mrm opSize:16];
                 rmWritePtr = [self.task.mem getPointer:modrmAddress type:MEM_WRITE];
             }
-            [self readFourBytesIncIP:&imm32];
-            *((uint32_t *)rmWritePtr) = (uint32_t)imm32;
+            [self readTwoBytesIncIP:&imm16];
+            *((uint16_t *)rmWritePtr) = (uint16_t)imm16;
             break;
             
         case 0xc9:
@@ -3877,7 +3878,7 @@
                 if (!(rmReadPtr = [self.task.mem getPointer:modrmAddress type:MEM_READ])) {
                     return 13;
                 }
-                memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                 rmWritePtr = [self.task.mem getPointer:modrmAddress type:MEM_WRITE];
             }
             
@@ -3951,36 +3952,36 @@
         case 0xd1:
             [self readByteIncIP:&modRMByte];
             mrm = [self decodeModRMByte:modRMByte];
-            regPtr = [self getRegPointer:mrm.reg opSize:32];
+            regPtr = [self getRegPointer:mrm.reg opSize:16];
             if (mrm.type == modrm_register) {
-                rmWritePtr = [self getRegPointer:mrm.base opSize:32];
-                rmReadPtr = [self getRegPointer:mrm.base opSize:32]; memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                rmWritePtr = [self getRegPointer:mrm.base opSize:16];
+                rmReadPtr = [self getRegPointer:mrm.base opSize:16]; memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
             } else {
-                addr_t modrmAddress = [self getModRMAddress:mrm opSize:32];
+                addr_t modrmAddress = [self getModRMAddress:mrm opSize:16];
                 if (!(rmReadPtr = [self.task.mem getPointer:modrmAddress type:MEM_READ])) {
                     return 13;
                 }
-                memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                 rmWritePtr = [self.task.mem getPointer:modrmAddress type:MEM_WRITE];
             }
             
             switch (mrm.reg) {
                 case 0x0:
-                    temp32 = 1;
-                    if (temp32) {
-                        *rmWritePtr = *rmReadPtr << temp32 | *rmReadPtr >> (32 - temp32);
+                    temp16 = 1;
+                    if (temp16) {
+                        *rmWritePtr = *rmReadPtr << temp16 | *rmReadPtr >> (16 - temp16);
                         self->state.cf = *rmReadPtr & 1;
-                        if (temp32 == 1) {
-                            self->state.of = self->state.cf ^ *rmReadPtr >> (32 - 1);
+                        if (temp16 == 1) {
+                            self->state.of = self->state.cf ^ *rmReadPtr >> (16 - 1);
                         }
                     }
                     break;
                 case 0x1:
-                    temp32 = 1;
-                    if (temp32) {
-                        *rmWritePtr = *rmReadPtr >> temp32 | *rmReadPtr << (32 - temp32);
-                        self->state.cf = *rmReadPtr >> (32 - 1);
-                        if (temp32 == 1) {
+                    temp16 = 1;
+                    if (temp16) {
+                        *rmWritePtr = *rmReadPtr >> temp16 | *rmReadPtr << (16 - temp16);
+                        self->state.cf = *rmReadPtr >> (16 - 1);
+                        if (temp16 == 1) {
                             self->state.of = self->state.cf ^ (*rmReadPtr & 1);
                         }
                     }
@@ -3993,33 +3994,33 @@
                     break;
                 case 0x4:
                 case 0x6:
-                    temp32 = 1;
-                    if (temp32) {
-                        self->state.cf = *rmReadPtr << (temp32 - 1) >> (32 - 1);
-                        self->state.of = self->state.cf ^ *rmReadPtr >> (32 - 1);
-                        self->state.res = *rmWritePtr = *rmReadPtr << temp32;
+                    temp16 = 1;
+                    if (temp16) {
+                        self->state.cf = *rmReadPtr << (temp16 - 1) >> (16 - 1);
+                        self->state.of = self->state.cf ^ *rmReadPtr >> (16 - 1);
+                        self->state.res = *rmWritePtr = *rmReadPtr << temp16;
                         
                         self->state.zf_res = self->state.sf_res = self->state.pf_res = 1;
                         self->state.af = self->state.af_ops = 0;
                     }
                     break;
                 case 0x5:
-                    temp32 = 1;
-                    if (temp32) {
-                        self->state.cf = *rmReadPtr << (temp32 - 1) >> (temp32 - 1) & 1;
-                        self->state.of = *rmReadPtr >> (32 - 1);
-                        self->state.res = *rmWritePtr = *rmReadPtr >> temp32;
+                    temp16 = 1;
+                    if (temp16) {
+                        self->state.cf = *rmReadPtr << (temp16 - 1) >> (temp16 - 1) & 1;
+                        self->state.of = *rmReadPtr >> (16 - 1);
+                        self->state.res = *rmWritePtr = *rmReadPtr >> temp16;
                         
                         self->state.zf_res = self->state.sf_res = self->state.pf_res = 1;
                         self->state.af = self->state.af_ops = 0;
                     }
                     break;
                 case 0x7:
-                    temp32 = 1;
-                    if (temp32) {
-                        self->state.cf = (*rmReadPtr >> (temp32 - 1)) & 1;
+                    temp16 = 1;
+                    if (temp16) {
+                        self->state.cf = (*rmReadPtr >> (temp16 - 1)) & 1;
                         self->state.of = 0;
-                        self->state.res = *rmWritePtr = *rmReadPtr >> temp32;
+                        self->state.res = *rmWritePtr = *rmReadPtr >> temp16;
                         
                         self->state.zf_res = self->state.sf_res = self->state.pf_res = 1;
                         self->state.af = self->state.af_ops = 0;
@@ -4044,7 +4045,7 @@
                 if (!(rmReadPtr = [self.task.mem getPointer:modrmAddress type:MEM_READ])) {
                     return 13;
                 }
-                memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                 rmWritePtr = [self.task.mem getPointer:modrmAddress type:MEM_WRITE];
             }
             
@@ -4106,36 +4107,36 @@
         case 0xd3:
             [self readByteIncIP:&modRMByte];
             mrm = [self decodeModRMByte:modRMByte];
-            regPtr = [self getRegPointer:mrm.reg opSize:32];
+            regPtr = [self getRegPointer:mrm.reg opSize:16];
             if (mrm.type == modrm_register) {
-                rmWritePtr = [self getRegPointer:mrm.base opSize:32];
-                rmReadPtr = [self getRegPointer:mrm.base opSize:32]; memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                rmWritePtr = [self getRegPointer:mrm.base opSize:16];
+                rmReadPtr = [self getRegPointer:mrm.base opSize:16]; memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
             } else {
-                addr_t modrmAddress = [self getModRMAddress:mrm opSize:32];
+                addr_t modrmAddress = [self getModRMAddress:mrm opSize:16];
                 if (!(rmReadPtr = [self.task.mem getPointer:modrmAddress type:MEM_READ])) {
                     return 13;
                 }
-                memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                 rmWritePtr = [self.task.mem getPointer:modrmAddress type:MEM_WRITE];
             }
             
-            // temp32 = *(uint32_t *)[self getRegPointer:reg_ecx opSize:8] % 32;
-            temp8 = self->state.cl % 32; // This is the shift count
+            // temp16 = *(uint16_t *)[self getRegPointer:reg_ecx opSize:8] % 16;
+            temp8 = self->state.cl % 16; // This is the shift count
             
             switch (mrm.reg) {
                 case 0x0:
                     if (temp8 != 0) {
-                        *rmWritePtr = *rmReadPtr << temp8 | *rmReadPtr >> (32 - temp8);
+                        *rmWritePtr = *rmReadPtr << temp8 | *rmReadPtr >> (16 - temp8);
                         self->state.cf = *rmReadPtr & 1;
-                        if (temp32 == 1) {
-                            self->state.of = self->state.cf ^ *rmReadPtr >> (32 - 1);
+                        if (temp16 == 1) {
+                            self->state.of = self->state.cf ^ *rmReadPtr >> (16 - 1);
                         }
                     }
                     break;
                 case 0x1:
                     if (temp8 != 0) {
-                        *rmWritePtr = *rmReadPtr >> temp8 | *rmReadPtr << (32 - temp8);
-                        self->state.cf = *rmReadPtr >> (32 - 1);
+                        *rmWritePtr = *rmReadPtr >> temp8 | *rmReadPtr << (16 - temp8);
+                        self->state.cf = *rmReadPtr >> (16 - 1);
                         if (temp8 == 1) {
                             self->state.of = self->state.cf ^ (*rmReadPtr & 1);
                         }
@@ -4150,8 +4151,8 @@
                 case 0x4:
                 case 0x6:
                     if (temp8 != 0) {
-                        self->state.cf = (*rmReadPtr << (temp8 - 1)) >> (32 - 1);
-                        self->state.of = (self->state.cf ^ *rmReadPtr) >> (32 - 1);
+                        self->state.cf = (*rmReadPtr << (temp8 - 1)) >> (16 - 1);
+                        self->state.of = (self->state.cf ^ *rmReadPtr) >> (16 - 1);
                         self->state.res = *rmWritePtr = *rmReadPtr << temp8;
                         
                         self->state.zf_res = self->state.sf_res = self->state.pf_res = 1;
@@ -4161,7 +4162,7 @@
                 case 0x5:
                     if (temp8 != 0) {
                         self->state.cf = *rmReadPtr << (temp8 - 1) >> (temp8 - 1) & 1;
-                        self->state.of = *rmReadPtr >> (32 - 1);
+                        self->state.of = *rmReadPtr >> (16 - 1);
                         self->state.res = *rmWritePtr = *rmReadPtr >> temp8;
                         
                         self->state.zf_res = self->state.sf_res = self->state.pf_res = 1;
@@ -4190,16 +4191,16 @@
             // http://ref.x86asm.net/coder32.html#xD8
             [self readByteIncIP:&modRMByte];
             mrm = [self decodeModRMByte:modRMByte];
-            regPtr = [self getRegPointer:mrm.reg opSize:32];
+            regPtr = [self getRegPointer:mrm.reg opSize:16];
             if (mrm.type == modrm_register) {
-                rmWritePtr = [self getRegPointer:mrm.base opSize:32];
-                rmReadPtr = [self getRegPointer:mrm.base opSize:32]; memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                rmWritePtr = [self getRegPointer:mrm.base opSize:16];
+                rmReadPtr = [self getRegPointer:mrm.base opSize:16]; memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
             } else {
-                addr_t modrmAddress = [self getModRMAddress:mrm opSize:32];
+                addr_t modrmAddress = [self getModRMAddress:mrm opSize:16];
                 if (!(rmReadPtr = [self.task.mem getPointer:modrmAddress type:MEM_READ])) {
                     return 13;
                 }
-                memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                 rmWritePtr = [self.task.mem getPointer:modrmAddress type:MEM_WRITE];
             }
             
@@ -4208,7 +4209,7 @@
                     if (mrm.type == modrm_register) {
                         self->state.fp[self->state.top] = f80_add(self->state.fp[self->state.top], self->state.fp[self->state.top + mrm.rm_opcode]);
                     } else {
-                        [self.task userRead:modrmAddress buf:&tempfloat count:4];
+                        [self.task userRead:modrmAddress buf:&tempfloat count:2];
                         self->state.fp[self->state.top] = f80_add(self->state.fp[self->state.top], f80_from_double(tempfloat));
                     }
                     break;
@@ -4216,7 +4217,7 @@
                     if (mrm.type == modrm_register) {
                         self->state.fp[self->state.top] = f80_mul(self->state.fp[self->state.top], self->state.fp[self->state.top + mrm.rm_opcode]);
                     } else {
-                        [self.task userRead:modrmAddress buf:&tempfloat count:4];
+                        [self.task userRead:modrmAddress buf:&tempfloat count:2];
                         self->state.fp[self->state.top] = f80_mul(self->state.fp[self->state.top], f80_from_double(tempfloat));
                     }
                     break;
@@ -4226,7 +4227,7 @@
                         self->state.c0 = f80_lt(self->state.fp[self->state.top], self->state.fp[self->state.top + mrm.rm_opcode]);
                         self->state.c0 = f80_eq(self->state.fp[self->state.top], self->state.fp[self->state.top + mrm.rm_opcode]);
                     } else {
-                        [self.task userRead:modrmAddress buf:&tempfloat count:4];
+                        [self.task userRead:modrmAddress buf:&tempfloat count:2];
                         self->state.c0 = f80_lt(self->state.fp[self->state.top], f80_from_double(tempfloat));
                         self->state.c0 = f80_eq(self->state.fp[self->state.top], f80_from_double(tempfloat));
                     }
@@ -4237,7 +4238,7 @@
                         self->state.c0 = f80_lt(self->state.fp[self->state.top], self->state.fp[self->state.top + mrm.rm_opcode]);
                         self->state.c0 = f80_eq(self->state.fp[self->state.top], self->state.fp[self->state.top + mrm.rm_opcode]);
                     } else {
-                        [self.task userRead:modrmAddress buf:&tempfloat count:4];
+                        [self.task userRead:modrmAddress buf:&tempfloat count:2];
                         self->state.c0 = f80_lt(self->state.fp[self->state.top], f80_from_double(tempfloat));
                         self->state.c0 = f80_eq(self->state.fp[self->state.top], f80_from_double(tempfloat));
                     }
@@ -4247,7 +4248,7 @@
                     if (mrm.type == modrm_register) {
                         self->state.fp[self->state.top] = f80_sub(self->state.fp[self->state.top], self->state.fp[self->state.top + mrm.rm_opcode]);
                     } else {
-                        [self.task userRead:modrmAddress buf:&tempfloat count:4];
+                        [self.task userRead:modrmAddress buf:&tempfloat count:2];
                         self->state.fp[self->state.top] = f80_sub(self->state.fp[self->state.top], f80_from_double(tempfloat));
                     }
                     break;
@@ -4255,7 +4256,7 @@
                     if (mrm.type == modrm_register) {
                         self->state.fp[self->state.top] = f80_sub(self->state.fp[self->state.top + mrm.rm_opcode], self->state.fp[self->state.top]);
                     } else {
-                        [self.task userRead:modrmAddress buf:&tempfloat count:4];
+                        [self.task userRead:modrmAddress buf:&tempfloat count:2];
                         self->state.fp[self->state.top] = f80_sub(f80_from_double(tempfloat), self->state.fp[self->state.top]);
                     }
                     break;
@@ -4263,7 +4264,7 @@
                     if (mrm.type == modrm_register) {
                         self->state.fp[self->state.top] = f80_div(self->state.fp[self->state.top], self->state.fp[self->state.top + mrm.rm_opcode]);
                     } else {
-                        [self.task userRead:modrmAddress buf:&tempfloat count:4];
+                        [self.task userRead:modrmAddress buf:&tempfloat count:2];
                         self->state.fp[self->state.top] = f80_div(self->state.fp[self->state.top], f80_from_double(tempfloat));
                     }
                     break;
@@ -4271,7 +4272,7 @@
                     if (mrm.type == modrm_register) {
                         self->state.fp[self->state.top] = f80_div(self->state.fp[self->state.top + mrm.rm_opcode], self->state.fp[self->state.top]);
                     } else {
-                        [self.task userRead:modrmAddress buf:&tempfloat count:4];
+                        [self.task userRead:modrmAddress buf:&tempfloat count:2];
                         self->state.fp[self->state.top] = f80_div(f80_from_double(tempfloat), self->state.fp[self->state.top]);
                     }
                     break;
@@ -4284,16 +4285,16 @@
             // http://ref.x86asm.net/coder32.html#xD9
             [self readByteIncIP:&modRMByte];
             mrm = [self decodeModRMByte:modRMByte];
-            regPtr = [self getRegPointer:mrm.reg opSize:32];
+            regPtr = [self getRegPointer:mrm.reg opSize:16];
             if (mrm.type == modrm_register) {
-                rmWritePtr = [self getRegPointer:mrm.base opSize:32];
-                rmReadPtr = [self getRegPointer:mrm.base opSize:32]; memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                rmWritePtr = [self getRegPointer:mrm.base opSize:16];
+                rmReadPtr = [self getRegPointer:mrm.base opSize:16]; memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
             } else {
-                addr_t modrmAddress = [self getModRMAddress:mrm opSize:32];
+                addr_t modrmAddress = [self getModRMAddress:mrm opSize:16];
                 if (!(rmReadPtr = [self.task.mem getPointer:modrmAddress type:MEM_READ])) {
                     return 13;
                 }
-                memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                 rmWritePtr = [self.task.mem getPointer:modrmAddress type:MEM_WRITE];
             }
             
@@ -4305,7 +4306,7 @@
                         self->state.fp[self->state.top] = tempfloat80;
                     } else {
                         self->state.top -= 1;
-                        [self.task userRead:modrmAddress buf:&tempfloat count:4];
+                        [self.task userRead:modrmAddress buf:&tempfloat count:2];
                         self->state.fp[self->state.top] = f80_from_double(tempfloat);
                     }
                     break;
@@ -4322,7 +4323,7 @@
                     if (mrm.type == modrm_register) {
                         die("Could happen, just remove this if block for only the else block");
                     } else {
-                        [self.task userRead:modrmAddress buf:&tempfloat count:4];
+                        [self.task userRead:modrmAddress buf:&tempfloat count:2];
                         self->state.fp[self->state.top] = f80_from_double(tempfloat);
                     }
                     break;
@@ -4330,7 +4331,7 @@
                     if (mrm.type == modrm_register) {
                         die("Could happen, just remove this if block for only the else block");
                     } else {
-                        [self.task userRead:modrmAddress buf:&tempfloat count:4];
+                        [self.task userRead:modrmAddress buf:&tempfloat count:2];
                         self->state.fp[self->state.top] = f80_from_double(tempfloat);
                     }
                     self->state.top += 1;
@@ -4360,27 +4361,27 @@
             // http://ref.x86asm.net/coder32.html#xDA
             [self readByteIncIP:&modRMByte];
             mrm = [self decodeModRMByte:modRMByte];
-            regPtr = [self getRegPointer:mrm.reg opSize:32];
+            regPtr = [self getRegPointer:mrm.reg opSize:16];
             if (mrm.type == modrm_register) {
-                rmWritePtr = [self getRegPointer:mrm.base opSize:32];
-                rmReadPtr = [self getRegPointer:mrm.base opSize:32]; memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                rmWritePtr = [self getRegPointer:mrm.base opSize:16];
+                rmReadPtr = [self getRegPointer:mrm.base opSize:16]; memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
             } else {
-                addr_t modrmAddress = [self getModRMAddress:mrm opSize:32];
+                addr_t modrmAddress = [self getModRMAddress:mrm opSize:16];
                 if (!(rmReadPtr = [self.task.mem getPointer:modrmAddress type:MEM_READ])) {
                     return 13;
                 }
-                memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                 rmWritePtr = [self.task.mem getPointer:modrmAddress type:MEM_WRITE];
             }
             
             switch(mrm.opcode) {
                 case 0x0:
-                    [self.task userRead:modrmAddress buf:&temp32 count:4];
-                    self->state.fp[self->state.top] = f80_add(self->state.fp[self->state.top], f80_from_int(temp32));
+                    [self.task userRead:modrmAddress buf:&temp16 count:2];
+                    self->state.fp[self->state.top] = f80_add(self->state.fp[self->state.top], f80_from_int(temp16));
                     break;
                 case 0x1:
-                    [self.task userRead:modrmAddress buf:&temp32 count:4];
-                    self->state.fp[self->state.top] = f80_mul(self->state.fp[self->state.top], f80_from_int(temp32));
+                    [self.task userRead:modrmAddress buf:&temp16 count:2];
+                    self->state.fp[self->state.top] = f80_mul(self->state.fp[self->state.top], f80_from_int(temp16));
                     break;
                 case 0x2:
                     self->state.eip = saved_ip;
@@ -4392,20 +4393,20 @@
                     self->state.top += 1;
                     break;
                 case 0x4:
-                    [self.task userRead:modrmAddress buf:&temp32 count:4];
-                    self->state.fp[self->state.top] = f80_sub(f80_from_int(temp32), self->state.fp[self->state.top]);
+                    [self.task userRead:modrmAddress buf:&temp16 count:2];
+                    self->state.fp[self->state.top] = f80_sub(f80_from_int(temp16), self->state.fp[self->state.top]);
                     break;
                 case 0x5:
-                    [self.task userRead:modrmAddress buf:&temp32 count:4];
-                    self->state.fp[self->state.top] = f80_sub(self->state.fp[self->state.top], f80_from_int(temp32));
+                    [self.task userRead:modrmAddress buf:&temp16 count:2];
+                    self->state.fp[self->state.top] = f80_sub(self->state.fp[self->state.top], f80_from_int(temp16));
                     break;
                 case 0x6:
-                    [self.task userRead:modrmAddress buf:&temp32 count:4];
-                    self->state.fp[self->state.top] = f80_div(self->state.fp[self->state.top], f80_from_int(temp32));
+                    [self.task userRead:modrmAddress buf:&temp16 count:2];
+                    self->state.fp[self->state.top] = f80_div(self->state.fp[self->state.top], f80_from_int(temp16));
                     break;
                 case 0x7:
-                    [self.task userRead:modrmAddress buf:&temp32 count:4];
-                    self->state.fp[self->state.top] = f80_div(f80_from_int(temp32), self->state.fp[self->state.top]);
+                    [self.task userRead:modrmAddress buf:&temp16 count:2];
+                    self->state.fp[self->state.top] = f80_div(f80_from_int(temp16), self->state.fp[self->state.top]);
                     break;
                 default:
                     die("Reached an impossible FPU Opcode");
@@ -4416,23 +4417,23 @@
             // http://ref.x86asm.net/coder32.html#xDB
             [self readByteIncIP:&modRMByte];
             mrm = [self decodeModRMByte:modRMByte];
-            regPtr = [self getRegPointer:mrm.reg opSize:32];
+            regPtr = [self getRegPointer:mrm.reg opSize:16];
             if (mrm.type == modrm_register) {
-                rmWritePtr = [self getRegPointer:mrm.base opSize:32];
-                rmReadPtr = [self getRegPointer:mrm.base opSize:32]; memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                rmWritePtr = [self getRegPointer:mrm.base opSize:16];
+                rmReadPtr = [self getRegPointer:mrm.base opSize:16]; memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
             } else {
-                addr_t modrmAddress = [self getModRMAddress:mrm opSize:32];
+                addr_t modrmAddress = [self getModRMAddress:mrm opSize:16];
                 if (!(rmReadPtr = [self.task.mem getPointer:modrmAddress type:MEM_READ])) {
                     return 13;
                 }
-                memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                 rmWritePtr = [self.task.mem getPointer:modrmAddress type:MEM_WRITE];
             }
             
             switch(mrm.opcode) {
                 case 0x0:
-                    [self.task userRead:modrmAddress buf:&temp32 count:4];
-                    tempfloat80 = f80_from_int(temp32);
+                    [self.task userRead:modrmAddress buf:&temp16 count:2];
+                    tempfloat80 = f80_from_int(temp16);
                     self->state.top -= 1;
                     self->state.fp[self->state.top] = tempfloat80;
                     break;
@@ -4440,12 +4441,12 @@
                     die("shouldnt happen?");
                     break;
                 case 0x2:
-                    temp32 = f80_to_int(self->state.fp[self->state.top]);
-                    [self.task userWrite:modrmAddress buf:&temp32 count:4];
+                    temp16 = f80_to_int(self->state.fp[self->state.top]);
+                    [self.task userWrite:modrmAddress buf:&temp16 count:2];
                     break;
                 case 0x3:
-                    temp32 = f80_to_int(self->state.fp[self->state.top]);
-                    [self.task userWrite:modrmAddress buf:&temp32 count:4];
+                    temp16 = f80_to_int(self->state.fp[self->state.top]);
+                    [self.task userWrite:modrmAddress buf:&temp16 count:2];
                     self->state.top += 1;
                     break;
                 case 0x4:
@@ -4484,16 +4485,16 @@
             // http://ref.x86asm.net/coder32.html#xDC
             [self readByteIncIP:&modRMByte];
             mrm = [self decodeModRMByte:modRMByte];
-            regPtr = [self getRegPointer:mrm.reg opSize:32];
+            regPtr = [self getRegPointer:mrm.reg opSize:16];
             if (mrm.type == modrm_register) {
-                rmWritePtr = [self getRegPointer:mrm.base opSize:32];
-                rmReadPtr = [self getRegPointer:mrm.base opSize:32]; memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                rmWritePtr = [self getRegPointer:mrm.base opSize:16];
+                rmReadPtr = [self getRegPointer:mrm.base opSize:16]; memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
             } else {
-                addr_t modrmAddress = [self getModRMAddress:mrm opSize:32];
+                addr_t modrmAddress = [self getModRMAddress:mrm opSize:16];
                 if (!(rmReadPtr = [self.task.mem getPointer:modrmAddress type:MEM_READ])) {
                     return 13;
                 }
-                memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                 rmWritePtr = [self.task.mem getPointer:modrmAddress type:MEM_WRITE];
             }
             
@@ -4580,16 +4581,16 @@
             // http://ref.x86asm.net/coder32.html#xDD
             [self readByteIncIP:&modRMByte];
             mrm = [self decodeModRMByte:modRMByte];
-            regPtr = [self getRegPointer:mrm.reg opSize:32];
+            regPtr = [self getRegPointer:mrm.reg opSize:16];
             if (mrm.type == modrm_register) {
-                rmWritePtr = [self getRegPointer:mrm.base opSize:32];
-                rmReadPtr = [self getRegPointer:mrm.base opSize:32]; memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                rmWritePtr = [self getRegPointer:mrm.base opSize:16];
+                rmReadPtr = [self getRegPointer:mrm.base opSize:16]; memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
             } else {
-                addr_t modrmAddress = [self getModRMAddress:mrm opSize:32];
+                addr_t modrmAddress = [self getModRMAddress:mrm opSize:16];
                 if (!(rmReadPtr = [self.task.mem getPointer:modrmAddress type:MEM_READ])) {
                     return 13;
                 }
-                memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                 rmWritePtr = [self.task.mem getPointer:modrmAddress type:MEM_WRITE];
             }
             
@@ -4665,16 +4666,16 @@
             // http://ref.x86asm.net/coder32.html#xDE
             [self readByteIncIP:&modRMByte];
             mrm = [self decodeModRMByte:modRMByte];
-            regPtr = [self getRegPointer:mrm.reg opSize:32];
+            regPtr = [self getRegPointer:mrm.reg opSize:16];
             if (mrm.type == modrm_register) {
-                rmWritePtr = [self getRegPointer:mrm.base opSize:32];
-                rmReadPtr = [self getRegPointer:mrm.base opSize:32]; memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                rmWritePtr = [self getRegPointer:mrm.base opSize:16];
+                rmReadPtr = [self getRegPointer:mrm.base opSize:16]; memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
             } else {
-                addr_t modrmAddress = [self getModRMAddress:mrm opSize:32];
+                addr_t modrmAddress = [self getModRMAddress:mrm opSize:16];
                 if (!(rmReadPtr = [self.task.mem getPointer:modrmAddress type:MEM_READ])) {
                     return 13;
                 }
-                memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                 rmWritePtr = [self.task.mem getPointer:modrmAddress type:MEM_WRITE];
             }
             
@@ -4765,16 +4766,16 @@
             // http://ref.x86asm.net/coder32.html#xDF
             [self readByteIncIP:&modRMByte];
             mrm = [self decodeModRMByte:modRMByte];
-            regPtr = [self getRegPointer:mrm.reg opSize:32];
+            regPtr = [self getRegPointer:mrm.reg opSize:16];
             if (mrm.type == modrm_register) {
-                rmWritePtr = [self getRegPointer:mrm.base opSize:32];
-                rmReadPtr = [self getRegPointer:mrm.base opSize:32]; memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                rmWritePtr = [self getRegPointer:mrm.base opSize:16];
+                rmReadPtr = [self getRegPointer:mrm.base opSize:16]; memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
             } else {
-                addr_t modrmAddress = [self getModRMAddress:mrm opSize:32];
+                addr_t modrmAddress = [self getModRMAddress:mrm opSize:16];
                 if (!(rmReadPtr = [self.task.mem getPointer:modrmAddress type:MEM_READ])) {
                     return 13;
                 }
-                memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                 rmWritePtr = [self.task.mem getPointer:modrmAddress type:MEM_WRITE];
             }
             
@@ -4881,24 +4882,24 @@
             break;
         case 0xe8:
             // CALL    rel16/32
-            if ([self readFourBytesIncIP:&imm32]) {
+            if ([self readTwoBytesIncIP:&imm16]) {
                 SEGFAULT
             }
-            if ([self.task userWrite:self->state.esp - 4 buf:&self->state.eip count:4]) {
+            if ([self.task userWrite:self->state.esp - 2 buf:&self->state.eip count:2]) {
                 SEGFAULT
             }
             self->state.esp -= 4;
             
-            self->state.eip += (int32_t)imm32;
+            self->state.eip += (int16_t)imm16;
             // TODO: If this is a 16bit CALL then & eip by 0xffff after this eip += imm
             break;
             
         case 0xe9:
             // JMP    rel16/32
-            if ([self readFourBytesIncIP:&imm32]) {
+            if ([self readTwoBytesIncIP:&imm16]) {
                 SEGFAULT
             }
-            self->state.eip += (int32_t)imm32;
+            self->state.eip += (int16_t)imm16;
             break;
             
         case 0xeb:
@@ -4921,7 +4922,7 @@
                 if (!(rmReadPtr = [self.task.mem getPointer:modrmAddress type:MEM_READ])) {
                     return 13;
                 }
-                memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                 rmWritePtr = [self.task.mem getPointer:modrmAddress type:MEM_WRITE];
             }
             
@@ -4958,8 +4959,8 @@
                     // Unsigned multiply
                     temp64 = (*(uint8_t *)[self getRegPointer:reg_eax opSize:8] * (uint64_t)((uint8_t)rmReadValue));
                     
-                    *(uint8_t *)[self getRegPointer:reg_eax opSize:8] = temp32;
-                    *(uint8_t *)[self getRegPointer:reg_edx opSize:8] = temp32 >> 8;
+                    *(uint8_t *)[self getRegPointer:reg_eax opSize:8] = temp16;
+                    *(uint8_t *)[self getRegPointer:reg_edx opSize:8] = temp16 >> 8;
                     
                     FFLog(@"\n\n\n  Check this OpCode result out! Is it correct? F6 /4    MUL r/m8   \n\n\n\n");
                     __debugbreak();
@@ -4969,7 +4970,7 @@
                     // *(uint8_t *)&cpu->eax = tmp;
                     // *(uint8_t *)&cpu->edx = tmp >> 8;
                     
-                    self->state.cf = self->state.of = ((int32_t)temp64 != (uint32_t)temp64);
+                    self->state.cf = self->state.of = ((int16_t)temp64 != (uint16_t)temp64);
                     self->state.af = self->state.af_ops = 0;
                     self->state.zf = self->state.sf = self->state.zf_res = self->state.sf_res = self->state.pf_res = 1;
                     break;
@@ -4980,14 +4981,14 @@
                     // TODO: This outer int64_t cast is unnecessary?
                     temp64 = (int64_t)(*(int8_t *)[self getRegPointer:reg_eax opSize:8] * (int64_t)((int8_t)rmReadValue));
                     
-                    *(uint8_t *)[self getRegPointer:reg_eax opSize:8] = temp32;
-                    *(uint8_t *)[self getRegPointer:reg_edx opSize:8] = temp32 >> 8;
+                    *(uint8_t *)[self getRegPointer:reg_eax opSize:8] = temp16;
+                    *(uint8_t *)[self getRegPointer:reg_edx opSize:8] = temp16 >> 8;
                     
                     FFLog(@"\n\n\n  Check this OpCode result out! Is it correct? F6 /5    IMUL r/m8   \n\n\n\n");
                     __debugbreak();
                     
                     // TODO: Does this of/cf check actually do anything?
-                    self->state.cf = self->state.of = ((int32_t)temp64 != temp64);
+                    self->state.cf = self->state.of = ((int16_t)temp64 != temp64);
                     self->state.af = self->state.af_ops = 0;
                     self->state.zf = self->state.sf = self->state.zf_res = self->state.sf_res = self->state.pf_res = 1;
                     break;
@@ -5042,16 +5043,16 @@
         case 0xf7:
             [self readByteIncIP:&modRMByte];
             mrm = [self decodeModRMByte:modRMByte];
-            regPtr = [self getRegPointer:mrm.reg opSize:32];
+            regPtr = [self getRegPointer:mrm.reg opSize:16];
             if (mrm.type == modrm_register) {
-                rmWritePtr = [self getRegPointer:mrm.base opSize:32];
-                rmReadPtr = [self getRegPointer:mrm.base opSize:32]; memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                rmWritePtr = [self getRegPointer:mrm.base opSize:16];
+                rmReadPtr = [self getRegPointer:mrm.base opSize:16]; memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
             } else {
-                addr_t modrmAddress = [self getModRMAddress:mrm opSize:32];
+                addr_t modrmAddress = [self getModRMAddress:mrm opSize:16];
                 if (!(rmReadPtr = [self.task.mem getPointer:modrmAddress type:MEM_READ])) {
                     return 13;
                 }
-                memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                 rmWritePtr = [self.task.mem getPointer:modrmAddress type:MEM_WRITE];
             }
             
@@ -5059,24 +5060,24 @@
                 case 0x0:
                 case 0x1:
                     // TEST    r/m32    imm8
-                    [self readFourBytesIncIP:&imm32];
+                    [self readTwoBytesIncIP:&imm16];
                     
-                    self->state.res = (uint32_t)rmReadValue & (uint32_t)imm32;
+                    self->state.res = (uint16_t)rmReadValue & (uint16_t)imm16;
                     
                     self->state.zf_res = self->state.sf_res = self->state.pf_res = 1;
                     self->state.cf = self->state.of = self->state.af = self->state.af_ops = 0;
                     break;
                 case 0x2:
                     // NOT    r/m32
-                    *(int32_t *)rmWritePtr = ~(int32_t)rmReadValue;
+                    *(int16_t *)rmWritePtr = ~(int16_t)rmReadValue;
                     break;
                 case 0x3:
                     // NEG    r/m32
                     // 2's compliment negation
-                    self->state.of = __builtin_sub_overflow((int32_t)0, (int32_t)rmReadValue, (int32_t *)&self->state.res);
-                    self->state.cf = __builtin_sub_overflow((uint32_t)0, (uint32_t)rmReadValue, (uint32_t *)&self->state.res);
+                    self->state.of = __builtin_sub_overflow((int16_t)0, (int16_t)rmReadValue, (int16_t *)&self->state.res);
+                    self->state.cf = __builtin_sub_overflow((uint16_t)0, (uint16_t)rmReadValue, (uint16_t *)&self->state.res);
                     
-                    *(int32_t *)rmWritePtr = (int32_t)self->state.res;
+                    *(int16_t *)rmWritePtr = (int16_t)self->state.res;
                     
                     self->state.zf_res = self->state.sf_res = self->state.pf_res = 1;
                     self->state.af_ops = 0;
@@ -5084,15 +5085,15 @@
                 case 0x4:
                     // MUL    AX    AL * r/m32
                     // Unsigned multiply
-                    temp64 = (*(uint32_t *)[self getRegPointer:reg_eax opSize:32] * (uint64_t)((uint32_t)rmReadValue));
+                    temp64 = (*(uint16_t *)[self getRegPointer:reg_eax opSize:16] * (uint64_t)((uint16_t)rmReadValue));
                     
-                    *(uint32_t *)[self getRegPointer:reg_eax opSize:32] = temp32;
-                    *(uint32_t *)[self getRegPointer:reg_edx opSize:32] = temp32 >> 8;
+                    *(uint16_t *)[self getRegPointer:reg_eax opSize:16] = temp16;
+                    *(uint16_t *)[self getRegPointer:reg_edx opSize:16] = temp16 >> 8;
                     
                     FFLog(@"\n\n\n  Check this OpCode result out! Is it correct? F6 /4    MUL r/m8   \n\n\n\n");
                     __debugbreak();
                     
-                    self->state.cf = self->state.of = ((int32_t)temp64 != (uint32_t)temp64);
+                    self->state.cf = self->state.of = ((int16_t)temp64 != (uint16_t)temp64);
                     self->state.af = self->state.af_ops = 0;
                     self->state.zf = self->state.sf = self->state.zf_res = self->state.sf_res = self->state.pf_res = 1;
                     break;
@@ -5101,16 +5102,16 @@
                     // Signed multiply
                     
                     // TODO: This outer int64_t cast is unnecessary?
-                    temp64 = (int64_t)(*(int32_t *)[self getRegPointer:reg_eax opSize:32] * (int64_t)((int32_t)rmReadValue));
+                    temp64 = (int64_t)(*(int16_t *)[self getRegPointer:reg_eax opSize:16] * (int64_t)((int16_t)rmReadValue));
                     
-                    *(uint32_t *)[self getRegPointer:reg_eax opSize:32] = temp32;
-                    *(uint32_t *)[self getRegPointer:reg_edx opSize:32] = temp32 >> 32;
+                    *(uint16_t *)[self getRegPointer:reg_eax opSize:16] = temp16;
+                    *(uint16_t *)[self getRegPointer:reg_edx opSize:16] = temp16 >> 32;
                     
                     FFLog(@"\n\n\n  Check this OpCode result out! Is it correct? F6 /5    IMUL r/m8   \n\n\n\n");
                     __debugbreak();
                     
                     // TODO: Does this of/cf check actually do anything?
-                    self->state.cf = self->state.of = ((int32_t)temp64 != temp64);
+                    self->state.cf = self->state.of = ((int16_t)temp64 != temp64);
                     self->state.af = self->state.af_ops = 0;
                     self->state.zf = self->state.sf = self->state.zf_res = self->state.sf_res = self->state.pf_res = 1;
                     break;
@@ -5118,7 +5119,7 @@
                     // DIV    AX    AL * r/m32
                     // Unsigned Divide
                     do {
-                        divisor32 = (int32_t)rmReadValue;
+                        divisor32 = (int16_t)rmReadValue;
                         // Divide by 0
                         if (divisor32 == 0) {
                             //break;
@@ -5128,17 +5129,17 @@
                         
                         
                         // Combine al and dl back into one 16 bit unsigned int
-                        dividend32 = (*(uint32_t *)[self getRegPointer:reg_eax opSize:32]) | ((*(uint32_t *)[self getRegPointer:reg_edx opSize:32]) << 32);
+                        dividend32 = (*(uint16_t *)[self getRegPointer:reg_eax opSize:16]) | ((*(uint16_t *)[self getRegPointer:reg_edx opSize:16]) << 32);
                         
-                        *(uint32_t *)[self getRegPointer:reg_edx opSize:32] = dividend32 % (uint32_t)rmReadValue;
-                        *(uint32_t *)[self getRegPointer:reg_eax opSize:32] = dividend32 / (uint32_t)rmReadValue;
+                        *(uint16_t *)[self getRegPointer:reg_edx opSize:16] = dividend32 % (uint16_t)rmReadValue;
+                        *(uint16_t *)[self getRegPointer:reg_eax opSize:16] = dividend32 / (uint16_t)rmReadValue;
                     } while (0);
                     break;
                 case 0x7:
                     // IDIV    AX    AL * r/m32
                     // Signed Divide
                     do {
-                        divisor32 = (int32_t)rmReadValue;
+                        divisor32 = (int16_t)rmReadValue;
                         // Divide by 0
                         if (divisor32 == 0) {
                             //break;
@@ -5149,10 +5150,10 @@
                         __debugbreak();
                         
                         // Combine al and dl back into one 16 bit unsigned int
-                        dividend16 = (*(uint32_t *)[self getRegPointer:reg_eax opSize:32]) | ((*(uint32_t *)[self getRegPointer:reg_edx opSize:32]) << 8);
+                        dividend16 = (*(uint16_t *)[self getRegPointer:reg_eax opSize:16]) | ((*(uint16_t *)[self getRegPointer:reg_edx opSize:16]) << 8);
                         
-                        *(uint32_t *)[self getRegPointer:reg_edx opSize:32] = dividend16 % (uint32_t)rmReadValue;
-                        *(uint32_t *)[self getRegPointer:reg_eax opSize:32] = dividend16 / (uint32_t)rmReadValue;
+                        *(uint16_t *)[self getRegPointer:reg_edx opSize:16] = dividend16 % (uint16_t)rmReadValue;
+                        *(uint16_t *)[self getRegPointer:reg_eax opSize:16] = dividend16 / (uint16_t)rmReadValue;
                     } while (0);
                     break;
                 default:
@@ -5215,46 +5216,46 @@
         case 0xff:
             [self readByteIncIP:&modRMByte];
             mrm = [self decodeModRMByte:modRMByte];
-            regPtr = [self getRegPointer:mrm.reg opSize:32];
+            regPtr = [self getRegPointer:mrm.reg opSize:16];
             if (mrm.type == modrm_register) {
-                rmWritePtr = [self getRegPointer:mrm.base opSize:32];
-                rmReadPtr = [self getRegPointer:mrm.base opSize:32]; memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                rmWritePtr = [self getRegPointer:mrm.base opSize:16];
+                rmReadPtr = [self getRegPointer:mrm.base opSize:16]; memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
             } else {
-                addr_t modrmAddress = [self getModRMAddress:mrm opSize:32];
+                addr_t modrmAddress = [self getModRMAddress:mrm opSize:16];
                 if (!(rmReadPtr = [self.task.mem getPointer:modrmAddress type:MEM_READ])) {
                     return 13;
                 }
-                memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                 rmWritePtr = [self.task.mem getPointer:modrmAddress type:MEM_WRITE];
             }
             
             switch (mrm.reg) {
                 case 0x0:
                     // INC    r/m32
-                    self->state.of = __builtin_add_overflow((int32_t)rmReadValue, (int32_t)1, &self->state.res);
-                    self->state.cf = __builtin_add_overflow((uint32_t)rmReadValue, (uint32_t)1, &self->state.res);
+                    self->state.of = __builtin_add_overflow((int16_t)rmReadValue, (int16_t)1, &self->state.res);
+                    self->state.cf = __builtin_add_overflow((uint16_t)rmReadValue, (uint16_t)1, &self->state.res);
                     
-                    *(uint32_t *)rmWritePtr = (int32_t)self->state.res;
+                    *(uint16_t *)rmWritePtr = (int16_t)self->state.res;
                     
                     self->state.af_ops = 0;
                     self->state.zf_res = self->state.sf_res = self->state.pf_res = 1;
                     break;
                 case 0x1:
                     // DEC    r/m32
-                    self->state.of = __builtin_sub_overflow((int32_t)rmReadValue, (int32_t)1, &self->state.res);
-                    self->state.cf = __builtin_sub_overflow((uint32_t)rmReadValue, (uint32_t)1, &self->state.res);
+                    self->state.of = __builtin_sub_overflow((int16_t)rmReadValue, (int16_t)1, &self->state.res);
+                    self->state.cf = __builtin_sub_overflow((uint16_t)rmReadValue, (uint16_t)1, &self->state.res);
                     
-                    *(uint32_t *)rmWritePtr = (int32_t)self->state.res;
+                    *(uint16_t *)rmWritePtr = (int16_t)self->state.res;
                     
                     self->state.af_ops = 0;
                     self->state.zf_res = self->state.sf_res = self->state.pf_res = 1;
                     break;
                 case 0x2:
                     // CALL    r/m16/32
-                    [self.task userWrite:(self->state.esp-4) buf:&self->state.eip count:4];
+                    [self.task userWrite:(self->state.esp-2) buf:&self->state.eip count:2];
                     self->state.esp -= 4;
                     
-                    self->state.eip = (uint32_t)rmReadValue;
+                    self->state.eip = (uint16_t)rmReadValue;
                     break;
                 case 0x3:
                     // CALLF    r/m16/32
@@ -5263,7 +5264,7 @@
                     break;
                 case 0x4:
                     // JMP    r/m16/32
-                    self->state.eip = (uint32_t)rmReadValue;
+                    self->state.eip = (uint16_t)rmReadValue;
                     break;
                 case 0x5:
                     // JMPF    r/m16/32
@@ -5272,7 +5273,7 @@
                     break;
                 case 0x6:
                     // PUSH    r/m16/32
-                    [self.task userWrite:(self->state.esp-4) buf:&rmReadValue count:4];
+                    [self.task userWrite:(self->state.esp-2) buf:&rmReadValue count:2];
                     self->state.esp -= 4;
                     break;
                 default:
@@ -5288,7 +5289,6 @@
     
     return -1;
 }
-
 
 // -------------------------------------------------------------------- START STEP - 32
 
