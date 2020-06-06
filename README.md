@@ -40,6 +40,59 @@ I have actually verified that "my" implementation (in quotes because I had been 
 
 I have made a bunch of other small changes as well, mostly just to challenge myself so that I didn't just copy and paste code from Ish over into a new project. My goal was to be able to describe what any particular line of code did, not to be able to write this on my own necessarily. I also thought it would be nice if I could document the code to a ridiculous standard so that it may provide useful for anyone else who was having a hard time finding material.
 
+Some other interesting code would be in the setup for any instruction:
+
+    [self readByteIncIP:&modRMByte];
+    mrm = [self decodeModRMByte:modRMByte];
+    regPtr = [self getRegPointer:mrm.reg opSize:8];
+    if (mrm.type == modrm_register) {
+        rmWritePtr = rmReadPtr = [self getRegPointer:mrm.base opSize:8];
+        memcpy(&rmReadValue, rmReadPtr, sizeof(uint8_t));
+    } else {
+        addr = [self getModRMAddress:mrm opSize:8];
+        if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
+            return 13;
+        }
+        memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
+        rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
+    }
+    
+    regPtr = [self getRegPointer:mrm.reg opSize:8];
+
+and:
+
+    [self readFourBytesIncIP:&imm32];
+
+
+I thought this turned out be fairly readable, even with the hacks I had to add in to make this block re usable in all situations (the hack I am referring to is the use of memcpy which I will explain).
+
+Many op codes operate on either a register, whatever the "MODRM" byte says to operate on and/or an immediate value.
+
+That first block of code is executed after the first opcode byte has been read and we have figured out which opcode we are parsing bytes for. Then that code above starts out by reading in the MODRM byte. This byte will say whether or not it will be effecting an address or a register. This is why there is an if statement there.
+
+The nice part about this code is that regardless of the branch of logic we take we end up with 2 pointers rmWritePtr and rmReadPtr. Both of which can be used regardless of whether the MODRM byte decided that this was a register operation or a memory operation. This way the code actually performing the operations doesn't need to check the MODRM byte or worry about this difference. When writing the code for a MODRM operation I can just use 
+
+    *(uint32_t *)rmWritePtr 
+
+whenever I need to set a r/m value and 
+
+    *(uint32_t *)rmReadPtr 
+
+whenever I need to read a r/m value.
+
+For example if I had an operation like:
+
+    ADD r16/32 r/m16/32  
+
+This would be asking me to add the value from the register specified in the opcode with with MODRM value and store it in the MODRM location.
+
+I could get the (dumbed down) result with:
+
+    *(uint32_t *)rmWritePtr = (uint32_t)rmReadValue + *(uint32_t *)regPtr
+
+I thought this lead to very readable opcodes.
+
+And I showed above how easy it is to read a few bytes from eip to grab an immediate already.
 
 ## What's going on with it now?
 
