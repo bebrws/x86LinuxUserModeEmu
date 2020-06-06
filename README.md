@@ -48,4 +48,10 @@ I have made a bunch of other small changes as well, mostly just to challenge mys
 
 I am trying not to give up now that I am relatively close to getting a terminal up.. I am close only if I try and just hurry through the syscall/Linux kernel aspects of Ish. (I really want to play around with some different virtual memory ideas and to see if removing things like the TLB helps much). For that reason the syscalls may just end up copied over from Ish directly for now but I hope I have time later to learn more about how they work.
 
-Ish is an amazing project and I am glad that the author has open sourced it. I have learned a lot from reading through it and creating my broken clone.
+In summary the x86 emulation part is done up until the point where all opcodes needed to get to the first syscall execute correctly and are verified by comparing against the state of Ish. However I am sure there are still bugs in there, especially in the 16 bit version of the opcodes. These have had very little coverage.
+
+The majority of the rest of the work to getting a terminal up (when I will be happy with this) probably lays in finishing off all the syscalls.
+
+## Thanks Ish
+
+Ish is an amazing project and I am glad that the author has open sourced it. I have learned a lot from reading through it and creating my broken clone. Thank you
