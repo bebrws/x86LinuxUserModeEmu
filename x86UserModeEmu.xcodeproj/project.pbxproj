@@ -758,6 +758,7 @@
 		B1D675F3242554A800891871 /* FakeFSStore.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FakeFSStore.h; sourceTree = "<group>"; };
 		B1D675F4242554A800891871 /* FakeFSStore.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FakeFSStore.m; sourceTree = "<group>"; };
 		B1D675F92425559800891871 /* JSONModel.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JSONModel.framework; path = jsonmodel/build/Debug/JSONModel.framework; sourceTree = "<group>"; };
+		B1E1EB17248B37B7004B291C /* TLS_CPU.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TLS_CPU.h; sourceTree = "<group>"; };
 		B1E269142431259600A28DED /* ThreadGroup.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ThreadGroup.h; sourceTree = "<group>"; };
 		B1E269152431259600A28DED /* ThreadGroup.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ThreadGroup.m; sourceTree = "<group>"; };
 		B1E26917243127A500A28DED /* time.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = time.h; sourceTree = "<group>"; };
@@ -999,6 +1000,7 @@
 				B1017E9024274AE8005B0A32 /* bits.h */,
 				FA443A9823F8ED4800AE4A51 /* CPU.m */,
 				B18DBBF0242FE2C900261A73 /* Group1OpCodes.h */,
+				B1E1EB17248B37B7004B291C /* TLS_CPU.h */,
 			);
 			path = cpu;
 			sourceTree = "<group>";

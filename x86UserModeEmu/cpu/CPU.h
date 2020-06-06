@@ -330,9 +330,16 @@ static inline const char *reg32_name(enum reg32 reg) {
 - (id)initWithTask:(Task *)task;
 - (void)start;
 
+// syscalls
+- (uint32_t)sysSetThreadArea:(addr_t) u_info_addr;
+
+
+
 @property (nonatomic, strong) NSThread *thread;
 @property (nonatomic, strong) Task *task;
 @property (nonatomic, assign) int interrupt;
+@property (nonatomic, assign) uint32_t syscall;
+
 
 // DEBUG
 @property (nonatomic, strong) NSMutableDictionary *ishDebugState;
