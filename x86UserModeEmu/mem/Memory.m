@@ -22,8 +22,39 @@
 
 #import "log.h"
 
+#include <sys/mman.h>
 
 @implementation Memory
+
+- (int)setPageTableEntryFlags:(page_t)start len:(pages_t)len flags:(uint32_t)flags {
+    for(int page = start; page <= start + len; page++) {
+        PageTableEntry *ptentry = [self.pages objectAtIndex:page];
+        if (!ptentry.isInUse) {
+            return _ENOMEM;
+        }
+        
+        uint32_t oldFlags = ptentry.flags;
+        ptentry.flags = flags;
+        
+        // Check if the level of protections is increasing:
+        if ((flags & ~oldFlags) & (P_READ|P_WRITE)) {
+            // If so then make the actual mprotect syscall to give the actual protections specified
+            void *data = (char *) ptentry.mappedMemory.data + ptentry.mappedMemory.fileOffset;
+            // force to be page aligned
+            data = (void *) ((uintptr_t) data & ~(get_real_page_size() - 1));
+            
+            int actualProtFlags = PROT_READ;
+            if (flags & P_WRITE) {
+                actualProtFlags |= PROT_WRITE;
+            }
+            if (mprotect(data, get_real_page_size(), actualProtFlags) < 0) {
+                return errno_map();
+            }
+        }
+    }
+    self.changesToMemory++; // mem_changed(mem);
+    return 0;
+}
 
 - (PageTableEntry *)findNextPageTableEntryHole:(pages_t)size {
     bool inHole = false;

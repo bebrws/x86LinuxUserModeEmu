@@ -13,6 +13,7 @@
 #import "misc.h"
 #import "debug.h"
 #import "log.h"
+#include "errno.h"
 
 #include <stdio.h>
 
@@ -60,6 +61,27 @@
 // ########################################### HANDLE INTERRUPT
 
 
+- (uint32_t) sysMProtect:(addr_t)addr len:(uint32_t)len protFlags:(uint32_t) protFlags {
+    // https://www.man7.org/linux/man-pages/man2/mprotect.2.html
+    // changes the access protections for memory pages starting at addr and running through len length
+    // addr must be page aligned
+    // len will be rounded up to the next nearest page
+    // prot contains the flags to set the on the pages, they are listed in the link above
+    STRACE("mprotect(0x%x, 0x%x, 0x%x)", addr, len, prot);
+    if (PGOFFSET(addr) != 0) {
+        return _EINVAL;
+    }
+    if (protFlags & ~P_RWX) {
+        return _EINVAL;
+    }
+    pages_t pages = PAGE_ROUND_UP(len);
+    write_wrlock(&self.task.mem->lock);
+    int err = [self.task.mem setPageTableEntryFlags:PAGE(addr) len:pages flags:protFlags];
+    write_wrunlock(&self.task.mem->lock);
+    return err;
+}
+
+
 - (void)handleInterrupt:(int)interrupt {
     switch (interrupt) {
         case INT_SYSCALL: {
@@ -69,11 +91,14 @@
             // if (self.syscall >= 10000) || syscall is not defined yet
             //     CLog(@"P: %d SYSCALL #%d 0x%x is not defined. Delivering SISSYS signal.\n", self.task.pid.id, self.syscall, self.syscall);
             //     deliver_signal(current, SIGSYS_, SIGINFO_NIL);
-            STRACE(@"P: %d SYSCALL #%d 0x%x\n", self.task.pid.id, self.syscall, self.syscall);
+            STRACE(@"SYSCALL #%d 0x%x\n", self.syscall, self.syscall);
             // The arguments passed to a syscall are:
             // syscall(self->state.ebx, self->state.ecx, self->state.edx, self->state.esi, self->state.edi, self->state.ebp)
             int result = -1;
             switch (self.syscall) {
+                case 125:
+                    result = [self sysMProtect:self->state.ebx len:self->state.ecx protFlags:self->state.edx];
+                    break;
                 case 243:
                     result = [self sysSetThreadArea:self->state.ebx];
                     break;
@@ -87,7 +112,7 @@
                     break;
             }
             // int result = syscall(self->state.ebx, self->state.ecx, self->state.edx, self->state.esi, self->state.edi, self->state.ebp);
-            STRACE(@"P: %d SYSCALL #%d 0x%x Result: %d\n", self.task.pid.id, self.syscall, self.syscall, result);
+            STRACE(@"SYSCALL #%d 0x%x Result: %d\n", self.syscall, self.syscall, result);
             
             break;
         }

@@ -85,6 +85,7 @@ typedef dword_t pages_t;
 
 // Todo maybe add an array of page table entries here to for faster iteration?
 
+- (int)setPageTableEntryFlags:(page_t)start len:(pages_t)len flags:(uint32_t)flags;
 //- (void)mem_init(struct mem *mem);
 //- (void)mem_destroy(struct mem *mem);
 - (PageTableEntry *)getPageTableEntry:(page_t)page;

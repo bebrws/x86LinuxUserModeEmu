@@ -31,7 +31,7 @@
 @property (nonatomic, strong) MappedMemory *mappedMemory;
 // flags are describing the page table entry like the direction in which memory grows
 // which is bit mask 1<<3 or 8
-@property (nonatomic, assign) unsigned int flags;
+@property (nonatomic, assign) uint32_t flags;
 // this is an offset into self.mappedMemory.memory
 @property (nonatomic, assign) size_t offsetIntoMappedMemory;
 

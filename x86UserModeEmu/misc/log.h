@@ -4,7 +4,7 @@
 void CleanLog (NSString *format, ...);
 
 #ifdef SYSCALLTRACE
-#define STRACE(fmt, ...) CleanLog(fmt, ##__VA_ARGS__)
+#define STRACE(fmt, ...) CleanLog((@"P: %d - " fmt), self.task.pid.id, ##__VA_ARGS__)
 #else
 #define STRACE(...)
 #endif
