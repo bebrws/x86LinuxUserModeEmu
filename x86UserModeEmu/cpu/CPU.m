@@ -269,7 +269,7 @@
 
 // -------------------------------------------------------------------- START STEP - 16
 
-- (int)step16 {
+- (int32_t)step16:(uint32_t) addrDefault {
     dword_t saved_ip = self->state.eip;
     modrm mrm;
     uint8_t modRMByte;
@@ -277,7 +277,7 @@
     uint8_t firstOpByte;
     uint8_t secondOpByte;
     
-    uint16_t addr = 0;
+    uint32_t addr = addrDefault;
     
     uint8_t *moffs8;
     uint16_t *moffs16;
@@ -313,7 +313,7 @@
     uint16_t *rmWritePtr;
     enum reg32 opReg;
     
-restart16:    
+// restart16:
     [self readByteIncIP:&firstOpByte];
     // printf("\n\n16 bit mode -\n");
     // [self printState:firstOpByte];
@@ -564,7 +564,7 @@ restart16:
             break;
             
         case 0x0f:
-            multibyterestart16:
+            // multibyterestart16:
             [self readByteIncIP:&secondOpByte];
             switch(secondOpByte) {
                 case 0x18 ... 0x1f:
@@ -946,8 +946,9 @@ restart16:
                     // A NOP
                     break;
                 case 0x65:
+                    die("Figure out how to implement without goto");
                     addr += self->state.tls_ptr;
-                    goto multibyterestart16;
+                    // goto multibyterestart16;
                     break;                                   
                 case 0x6e:
                     // MOVD    mm    r/m32            mmx                        Move Doubleword
@@ -2860,7 +2861,8 @@ restart16:
             
         case 0x65:
             addr += self->state.tls_ptr;
-            goto restart16;
+            [self step16:addr];
+            // goto restart16;
             break;
         case 0x66:
             die("Hit an opcode that should just call the 16 bit cpu step");
@@ -5322,7 +5324,7 @@ restart16:
 
 // -------------------------------------------------------------------- START STEP - 32
 
-- (int)step {
+- (int)step:(uint32_t) addrDefault {
     dword_t saved_ip = self->state.eip;
 //    char previewString[4096 + 1];
 //    for (int i = 0; i < 4096; i+=8) {
@@ -5352,7 +5354,7 @@ restart16:
     uint8_t firstOpByte;
     uint8_t secondOpByte;
 
-restart32:
+// restart32:
 
     [self readByteIncIP:&firstOpByte];
     
@@ -5424,7 +5426,7 @@ restart32:
 
 
     // TODO: What is this for or how is it related to segment:offset
-    uint32_t addr = 0;
+    uint32_t addr = addrDefault;
 
     uint8_t *moffs8;
     uint32_t *moffs32;
@@ -5706,7 +5708,7 @@ restart32:
             break;
 
         case 0x0f:
-multibyterestart32:
+// multibyterestart32:
             [self readByteIncIP:&secondOpByte];
             switch(secondOpByte) {
                 case 0x18 ... 0x1f:
@@ -6088,8 +6090,9 @@ multibyterestart32:
                     // A NOP
                     break;
                 case 0x65:
+                    die("Figure out how to implement without goto");
                     addr += self->state.tls_ptr;
-                    goto multibyterestart32;
+                    // goto multibyterestart32;
                     break;                    
                 case 0x6e:
                     // MOVD    mm    r/m32            mmx                        Move Doubleword
@@ -8002,7 +8005,8 @@ multibyterestart32:
 
         case 0x65:
             addr += self->state.tls_ptr;
-            goto restart;
+            [self step:addr];
+            // goto restart;
             break;
         case 0x66:
             return [self step16];
@@ -10787,7 +10791,7 @@ multibyterestart32:
             // If an interrupt occurs self.interrupt will be set
             
             [CPUStepLock lock];
-            self.interrupt = [self step];
+            self.interrupt = [self step:0];
             [CPUStepLock unlock];
             
             if (self.interrupt == INT_NONE && cycleCount++ >= NUM_CYCLES_TO_PROCESS_BEFORE_INT_TIMER) {
