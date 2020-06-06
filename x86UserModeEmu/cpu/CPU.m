@@ -5073,8 +5073,6 @@
                 case 0x3:
                     // NEG    r/m32
                     // 2's compliment negation
-                    [self readFourBytesIncIP:&imm32];
-                    
                     self->state.of = __builtin_sub_overflow((int32_t)0, (int32_t)rmReadValue, (int32_t *)&self->state.res);
                     self->state.cf = __builtin_sub_overflow((uint32_t)0, (uint32_t)rmReadValue, (uint32_t *)&self->state.res);
                     
@@ -10213,8 +10211,6 @@
                 case 0x3:
                     // NEG    r/m32
                     // 2's compliment negation
-                    [self readFourBytesIncIP:&imm32];
-
                     self->state.of = __builtin_sub_overflow((int32_t)0, (int32_t)rmReadValue, (int32_t *)&self->state.res);
                     self->state.cf = __builtin_sub_overflow((uint32_t)0, (uint32_t)rmReadValue, (uint32_t *)&self->state.res);
 
