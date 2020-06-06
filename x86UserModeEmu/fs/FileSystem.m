@@ -44,7 +44,7 @@
 - (FileDescriptor *) genericOpenAt:(FileDescriptor *)at path:(NSString *)pathRaw flags:(int)flags mode:(int)mode currentTask:(Task *)currentTask {
     if (flags & O_RDWR_ && flags & O_WRONLY_) {
         FileDescriptor *fd= [FileDescriptor new];
-        fd.err = _EINVAL;
+        fd->err = _EINVAL;
         
         FFLog(@"Error opening file descriptor not right flags: flags & O_RDWR_ && flags & O_WRONLY_ ");
         
@@ -57,7 +57,7 @@
     
     if (err < 0) {
         FileDescriptor *fd=[FileDescriptor new];
-        fd.err = err;
+        fd->err = err;
         FFLog(@"Error opening file descriptor - pathNormalize failed to return fd");
         
         return fd;
@@ -65,7 +65,7 @@
     Mount *mount = [self findMountAndTrimPath:pathN];
 //    lock(&inodes_lock); // TODO: don't do this
     FileDescriptor *fd = [self.fsOps open:mount path:pathN flags:flags mode:mode currentTask:currentTask];
-    if (fd.err) {
+    if (fd->err) {
         // unlock(&inodes_lock);
         [mount releaseMount];
         return fd;
@@ -77,7 +77,7 @@
     if (err < 0) {
 //        unlock(&inodes_lock);
         [fd close];
-        fd.err = err;
+        fd->err = err;
         FFLog(@"Error opening file descriptor for fstat in genericOpenat");
         
         return fd;
@@ -85,8 +85,8 @@
 //    fd->inode = inode_get_unlocked(mount, stat.inode);
 //    unlock(&inodes_lock);
     
-    fd.type = statResult.mode & S_IFMT;
-    fd.flags = flags;
+    fd->type = statResult.mode & S_IFMT;
+    fd->flags = flags;
 //
     int accmode;
     if (flags & O_RDWR_) accmode = AC_R | AC_W;
@@ -97,7 +97,7 @@
     if (err < 0) {
         // This is goto error
         [fd close];
-        fd.err = err;
+        fd->err = err;
         FFLog(@"Access check failed");
         return fd;
     }
@@ -116,14 +116,14 @@
 //
 //        if (err < 0) {
 //            [fd close];
-//            fd.err = _ENXIO;
+//            fd->err = _ENXIO;
 //            return fd;
 //        }
 //    }
 //
 //    if ((S_ISSOCK(fd.type)) || (S_ISDIR(fd.type) && flags & (O_RDWR_ | O_WRONLY_)) || (!S_ISDIR(fd.type) && flags & O_DIRECTORY_)) {
 //        [fd close];
-//        fd.err = _ENXIO;
+//        fd->err = _ENXIO;
 //        return fd;
 //    }
     
@@ -174,8 +174,8 @@
     self.root = [self genericOpen:@"/" flags:O_RDONLY_ mode:0 currentTask:currentTask];
     
     // TODO: IMPORTANT: Find a better way to pass up errors? Maybe throw an exception?r
-    if (self.root.err) {
-        return self.root.err;
+    if (self.root->err) {
+        return self.root->err;
     }
     
     self.pwd = self.root;

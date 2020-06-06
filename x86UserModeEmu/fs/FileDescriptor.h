@@ -23,26 +23,23 @@ struct dir_entry {
 #define LSEEK_CUR 1
 #define LSEEK_END 2
 
-typedef sdword_t fd_t;
+#define FD_ALLOWED_FLAGS (O_APPEND_ | O_NONBLOCK_)
 
 @class Mount;
 
 @class FileDescriptor;
 
-@interface FileDescriptor : NSObject
+@interface FileDescriptor : NSObject {
+    @public bool closeOnExec;
+    @public ino_t fakeInode;
+    @public int err;
+    @public int realFD;
+    @public DIR *dir; // a pointer to the directory stream
+    @public int flags;
+    @public int type;
+    @public int offset;
+}
 @property (nonatomic, strong) id<FileDescriptorOperations> fdOps;
-@property (nonatomic, assign) bool closeOnExec;
-
-@property (nonatomic, assign) ino_t fakeInode;
-
-@property (nonatomic, assign) int err;
-@property (nonatomic, assign) int realFD;
-@property (nonatomic, assign) DIR *dir; // a pointer to the directory stream
-
-@property (nonatomic, assign) atomic_uint refCount;
-@property (nonatomic, assign) int flags;
-@property (nonatomic, assign) int type;
-@property (nonatomic, assign) int offset;
 
 // Was weak??
 @property (nonatomic, strong) Mount *mount;
@@ -50,6 +47,7 @@ typedef sdword_t fd_t;
 
 //@property (nonatomic, assign) CPU *cpu;
 //- (void)genericOpen: (NSString *)path, int flags, int mode;
+- (int)setFlags:(dword_t)flags;
 - (id)init;
 - (int)close;
 - (void)incrementRefCount;

@@ -442,6 +442,8 @@
         }
         
         self.changesToMemory = 0;
+        
+        lock_init(&self->lock);
     }
     return self;
 }

@@ -9,7 +9,7 @@
 #import <Foundation/Foundation.h>
 #import "misc.h"
 #include <pthread.h>
-#import "sync.h"
+#import "sys/sync.h"
 
 @interface SigHandler : NSObject {
     @public id actions[NUM_SIGS];

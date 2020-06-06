@@ -9,7 +9,7 @@
 #import <Foundation/Foundation.h>
 #import "misc.h"
 #import "Task.h"
-#import "sync.h"
+#import "sys/sync.h"
 #import "time.h"
 
 #ifndef thread_group_H
@@ -121,8 +121,8 @@ struct rusage_ {
     @public struct rusage_ childrenRusage;
     @public cond_t childExit;
     
-    // for everything in this struct not locked by something else
     @public lock_t lock;
+    @public cond_t cond;
     
     @public struct rusage_ rusage;
 }
@@ -132,7 +132,7 @@ struct rusage_ {
 @property (nonatomic, assign) BOOL doingGroupExit;
 @property (nonatomic, strong) NSMutableArray *session; // TODO: Correct? List of processes in the same session
 @property (nonatomic, strong) NSMutableArray *pgroup;  // TODO: Correct? List of processes in the same group
-@property (nonatomic, strong) NSMutableArray *threads; // locked by pids_lock, by majority vote
+@property (nonatomic, strong) NSMutableArray *threads; // locked by pids_lock, by majority vote This is an array of Tasks
 @property (nonatomic, strong) Task *leader;     // This is immutable - "POSIX prohibits the change of the process group
                                                 // ID of a session leader." - https://en.wikipedia.org/wiki/Process_group
 

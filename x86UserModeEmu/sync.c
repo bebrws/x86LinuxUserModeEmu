@@ -11,7 +11,7 @@
 #include "debug.h"
 #include "misc.h"
 #include "errno.h"
-#include "sync.h"
+#import "sys/sync.h"
 
 
 void cond_init(cond_t *cond) {

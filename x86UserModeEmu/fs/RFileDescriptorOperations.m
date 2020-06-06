@@ -28,21 +28,21 @@
 }
 
 - (void)opendir:(FileDescriptor *)fd {
-    if (fd.dir == NULL) {
-        int dirfd = dup(fd.realFD);
-        fd.dir = fdopendir(dirfd);
+    if (fd->dir == NULL) {
+        int dirfd = dup(fd->realFD);
+        fd->dir = fdopendir(dirfd);
         // this should never get called on a non-directory
-        assert(fd.dir != NULL);
+        assert(fd->dir != NULL);
     }
 }
 
 - (void)seekdir:(FileDescriptor *)fd location:(int)location {
     [self opendir:fd];
-    seekdir(fd.dir, location);
+    seekdir(fd->dir, location);
 }
 
 - (off_t_)lseek:(FileDescriptor *)fd off:(int)off whence:(int)whence {
-    if (fd.dir != NULL && whence == LSEEK_SET) {
+    if (fd->dir != NULL && whence == LSEEK_SET) {
         [fd.fdOps seekdir:fd location:off];
         return off;
     }
@@ -56,35 +56,35 @@
     else
         return _EINVAL;
     
-    off_t res = lseek(fd.realFD, off, whence);
+    off_t res = lseek(fd->realFD, off, whence);
     if (res < 0)
         return errno_map();
     return res;
 }
 
 - (ssize_t)pread:(FileDescriptor *)fd buf:(char *)buf bufSize:(size_t)bufsize off:(off_t)off {
-    ssize_t res = pread(fd.realFD, buf, bufsize, off);
+    ssize_t res = pread(fd->realFD, buf, bufsize, off);
     if (res < 0)
         return errno_map();
     return res;
 }
 
 - (ssize_t)read:(FileDescriptor *)fd buf:(char *)buf bufSize:(size_t)bufsize {
-    ssize_t res = read(fd.realFD, buf, bufsize);
+    ssize_t res = read(fd->realFD, buf, bufsize);
     if (res < 0)
         return errno_map();
     return res;
 }
 
 - (ssize_t)write:(FileDescriptor *)fd buf:(const char *)buf bufSize:(size_t)bufsize {
-    ssize_t res = write(fd.realFD, buf, bufsize);
+    ssize_t res = write(fd->realFD, buf, bufsize);
     if (res < 0)
         return errno_map();
     return res;
 }
 
 - (ssize_t)pwrite:(FileDescriptor *)fd buf:(const char *)buf bufSize:(size_t)bufsize off:(off_t)off {
-    ssize_t res = pwrite(fd.realFD, buf, bufsize, off);
+    ssize_t res = pwrite(fd->realFD, buf, bufsize, off);
     if (res < 0)
         return errno_map();
     return res;
@@ -97,7 +97,7 @@
     
     // Read in a directory entry
     errno = 0;
-    struct dirent *dirent = readdir(fd.dir);
+    struct dirent *dirent = readdir(fd->dir);
     if (dirent == NULL) {
         if (errno != 0)
             return errno_map();
@@ -113,12 +113,12 @@
 
 - (unsigned long)telldirL:(FileDescriptor *)fd {
     [self opendir:fd];
-    return telldir(fd.dir);
+    return telldir(fd->dir);
 }
 
 - (void) seekdir:(FileDescriptor *)fd ptr:(unsigned long)ptr {
     [self opendir:fd];
-    seekdir(fd.dir, ptr);
+    seekdir(fd->dir, ptr);
 }
 
 - (int)mmap:(FileDescriptor *)fd task:(Task *)task start:(page_t)start pages:(pages_t)pages offset:(off_t)offset prot:(int)prot flags:(int)flags {
@@ -143,9 +143,9 @@
     die("Not yet implemented!"); return 0;
 }
 - (int)close:(FileDescriptor *)fd {
-    if (fd.dir)
-        closedir(fd.dir);
-    int err = close(fd.realFD);
+    if (fd->dir)
+        closedir(fd->dir);
+    int err = close(fd->realFD);
     if (err < 0)
         return errno_map();
     die("Not yet implemented!"); return 0;
@@ -155,7 +155,7 @@
     die("Not yet implemented!"); return 0;
 }
 
-- (int)setflags:(FileDescriptor *)fd arg:(dword_t)arg {
+- (int)setflags:(FileDescriptor *)fd flags:(dword_t)flags {
     die("Not yet implemented!"); return 0;
 }
 

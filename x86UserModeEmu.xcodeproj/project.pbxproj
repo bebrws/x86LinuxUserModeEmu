@@ -69,6 +69,8 @@
 		B1D675DC24249E9900891871 /* NSString+FileSystemEmu.m in Sources */ = {isa = PBXBuildFile; fileRef = B1D675DB24249E9900891871 /* NSString+FileSystemEmu.m */; };
 		B1D675DF2424AD8300891871 /* RFileDescriptorOperations.m in Sources */ = {isa = PBXBuildFile; fileRef = B1D675DE2424AD8300891871 /* RFileDescriptorOperations.m */; };
 		B1D675F5242554A800891871 /* FakeFSStore.m in Sources */ = {isa = PBXBuildFile; fileRef = B1D675F4242554A800891871 /* FakeFSStore.m */; };
+		B1E1EB1B248B92D1004B291C /* timer.c in Sources */ = {isa = PBXBuildFile; fileRef = B1E1EB19248B92D0004B291C /* timer.c */; };
+		B1E1EB1C248B92D1004B291C /* timer.c in Sources */ = {isa = PBXBuildFile; fileRef = B1E1EB19248B92D0004B291C /* timer.c */; };
 		B1E269162431259600A28DED /* ThreadGroup.m in Sources */ = {isa = PBXBuildFile; fileRef = B1E269152431259600A28DED /* ThreadGroup.m */; };
 		B1E2691B24365C7200A28DED /* SigSet.m in Sources */ = {isa = PBXBuildFile; fileRef = B1E2691A24365C7200A28DED /* SigSet.m */; };
 		B1E2691C24365C7900A28DED /* SigSet.m in Sources */ = {isa = PBXBuildFile; fileRef = B1E2691A24365C7200A28DED /* SigSet.m */; };
@@ -758,7 +760,8 @@
 		B1D675F3242554A800891871 /* FakeFSStore.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FakeFSStore.h; sourceTree = "<group>"; };
 		B1D675F4242554A800891871 /* FakeFSStore.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FakeFSStore.m; sourceTree = "<group>"; };
 		B1D675F92425559800891871 /* JSONModel.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JSONModel.framework; path = jsonmodel/build/Debug/JSONModel.framework; sourceTree = "<group>"; };
-		B1E1EB17248B37B7004B291C /* TLS_CPU.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TLS_CPU.h; sourceTree = "<group>"; };
+		B1E1EB19248B92D0004B291C /* timer.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = timer.c; sourceTree = "<group>"; };
+		B1E1EB1A248B92D0004B291C /* timer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = timer.h; sourceTree = "<group>"; };
 		B1E269142431259600A28DED /* ThreadGroup.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ThreadGroup.h; sourceTree = "<group>"; };
 		B1E269152431259600A28DED /* ThreadGroup.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ThreadGroup.m; sourceTree = "<group>"; };
 		B1E26917243127A500A28DED /* time.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = time.h; sourceTree = "<group>"; };
@@ -967,6 +970,7 @@
 		B135B8D1240F46220081DA23 /* sys */ = {
 			isa = PBXGroup;
 			children = (
+				B141B6922421BC5500CF35A3 /* sync.h */,
 				B135B8CE240F45840081DA23 /* syscalls.h */,
 				B135B8D7240F48B00081DA23 /* syscalls.m */,
 				B135B8D2240F47680081DA23 /* exec.h */,
@@ -1000,7 +1004,6 @@
 				B1017E9024274AE8005B0A32 /* bits.h */,
 				FA443A9823F8ED4800AE4A51 /* CPU.m */,
 				B18DBBF0242FE2C900261A73 /* Group1OpCodes.h */,
-				B1E1EB17248B37B7004B291C /* TLS_CPU.h */,
 			);
 			path = cpu;
 			sourceTree = "<group>";
@@ -1796,7 +1799,8 @@
 				FA443A9C23F8EE9100AE4A51 /* AppDelegate.m */,
 				FA443A9123F8DECD00AE4A51 /* AppDelegate.h */,
 				B1C002B624747ADD00BE018A /* cpuid.h */,
-				B141B6922421BC5500CF35A3 /* sync.h */,
+				B1E1EB19248B92D0004B291C /* timer.c */,
+				B1E1EB1A248B92D0004B291C /* timer.h */,
 				FA443A9423F8E16900AE4A51 /* Task.h */,
 				FA443A9523F8E16D00AE4A51 /* Task.m */,
 				B134C71824092FD300FDD5F6 /* Globals.h */,
@@ -2159,6 +2163,7 @@
 				B1E6B3B2242812020082F690 /* NSObject+Creation.h in Sources */,
 				B1E6B3B3242812020082F690 /* NSObject+Creation.m in Sources */,
 				B1E6B3B4242812020082F690 /* NSObject+Marker.h in Sources */,
+				B1E1EB1C248B92D1004B291C /* timer.c in Sources */,
 				B1E6B3B5242812020082F690 /* NSObject+Marker.m in Sources */,
 				B185636F24373900004E927E /* NSString+BinaryRepresentation.m in Sources */,
 				B1E6B3B6242812020082F690 /* NSOperationQueue+WorkerQueue.h in Sources */,
@@ -2254,6 +2259,7 @@
 				B1D675DC24249E9900891871 /* NSString+FileSystemEmu.m in Sources */,
 				B1BA6D9B2425F9FB00319C74 /* NSURL+Parameters.m in Sources */,
 				B1EEE264241B766F0039EF87 /* FLLog.m in Sources */,
+				B1E1EB1B248B92D1004B291C /* timer.c in Sources */,
 				B1BA6DA52425FB8F00319C74 /* NSString+URLEncode.m in Sources */,
 				FA443A9D23F8EE9100AE4A51 /* AppDelegate.m in Sources */,
 				B1EEE259241B13600039EF87 /* EnvArgs.m in Sources */,

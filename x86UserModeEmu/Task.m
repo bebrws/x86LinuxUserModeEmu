@@ -24,6 +24,7 @@
 #import "FileDescriptor.h"
 #import "FileDescriptorTable.h"
 #import "FileDescriptorAndError.h"
+#import "RFileDescriptorOperations.h"
 #import "errno.h"
 #import "FileSystem.h"
 #import "PageTableEntry.h"
@@ -40,11 +41,15 @@
 #import "SigAction.h"
 #import "MountLookup.h"
 
+#include "timer.h"
 #include "elf.h"
+#include "sys/bits.h"
 #include "log.h"
 #import "vdso.h"
 #import "debug.h"
 #import "misc.h"
+
+#import "sys/sync.h"
 
 
 @class ThreadGroup;
@@ -74,6 +79,480 @@ int get_random(char *buf, size_t len)
 }
 
 @implementation Task
+
+- (FileDescriptor *)f_install_start:(FileDescriptor *)fd start:(fd_t)start {
+    // Shouldn't need to expand since using a dictionary?
+    // Or do any of this if using a dict
+    
+    /*
+    assert(start >= 0);
+    unsigned size = rlimit(RLIMIT_NOFILE_);
+    
+    if (size > [self.filesTable.tbl count]) {
+        size = [self.filesTable.tbl count];
+    }
+    
+    fd_t f;
+    for (f = start; (unsigned) f < size; f++) {
+        //if (self.filesTable.tbl[[NSString stringWithFormat:@"%d", f]] == NULL)
+        FileDescriptor *fd = [self.filesTable getFD:f];
+        if (fd) {
+            break;
+        }
+    }
+    */
+    
+    /*
+    if ((unsigned) f >= size) {
+        int err = fdtable_expand(table, f);
+        if (err < 0) {
+            f = err;
+        }
+    }
+     */
+    /*
+    if (f >= 0) {
+        self.filesTable->files[f] = fd;
+        bit_clear(f, table->cloexec);
+    } else {
+        fd_close(fd);
+    }
+     */
+    
+    // This just finds a place in the File Descriptor Table for this new FileDescriptor
+    // Normally this is done using an array which must be resized often but I am attempting to use a dictionairy instead.
+    // TODO: Important: I should really just keep track of the last key used so I can increment it without this ugly search below:
+    
+    NSInteger max = 0;
+    for (NSString *curks in [self.filesTable.tbl allKeys]) {
+        NSInteger curkn = [curks integerValue];
+        if (curkn > max) {
+            max = curkn;
+        }
+    }
+    
+    NSInteger newMaxForF = max + 1;
+    [self.filesTable setFD:newMaxForF fd:fd];
+    bit_clear(newMaxForF, self.filesTable->cloexec);
+    return fd;
+}
+
+- (FileDescriptor *)f_install:(FileDescriptor *)fd flags:(int)flags {
+    lock(&self.filesTable->lock);
+    FileDescriptor *f = [self f_install_start:fd start:0];
+    if (!f->err) {
+        if (flags & O_CLOEXEC_) {
+            bit_set(f, self.filesTable->cloexec);
+        }
+        if (flags & O_NONBLOCK_) {
+            [fd setFlags:O_NONBLOCK_];
+        }
+    }
+    unlock(&self.filesTable->lock);
+    return self;
+}
+
+- (FileDescriptor *) at_fd:(fd_t)f {
+    if (f == AT_FDCWD_)
+        return AT_PWD;
+    return [self f_get:f];
+}
+
+- (fd_t) sys_openat:(fd_t)at_f path_addr:(addr_t)path_addr flags:(dword_t)flags mode:(mode_t_)mode {
+    char path[MAX_PATH];
+    
+    if ([self userReadString:path_addr buf:path max:sizeof(path)]) {
+        return _EFAULT;
+    }
+    STRACE("openat(%d, \"%s\", 0x%x, 0x%x)", at_f, path, flags, mode);
+    
+    if (flags & O_CREAT_) {
+        // apply_umask(&mode);
+        mode &= ~self.fs->umask;
+    }
+    
+    FileDescriptor *at = [self at_fd:at_f];
+    if (at == NULL) {
+        return _EBADF;
+    }
+    // FileDescriptor *fd = generic_openat(at, path, flags, mode);
+    FileDescriptor *fd = [self.fs genericOpenAt:at path:[NSString stringWithCString:path encoding:NSUTF8StringEncoding]  flags:flags mode:mode currentTask:self];
+    
+    // TODO: Important check for error in fd
+    if (fd->err) {
+        return fd->err;
+    }
+    /*if (IS_ERR(fd)) {
+        return PTR_ERR(fd);
+    }*/
+    
+    return [self f_install:fd flags:flags]; 
+}
+
+- (fd_t) sys_open:(addr_t)path_addr flags:(dword_t)flags mode:(mode_t_)mode {
+    return [self sys_openat:AT_FDCWD_ path_addr:path_addr flags:flags mode:mode];
+}
+
+
+
+- (uint32_t) sys_write:(fd_t)fd_no buf_addr:(addr_t)buf_addr size:(uint32_t)size {
+    // FIXME this is a DOS vector
+    char *buf = malloc(size + 1);
+    if (buf == NULL) {
+        return _ENOMEM;
+    }
+    uint32_t res = 0;
+    
+    if ([self userRead:buf_addr buf:buf count:size]) {
+        res = _EFAULT;
+        free(buf);
+        return res;
+    }
+    
+    buf[size] = '\0';
+    
+    STRACE("write(%d, \"%.100s\", %d)", fd_no, buf, size);
+    
+    FileDescriptor *fd = [self f_get:fd_no];
+    //if (fd && fd.fdOps->write) {
+    if ([fd.fdOps class] == [RFileDescriptorOperations class]) {
+        res = [fd.fdOps write:fd buf:buf bufSize:size];
+    }
+    /*
+     else if (fd && fd.fdOps->pwrite) {
+        res = fd.fdOps->pwrite(fd, buf, size, fd->offset);
+        if (res > 0) {
+            fd.fdOps->lseek(fd, res, LSEEK_CUR);
+        }
+    }
+    */
+    else {
+        res = _EBADF;
+    }
+    out:
+    free(buf);
+    return res;
+}
+
+
+- (FileDescriptor *) f_get:(fd_t) f {
+    lock(&self.filesTable->lock);
+    FileDescriptor *fdf = [self.filesTable getFD:f];
+    unlock(&self.filesTable->lock);
+    return fdf;
+}
+
+- (uint32_t) sys_read:(fd_t)fd_no buf_addr:(addr_t)buf_addr size:(uint32_t)size {
+    STRACE("read(%d, 0x%x, %d)", fd_no, buf_addr, size);
+    char *buf = (char *) malloc(size+1);
+    if (buf == NULL) {
+        return _ENOMEM;
+    }
+    int_t res = 0;
+    FileDescriptor *fd = [self f_get:fd_no];
+    if (fd == NULL) {
+        res = _EBADF;
+        free(buf);
+        return res;
+    }
+    
+    if (S_ISDIR(fd->type)) {
+        res = _EISDIR;
+        free(buf);
+        return res;
+    }
+    
+    // if (fd.fdOps.read) {
+    if ([fd.fdOps class] == [RFileDescriptorOperations class]) {
+        res = [fd.fdOps read:fd buf:buf bufSize:size];
+    }
+    /* else if (fd.fdOps.pread) {
+        res = [fd.fdOps pread:fd buf:buf bufSize:size off:fd.offset];
+        if (res > 0) {
+            res = [fd.fdOps lseek:fd off:res whence:LSEEK_CUR];
+        }
+    }*/
+    else {
+        res = _EBADF;
+        free(buf);
+        return res;
+    }
+    
+    if (res >= 0) {
+        buf[res] = '\0';
+        STRACE(" \"%.99s\"", buf);
+        if ([self userWrite:buf_addr buf:buf count:res]) {
+            res = _EFAULT;
+        }
+    }
+    
+    free(buf);
+    return res;
+}
+
+
++ (ThreadGroup *) threadgroupCopy:(ThreadGroup *)oldGroup {
+    ThreadGroup *newGroup = [[ThreadGroup alloc] init];
+    newGroup->sid = oldGroup->sid;
+    newGroup->pgid = oldGroup->pgid;
+    newGroup->stoppedCond = oldGroup->stoppedCond;
+    newGroup->tty = oldGroup->tty;
+    newGroup->timer = oldGroup->timer;
+    memcpy(newGroup->limits, oldGroup->limits, sizeof(struct rlimit_) * RLIMIT_NLIMITS_);
+    newGroup->childrenRusage = oldGroup->childrenRusage;
+    newGroup->childExit = oldGroup->childExit;
+    newGroup->lock = oldGroup->lock;
+    newGroup->cond = oldGroup->cond;
+    newGroup->rusage = oldGroup->rusage;
+    
+    newGroup.threads = [[NSMutableArray alloc] init];
+    newGroup.pgroup = oldGroup.pgroup;
+    newGroup.session = oldGroup.session;
+    
+    newGroup->timer = NULL;
+    newGroup.doingGroupExit = false;
+    newGroup->childrenRusage = (struct rusage_) {};
+    cond_init(&newGroup->childExit);
+    cond_init(&newGroup->stoppedCond);
+    lock_init(&newGroup->lock);
+    return newGroup;
+}
+
++ (int32_t) copy_task:(Task *)task flags:(uint32_t)flags stack:(addr_t)stack ptid_addr:(addr_t)ptid_addr tls_addr:(addr_t)tls_addr ctid_addr:(addr_t)ctid_addr {
+    // task->vfork = NULL;
+    
+    if (stack != 0) {
+        task.cpu->state.esp = stack;
+    }
+    
+    // TODO: Important mem clone!!!
+    // task.mem = [mem clone];
+    task.mem = [[Memory alloc] init];
+    
+    if (flags & CLONE_FILES_) {
+        // TODO: Important
+        // task->_filesTable should be copied from the task already
+        // task->files->refcount++;
+    } else {
+        // task.filesTable
+        // task->files = fdtable_copy(task->files);
+        // TODO: Important
+        // TODO: Create a new FileDescriptorTable
+        // TODO: Iterate over all keys in task.filesTable.tbl bringin them into the new table
+        
+        // if (IS_ERR(task->files)) {
+        //    err = PTR_ERR(task->files);
+        //    goto fail_free_mem;
+        // }
+    }
+    
+    uint32_t err = _ENOMEM;
+    if (flags & CLONE_FS_) {
+        // TODO: Important
+        // task->fs->refcount++;
+        // Set to point to same fs object
+    } else {
+        // TODO: Important
+        // Otherwise create a new FS
+        // setting: umask pwd and root like in fs_info_copy
+        //
+        // task->fs = fs_info_copy(task->fs);
+        // if (task->fs == NULL)
+        //    goto fail_free_files;
+    }
+    
+    if (flags & CLONE_SIGHAND_) {
+        // task->sighand->refcount++;
+    } else {
+        // task->sighand = sighand_copy(task->sighand);
+        // if (task->sighand == NULL)
+        //    goto fail_free_fs;
+    }
+    
+    ThreadGroup *oldGroup = task.group;
+    lock(&pidsLock);
+    lock(&oldGroup->lock);
+    if (!(flags & CLONE_THREAD_)) {
+        task.group = [Task threadgroupCopy:oldGroup];
+        task.group.leader = task;
+        task->tgid = task.pid.id;
+    }
+    // list_add(&task->group->threads, &task->group_links);
+    [task.group.threads addObjectsFromArray:task.groupLinks];
+    unlock(&oldGroup->lock);
+    unlock(&pidsLock);
+    
+    if (flags & CLONE_SETTLS_) {
+        // err = task_set_thread_area(task, tls_addr);
+        err = [task setThreadArea:tls_addr];
+        
+        if (err < 0) {
+            // goto fail_free_sighand;
+            return err;
+        }
+    }
+    
+    uint32_t pidid = task.pid.id;
+    err = _EFAULT;
+    if (flags & CLONE_CHILD_SETTID_) {
+        if ([task userWrite:ctid_addr buf:&pidid count:sizeof(pidid)]) {
+            // goto fail_free_sighand;
+            return err;
+        }
+    }
+    if (flags & CLONE_PARENT_SETTID_) {
+        if ([task userWrite:ptid_addr buf:&pidid count:sizeof(pidid)]) {
+            // goto fail_free_sighand;
+            return err;
+        }
+    }
+    if (flags & CLONE_CHILD_CLEARTID_) {
+        task->clear_tid = ctid_addr;
+    }
+    
+    task->exitSignal = flags & CSIGNAL_;
+    
+    // remember to do CLONE_SYSVSEM
+    return 0;
+    /*
+fail_free_sighand:
+    sighand_release(task->sighand);
+fail_free_fs:
+    fs_info_release(task->fs);
+fail_free_files:
+    fdtable_release(task->files);
+fail_free_mem:
+    mm_release(task->mm);
+     */
+    //return err;
+}
+
+- (uint32_t) sys_clone:(dword_t) flags stack:(addr_t)stack ptid:(addr_t)ptid tls:(addr_t)tls ctid:(addr_t)ctid {
+    STRACE("clone(0x%x, 0x%x, 0x%x, 0x%x, 0x%x)", flags, stack, ptid, tls, ctid);
+    if (flags & ~CSIGNAL_ & ~IMPLEMENTED_FLAGS) {
+        // FIXME("unimplemented clone flags 0x%x", flags & ~CSIGNAL_ & ~IMPLEMENTED_FLAGS);
+        die("Unimplemented clone flags");
+        return _EINVAL;
+    }
+    if (flags & CLONE_SIGHAND_ && !(flags & CLONE_VM_))
+        return _EINVAL;
+    if (flags & CLONE_THREAD_ && !(flags & CLONE_SIGHAND_))
+        return _EINVAL;
+    
+    // struct task *task = task_create_(current);
+    Task *task = [[Task alloc] initWithParentTask:self];
+    if (!task) {
+        return _ENOMEM;
+    }
+    int err = [Task copy_task:task flags:flags stack:stack ptid_addr:ptid tls_addr:tls ctid_addr:ctid];
+    if (err < 0) {
+        // FIXME: there is a window between task_create_ and task_destroy where
+        // some other thread could get a pointer to the task.
+        // FIXME: task_destroy doesn't free all aspects of the task, which
+        // could cause leaks
+        lock(&pidsLock);
+        // TODO: Important
+        // task_destroy(task);
+        unlock(&pidsLock);
+        return err;
+    }
+    task.cpu->state.eax = 0;
+    
+    struct vfork_info vfork;
+    if (flags & CLONE_VFORK_) {
+        lock_init(&vfork.lock);
+        cond_init(&vfork.cond);
+        vfork.done = false;
+        task->vfork = vfork;
+    }
+    
+    // task might be destroyed by the time we finish, so save the pid
+    pid_t pid = task.pid.id;
+    [task start];
+    
+    if (flags & CLONE_VFORK_) {
+        lock(&vfork.lock);
+        while (!vfork.done) {
+            // FIXME this should stop waiting if a fatal signal is received
+            // wait_for_ignore_signals(&vfork.cond, &vfork.lock, NULL);
+            [self waitForIgnoreSignals:&vfork.cond lock:&vfork.lock timeout:NULL];
+        }
+        unlock(&vfork.lock);
+        // task->vfork = NULL;
+        cond_destroy(&vfork.cond);
+    }
+    return pid;
+}
+
+- (uint32_t) sys_fork {
+    return [self sys_clone:SIGCHLD_ stack:0 ptid:0 tls:0 ctid:0];
+}
+
+- (uint32_t)  sys_vfork {
+    return [self sys_clone:CLONE_VFORK_ | CLONE_VM_ | SIGCHLD_ stack:0 ptid:0 tls:0 ctid:0];
+}
+
+- (void) vfork_notify:(Task *)task {
+    //if (task->vfork) {
+        lock(&task->vfork.lock);
+        task->vfork.done = true;
+        notify(&task->vfork.cond);
+        unlock(&task->vfork.lock);
+    //}
+}
+
+
+
+- (uint32_t)setThreadArea:(addr_t) u_info_addr {
+    user_desc info;
+    if ([self userRead:u_info_addr buf:&info count:sizeof(info)]) {
+        return _EFAULT;
+    }
+    
+    self.cpu->state.tls_ptr = info.base_addr;
+    
+    // https://man7.org/linux/man-pages/man2/set_thread_area.2.html
+    // When set_thread_area() is passed an entry_number of -1, it searches
+    // for a free TLS entry.  If set_thread_area() finds a free TLS entry,
+    // the value of u_info->entry_number is set upon return to show which
+    // entry was changed.
+    //
+    // So here we are just picking a random entry in the not implemented TLS
+    // entry array to mark this as
+    if (info.entry_number == -1) {
+        info.entry_number = 0xc; // 0xc could probably be anything within bounds of whatever the TLS array size is
+    }
+    
+    // Then write back any changes, like the entry number, back into the processes virtual memory
+    if ([self userWrite:u_info_addr buf:&info count:sizeof(info)]) {
+        return _EFAULT;
+    }
+    
+    return 0;
+    
+}
+
+
+- (uint32_t)sysSetThreadArea:(addr_t) u_info_addr {
+    // u_info_addr is an address to a user_desc struct in a processes virtual memory
+    // the base_addr is saved in a processes' tls_ptr attribute and whenever opcode 0x65 is used
+    // meaning use the special GS segment, then the tls_ptr is added to the current addr variable and
+    // the next opcode is parsed and executed
+    return [self setThreadArea:u_info_addr];
+}
+
+// The TID address is where, when a new thread is created (depending on if the CLONE_CHILD_SETTID flag is set),
+// the thread id will be written to. If the CLONE_CHILD_CLEARTID flag is set then 0 is written to the address
+// upon termination along with a few more steps mentioned:
+// https://www.man7.org/linux/man-pages/man2/set_tid_address.2.html
+- (uint32_t)sysSetTIDAddress:(addr_t) tid_addr {
+    self->clear_tid = tid_addr;
+    return self.pid.id;
+}
+
+
+
+
 
 // ------------------------------------------ Memory helpers
 
@@ -416,8 +895,8 @@ int get_random(char *buf, size_t len)
     }
 
     FileDescriptor *interpreterFD = [self.fs genericOpen:interpreterStr flags:O_RDONLY_ mode:0 currentTask:self];
-    if (interpreterFD.err) {
-        return interpreterFD.err;
+    if (interpreterFD->err) {
+        return interpreterFD->err;
     }
     int err = [self formatExec:interpreterFD file:interpreterStr argv:aa envp:envp];
     [interpreterFD close];
@@ -452,7 +931,7 @@ int get_random(char *buf, size_t len)
     NSString *debugString = file;
     
     char tmpBuf[MAX_PATH];
-    int ferr = fcntl(fd.realFD, F_GETPATH, tmpBuf);
+    int ferr = fcntl(fd->realFD, F_GETPATH, tmpBuf);
     FFLog(@"Task ELF: File path for open: %s", tmpBuf);
     debugString = [NSString stringWithFormat:@"%s", tmpBuf];
     
@@ -496,8 +975,8 @@ int get_random(char *buf, size_t len)
 
         // open interpreter and read headers
         interp_fd = [self.fs genericOpen:[NSString stringWithCString:interp_name encoding:NSUTF8StringEncoding] flags:O_RDONLY mode:0 currentTask:self];
-        if (interp_fd.err) {
-            return interp_fd.err;
+        if (interp_fd->err) {
+            return interp_fd->err;
         }
         if ((err = [self readHeader:interp_fd header:&interp_header]) < 0) {
             if (err == _ENOEXEC) return _ELIBBAD;
@@ -792,15 +1271,15 @@ int get_random(char *buf, size_t len)
 //int __do_execve(const char *file, struct exec_args argv, struct exec_args envp) {
 - (int)doExecve:(NSString *)file argv:(ArgArgs *)argv envp:(EnvArgs *)envp {
     FileDescriptor *fd = [self.fs genericOpen:file flags:O_RDONLY mode:0 currentTask:self];
-    if (fd.err) {
-        return fd.err;
+    if (fd->err) {
+        return fd->err;
     }
 
     struct statbuf stat;
     int err = [self.fs.fsOps fstat:fd stat:&stat];
-    if (fd.err) {
+    if (fd->err) {
         [fd close];
-        return fd.err;
+        return fd->err;
     }
 
     // if nobody has permission to execute, it should be safe to not execute
@@ -877,16 +1356,9 @@ int get_random(char *buf, size_t len)
     return 0;
 }
 
-- (void)incrementRefCount {
-    self->mmRefCount++;
-}
-
-- (void)decrementRefCount {
-    self->mmRefCount--;
-    if (!self->mmRefCount) {
-        if (self.exeFile) [self.exeFile close];
-        [self.mem unmapMemory:0 numPages:NUM_PAGE_TABLE_ENTRIES];
-    }
+-(void)dealloc {
+    if (self.exeFile) [self.exeFile close];
+    [self.mem unmapMemory:0 numPages:NUM_PAGE_TABLE_ENTRIES];
 }
 
 - (Task *)cloneTask {
@@ -941,7 +1413,7 @@ int get_random(char *buf, size_t len)
     }
 
     char *memory = mmap(NULL, (numPages * PAGE_SIZE) + correction,
-                        mmapProtectionFlags, mmap_flags, fd.realFD, real_offset);
+                        mmapProtectionFlags, mmap_flags, fd->realFD, real_offset);
     FFLog(@"Task MMAP: Mapping memory ptr %x to page %x  real offset %x", memory, pageStart, real_offset);
     if (numPages) {
         FFLog(@"Task MMAP - First bytes from mmap %x %x %x %x %x %x", memory[0], memory[1], memory[2], memory[3], memory[4], memory[5]);
@@ -993,8 +1465,77 @@ int get_random(char *buf, size_t len)
 }
 
 -(NSString *)description {
-    return [[NSString alloc] initWithFormat:@"Pid: %d\nSigHandler: %@\nSigQueue: %@\nBlocked Signals: %@\nWaiting Signals: %@\nPending Signals: %@\nSaved Signals: %@\nThread Group: %@\nCPU: %@\nMem: %@\nGroups: %@\nFileSystem: %@\nFileDescTable: %@\nElf Load: %@\n", self.pid.id, self.sigHandler, self.sigQueue, self.blockedSignals, self.waitingSignals, self.pendingSignals, self.savedBlockedSignals, self.group, self.cpu, self.mem, self.groups, self.fs, self.filesTable, self.elfEntryVMemInfo];
+    return [[NSString alloc] initWithFormat:@"Pid: %d\nSigHandler: %@\nSigQueue: %@\nBlocked Signals: %@\nWaiting Signals: %@\nPending Signals: %@\nSaved Signals: %@\nThread Group: %@\nCPU: %@\nMem: %@\nFileSystem: %@\nFileDescTable: %@\nElf Load: %@\n", self.pid.id, self.sigHandler, self.sigQueue, self.blockedSignals, self.waitingSignals, self.pendingSignals, self.savedBlockedSignals, self.group, self.cpu, self.mem, self.fs, self.filesTable, self.elfEntryVMemInfo];
 }
+
+/*
+- (id)initWithTask:(Task *)task {
+    self = [super init];
+    if (!self) {
+        return nil;
+    }
+    
+    lock(&pidsLock);
+    static int current_pid = 1;
+    while (current_pid < MAX_PID) {
+        if (![pids objectForKey:[NSString stringWithFormat:@"%d", current_pid]]) {
+            break;
+        } else {
+            current_pid += 1;
+        }
+        
+        if (current_pid >= MAX_PID) {
+            current_pid = 0;
+        }
+    }
+    
+    Pid *newPid = [[Pid alloc] init];
+    newPid.id = current_pid;
+    newPid.task = self;
+    
+    NSString *pidString = [NSString stringWithFormat:@"%d", current_pid];
+    [pids setValue:newPid forKey:pidString];
+    
+    self.pid = newPid;
+    
+    self.pid.task = self;
+    
+    self.fs = task.fs;
+    
+    // The child task does inherit the parent's signal handlers
+    self.sigHandler = [[SigHandler alloc] initWith:task.sigHandler];
+    
+    self.blockedSignals = [[SigSet alloc] initWithSigSet:task.blockedSignals->mask];
+    self.waitingSignals = [[SigSet alloc] initWithSigSet:task.waitingSignals->mask];
+    self.pendingSignals = [[SigSet alloc] initWithSigSet:task.pendingSignals->mask];
+    self.savedBlockedSignals = [[SigSet alloc] initWithSigSet:task.savedBlockedSignals->mask];
+    
+    self.children = [[NSMutableArray alloc] init];
+    self.siblings = [[NSMutableArray alloc] init];
+    
+    if (task != NULL) {
+        self->parent = task;
+        list_add(&parent->children, &task->siblings);
+    }
+    unlock(&pids_lock);
+    
+    task->pending = 0;
+    list_init(&task->queue);
+    task->clear_tid = 0;
+    task->robust_list = 0;
+    task->did_exec = false;
+    lock_init(&task->general_lock);
+    
+    task->sockrestart = (struct task_sockrestart) {};
+    list_init(&task->sockrestart.listen);
+    
+    task->waiting_cond = NULL;
+    task->waiting_lock = NULL;
+    lock_init(&task->waiting_cond_lock);
+    cond_init(&task->pause);
+    return task;
+}
+*/
 
 - (id)initWithParentTask:(Task *)parent {
     self = [super init];
@@ -1055,14 +1596,15 @@ int get_random(char *buf, size_t len)
     self.cpu = [[CPU alloc] initWithTask:self];
     self.filesTable = [FileDescriptorTable new];
     self.didExec = false;
-//    self.generalLock = [NSLock new];
-//    self.memLock = [NSLock new];
-//    self.waitingLock = [NSLock new];
+    
+    lock_init(&self->generalLock);
+    wrlock_init(&self->memRWLock);
+    lock_init(&self->waitingLock);
+    
+    cond_init(&self->waitingCondition);
 
     self.mem = [[Memory alloc] init]; // TODO: FIX: When creating a new child task it stops here
     
-    self.groups = [NSMutableArray arrayWithCapacity:MAX_GROUPS];
-    self->mmRefCount = 1;
     return self;
 }
 
@@ -1087,11 +1629,38 @@ int get_random(char *buf, size_t len)
     unlock(&self->waitingConditionLock);
     //}
     int rc = 0;
-
+    
     if (!timeout) {
         pthread_cond_wait(&cond->cond, &lock->m);
     } else {
         rc = pthread_cond_timedwait_relative_np(&cond->cond, &lock->m, timeout);
+    }
+    
+    
+    //    if (current) {
+    lock(&self->waitingConditionLock);
+    //    self->waitingCondition = nil;
+    //    self->waitingLock = nil;
+    unlock(&self->waitingConditionLock);
+    //    }
+    if (rc == ETIMEDOUT)
+        return _ETIMEDOUT;
+    return 0;
+}
+
+/*- (int) waitForIgnoreSignals:(ThreadGroup *)group timeout:(struct timespec *)timeout {
+    //if (current) {
+    lock(&self->waitingConditionLock);
+    self->waitingCondition = group->cond;
+    self->waitingLock = group->lock;
+    unlock(&self->waitingConditionLock);
+    //}
+    int rc = 0;
+
+    if (!timeout) {
+        pthread_cond_wait(&group->cond.cond, &group->lock.m);
+    } else {
+        rc = pthread_cond_timedwait_relative_np(&group->cond.cond, &group->lock.m, timeout);
     }
 
     
@@ -1105,6 +1674,7 @@ int get_random(char *buf, size_t len)
         return _ETIMEDOUT;
     return 0;
 }
+ */
 
 - (void) deliverSignalTo:(Task *)task signal:(int)signal sigInfo:(SigInfo*)sigInfo {
     
@@ -1198,16 +1768,22 @@ int get_random(char *buf, size_t len)
     return [pids objectForKey:@"0"];
 }
 
-- (bool) exitThreadGroup {
-    self.groupLinks = [NSMutableArray new];
-    bool group_dead = [self.group.threads count] == 0;
-    if (group_dead) {
-        // Then the group is dead
-        // TODO: free timer
-        //if (group->timer)
-        //    timer_free(group->timer);
+- (bool) exitThreadGroup{
+    self.groupLinks = [[NSMutableArray alloc] init];
+    bool groupDead = [self.group.threads count] == 0;
+    if (groupDead) {
+        // don't need to lock the group since the only pointers to it come from:
+        // - other threads' current->group, but there are none left thanks to that list_empty call
+        // - locking pids_lock first, which do_exit did
+        if (self.group->timer)
+            timer_free(self.group->timer);
+        
+        // The group will be removed from its group and session by reap_if_zombie,
+        // because fish tries to set the pgid to that of an exited but not reaped
+        // task.
+        // https://github.com/Microsoft/WSL/issues/2786
     }
-    return group_dead;
+    return groupDead;
 }
 
 - (void) doExit:(int)status {
@@ -1220,9 +1796,9 @@ int get_random(char *buf, size_t len)
     }
     
     // TODO: release all our resources
-    // mm_release(current->mm);
-    // fdtable_release(current->files);
-    // fs_info_release(current->fs);
+    self.mem = nil;
+    self.filesTable = nil;
+    self.fs = nil;
     
     // sighand must be released below so it can be protected by pids_lock
     // since it can be accessed by other threads
@@ -1230,21 +1806,18 @@ int get_random(char *buf, size_t len)
     // save things that our parent might be interested in
     self->exitCode = status; // FIXME locking
     struct rusage_ rusage = [self getCurrentRusage];
-    // lock(&current->group->lock);
+    lock(&self.group->lock);
     rusage_add(&self.group->rusage, &rusage);
     struct rusage_ group_rusage = self.group->rusage;
-    // unlock(&current->group->lock);
+    unlock(&self.group->lock);
     
     // the actual freeing needs pids_lock
-    // lock(&pids_lock);
+    lock(&pidsLock);
     self->exiting = true;
-    // release the sighand
-    // sighand_release(current->sighand);
+    self.sigHandler = nil;
+    self.sigQueue = nil;
     
     [self.sigQueue.queue removeAllObjects];
-    // for (SigInfo *si in self.sigQueue.queue) {
-    //     [self.sigQueue remove:si];
-    // }
 
     Task *leader = self.group.leader;
     
@@ -1252,7 +1825,7 @@ int get_random(char *buf, size_t len)
     Task *newParent = [self findNewParent];
     for (Task *child in self.children) {
         child.parent = newParent;
-        child.siblings = [NSMutableArray new];
+        child.siblings = [[NSMutableArray alloc] init];
         [newParent.children addObjectsFromArray:child.siblings];
     }
     
@@ -1277,8 +1850,8 @@ int get_random(char *buf, size_t len)
                 .child.stime = clock_from_timeval(group_rusage.stime),
             };
             si->info = info;
-            if (leader->exit_signal != 0) {
-                [self sendSignalTo:parent signal:leader->exit_signal sigInfo:si];
+            if (leader->exitSignal != 0) {
+                [self sendSignalTo:parent signal:leader->exitSignal sigInfo:si];
             }
         }
         
@@ -1292,7 +1865,7 @@ int get_random(char *buf, size_t len)
     // TODO: Implement  Destroy self/task
     // if (current != leader)
     //    task_destroy(current);
-    // unlock(&pids_lock);
+    unlock(&pidsLock);
     
     pthread_exit(NULL);
 }

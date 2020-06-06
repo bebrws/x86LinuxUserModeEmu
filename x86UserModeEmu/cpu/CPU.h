@@ -331,10 +331,7 @@ static inline const char *reg32_name(enum reg32 reg) {
 - (void)start;
 
 // syscalls
-- (uint32_t)sysSetThreadArea:(addr_t) u_info_addr;
-- (uint32_t)sysSetTIDAddress:(addr_t) tid_addr;
-- (uint32_t)sysSetThreadArea:(addr_t) u_info_addr;
-- (uint32_t)taskSetThreadArea:(addr_t) u_info_addr;
+
 
 
 @property (nonatomic, strong) NSThread *thread;

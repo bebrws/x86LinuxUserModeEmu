@@ -8,6 +8,7 @@
 
 #import "FileDescriptorTable.h"
 #import "FileDescriptor.h"
+#import "sys/sync.h"
 
 // https://www.kernel.org/doc/Documentation/filesystems/files.txt
 // How linux manages files in the kernel - related to locking and threads
@@ -19,6 +20,8 @@
     if (!self) {
         return nil;
     }
+    
+    lock_init(&self->lock);
     
     self.tbl = [NSMutableDictionary new];
     return self;
@@ -38,7 +41,7 @@
 - (void)closeCloExecFDs {
     for (NSString *fStrKey in self.tbl) {
         FileDescriptor *fd = [self.tbl objectForKey:fStrKey];
-        if (fd.closeOnExec) {
+        if (fd->closeOnExec) {
             [fd close];
             [self.tbl removeObjectForKey:fStrKey];
         }

@@ -16,6 +16,7 @@
 // http://man7.org/linux/man-pages/man2/sigaction.2.html
 // and in the future
 // TODO: Add more information to siginfo struct to help with debugging and better signal introspection
+
 @interface SigInfo : NSObject {
     @public siginfo_ info;
 }

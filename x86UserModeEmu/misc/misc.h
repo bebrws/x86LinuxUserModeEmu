@@ -18,6 +18,12 @@
 #ifndef misc_h
 #define misc_h
 
+
+// TODO: Should be in FileDescriptor.h
+typedef int32_t fd_t;
+#define AT_FDCWD_ -100
+
+
 // utility macros
 #define glue(a, b) _glue(a, b)
 #define _glue(a, b) a##b

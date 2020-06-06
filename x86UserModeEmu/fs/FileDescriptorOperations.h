@@ -53,6 +53,6 @@
 // handle F_GETFL i.e. return open flags for this fd
 - (int)getflags:(FileDescriptor *)fd;
 // handle F_SETFL i.e. set O_NONBLOCK
-- (int)setflags:(FileDescriptor *)fd arg:(dword_t)arg;
+- (int)setflags:(FileDescriptor *)fd flags:(dword_t)flags;
 @end
 

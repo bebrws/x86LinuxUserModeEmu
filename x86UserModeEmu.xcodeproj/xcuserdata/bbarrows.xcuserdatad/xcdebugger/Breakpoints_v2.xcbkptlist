@@ -23,22 +23,6 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "512E855D-198D-4698-9F36-CDC3E443CF36"
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "x86UserModeEmu/AppDelegate.m"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "44"
-            endingLineNumber = "44"
-            landmarkName = "-applicationDidFinishLaunching:"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
             uuid = "2A9CC9EE-9656-4273-9E39-01CB495BEE85"
             shouldBeEnabled = "No"
             ignoreCount = "0"
@@ -46,8 +30,8 @@
             filePath = "x86UserModeEmu/AppDelegate.m"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "69"
-            endingLineNumber = "69"
+            startingLineNumber = "71"
+            endingLineNumber = "71"
             landmarkName = "-applicationDidFinishLaunching:"
             landmarkType = "7">
          </BreakpointContent>
@@ -62,8 +46,8 @@
             filePath = "x86UserModeEmu/AppDelegate.m"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "77"
-            endingLineNumber = "77"
+            startingLineNumber = "79"
+            endingLineNumber = "79"
             landmarkName = "-applicationDidFinishLaunching:"
             landmarkType = "7">
          </BreakpointContent>
@@ -78,8 +62,8 @@
             filePath = "x86UserModeEmu/AppDelegate.m"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "67"
-            endingLineNumber = "67"
+            startingLineNumber = "69"
+            endingLineNumber = "69"
             landmarkName = "-applicationDidFinishLaunching:"
             landmarkType = "7">
          </BreakpointContent>
@@ -136,8 +120,8 @@
             filePath = "x86UserModeEmu/AppDelegate.m"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "68"
-            endingLineNumber = "68"
+            startingLineNumber = "70"
+            endingLineNumber = "70"
             landmarkName = "-applicationDidFinishLaunching:"
             landmarkType = "7">
          </BreakpointContent>
@@ -210,8 +194,8 @@
             filePath = "x86UserModeEmu/AppDelegate.m"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "86"
-            endingLineNumber = "86"
+            startingLineNumber = "88"
+            endingLineNumber = "88"
             landmarkName = "-applicationDidFinishLaunching:"
             landmarkType = "7">
          </BreakpointContent>
@@ -1439,7 +1423,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "159"
             endingLineNumber = "159"
-            landmarkName = "-setflags:arg:"
+            landmarkName = "-setflags:flags:"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -1485,8 +1469,8 @@
             filePath = "x86UserModeEmu/fs/FileDescriptor.m"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "29"
-            endingLineNumber = "29"
+            startingLineNumber = "44"
+            endingLineNumber = "44"
             landmarkName = "-init"
             landmarkType = "7">
          </BreakpointContent>
@@ -1549,8 +1533,8 @@
             filePath = "x86UserModeEmu/Task.m"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "557"
-            endingLineNumber = "557"
+            startingLineNumber = "1036"
+            endingLineNumber = "1036"
             landmarkName = "-elfExec:file:argv:envp:"
             landmarkType = "7">
          </BreakpointContent>
@@ -1565,8 +1549,8 @@
             filePath = "x86UserModeEmu/Task.m"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "575"
-            endingLineNumber = "575"
+            startingLineNumber = "1054"
+            endingLineNumber = "1054"
             landmarkName = "-elfExec:file:argv:envp:"
             landmarkType = "7">
          </BreakpointContent>
@@ -1581,8 +1565,8 @@
             filePath = "x86UserModeEmu/Task.m"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "566"
-            endingLineNumber = "566"
+            startingLineNumber = "1045"
+            endingLineNumber = "1045"
             landmarkName = "-elfExec:file:argv:envp:"
             landmarkType = "7">
          </BreakpointContent>
@@ -1629,8 +1613,8 @@
             filePath = "x86UserModeEmu/Task.m"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "585"
-            endingLineNumber = "585"
+            startingLineNumber = "1064"
+            endingLineNumber = "1064"
             landmarkName = "-elfExec:file:argv:envp:"
             landmarkType = "7">
          </BreakpointContent>
@@ -1645,8 +1629,8 @@
             filePath = "x86UserModeEmu/AppDelegate.m"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "72"
-            endingLineNumber = "72"
+            startingLineNumber = "74"
+            endingLineNumber = "74"
             landmarkName = "-applicationDidFinishLaunching:"
             landmarkType = "7">
          </BreakpointContent>
@@ -1677,8 +1661,8 @@
             filePath = "x86UserModeEmu/Task.m"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "556"
-            endingLineNumber = "556"
+            startingLineNumber = "1035"
+            endingLineNumber = "1035"
             landmarkName = "-elfExec:file:argv:envp:"
             landmarkType = "7">
          </BreakpointContent>
@@ -1725,8 +1709,8 @@
             filePath = "x86UserModeEmu/Task.m"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "494"
-            endingLineNumber = "494"
+            startingLineNumber = "973"
+            endingLineNumber = "973"
             landmarkName = "-elfExec:file:argv:envp:"
             landmarkType = "7">
          </BreakpointContent>
@@ -1741,8 +1725,8 @@
             filePath = "x86UserModeEmu/Task.m"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "495"
-            endingLineNumber = "495"
+            startingLineNumber = "974"
+            endingLineNumber = "974"
             landmarkName = "-elfExec:file:argv:envp:"
             landmarkType = "7">
          </BreakpointContent>
@@ -1757,8 +1741,8 @@
             filePath = "x86UserModeEmu/Task.m"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "511"
-            endingLineNumber = "511"
+            startingLineNumber = "990"
+            endingLineNumber = "990"
             landmarkName = "-elfExec:file:argv:envp:"
             landmarkType = "7">
          </BreakpointContent>
@@ -1773,8 +1757,8 @@
             filePath = "x86UserModeEmu/Task.m"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "515"
-            endingLineNumber = "515"
+            startingLineNumber = "994"
+            endingLineNumber = "994"
             landmarkName = "-elfExec:file:argv:envp:"
             landmarkType = "7">
          </BreakpointContent>
@@ -1789,8 +1773,8 @@
             filePath = "x86UserModeEmu/Task.m"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "550"
-            endingLineNumber = "550"
+            startingLineNumber = "1029"
+            endingLineNumber = "1029"
             landmarkName = "-elfExec:file:argv:envp:"
             landmarkType = "7">
          </BreakpointContent>
@@ -1805,8 +1789,8 @@
             filePath = "x86UserModeEmu/Task.m"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "522"
-            endingLineNumber = "522"
+            startingLineNumber = "1001"
+            endingLineNumber = "1001"
             landmarkName = "-elfExec:file:argv:envp:"
             landmarkType = "7">
          </BreakpointContent>
@@ -1821,8 +1805,8 @@
             filePath = "x86UserModeEmu/Task.m"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "549"
-            endingLineNumber = "549"
+            startingLineNumber = "1028"
+            endingLineNumber = "1028"
             landmarkName = "-elfExec:file:argv:envp:"
             landmarkType = "7">
          </BreakpointContent>
@@ -1837,8 +1821,8 @@
             filePath = "x86UserModeEmu/Task.m"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "534"
-            endingLineNumber = "534"
+            startingLineNumber = "1013"
+            endingLineNumber = "1013"
             landmarkName = "-elfExec:file:argv:envp:"
             landmarkType = "7">
          </BreakpointContent>
@@ -1853,8 +1837,8 @@
             filePath = "x86UserModeEmu/Task.m"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "533"
-            endingLineNumber = "533"
+            startingLineNumber = "1012"
+            endingLineNumber = "1012"
             landmarkName = "-elfExec:file:argv:envp:"
             landmarkType = "7">
          </BreakpointContent>
@@ -1869,8 +1853,8 @@
             filePath = "x86UserModeEmu/Task.m"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "332"
-            endingLineNumber = "332"
+            startingLineNumber = "811"
+            endingLineNumber = "811"
             landmarkName = "-loadEntry:ph:bias:debugString:"
             landmarkType = "7">
          </BreakpointContent>
@@ -1885,8 +1869,8 @@
             filePath = "x86UserModeEmu/Task.m"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "936"
-            endingLineNumber = "936"
+            startingLineNumber = "1408"
+            endingLineNumber = "1408"
             landmarkName = "-mmap:pageStart:numPages:offset:protectionFlags:flags:debugString:"
             landmarkType = "7">
          </BreakpointContent>
@@ -1901,8 +1885,8 @@
             filePath = "x86UserModeEmu/Task.m"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "463"
-            endingLineNumber = "463"
+            startingLineNumber = "942"
+            endingLineNumber = "942"
             landmarkName = "-elfExec:file:argv:envp:"
             landmarkType = "7">
          </BreakpointContent>
@@ -1917,8 +1901,8 @@
             filePath = "x86UserModeEmu/Task.m"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "461"
-            endingLineNumber = "461"
+            startingLineNumber = "940"
+            endingLineNumber = "940"
             landmarkName = "-elfExec:file:argv:envp:"
             landmarkType = "7">
          </BreakpointContent>
@@ -1933,8 +1917,8 @@
             filePath = "x86UserModeEmu/Task.m"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "460"
-            endingLineNumber = "460"
+            startingLineNumber = "939"
+            endingLineNumber = "939"
             landmarkName = "-elfExec:file:argv:envp:"
             landmarkType = "7">
          </BreakpointContent>
@@ -1949,8 +1933,8 @@
             filePath = "x86UserModeEmu/Task.m"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "462"
-            endingLineNumber = "462"
+            startingLineNumber = "941"
+            endingLineNumber = "941"
             landmarkName = "-elfExec:file:argv:envp:"
             landmarkType = "7">
          </BreakpointContent>
@@ -1965,8 +1949,8 @@
             filePath = "x86UserModeEmu/Task.m"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "948"
-            endingLineNumber = "948"
+            startingLineNumber = "1420"
+            endingLineNumber = "1420"
             landmarkName = "-mmap:pageStart:numPages:offset:protectionFlags:flags:debugString:"
             landmarkType = "7">
          </BreakpointContent>
@@ -2013,8 +1997,8 @@
             filePath = "x86UserModeEmu/Task.m"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "940"
-            endingLineNumber = "940"
+            startingLineNumber = "1412"
+            endingLineNumber = "1412"
             landmarkName = "-mmap:pageStart:numPages:offset:protectionFlags:flags:debugString:"
             landmarkType = "7">
          </BreakpointContent>
@@ -2061,8 +2045,8 @@
             filePath = "x86UserModeEmu/Task.m"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "553"
-            endingLineNumber = "553"
+            startingLineNumber = "1032"
+            endingLineNumber = "1032"
             landmarkName = "-elfExec:file:argv:envp:"
             landmarkType = "7">
          </BreakpointContent>
@@ -2077,8 +2061,8 @@
             filePath = "x86UserModeEmu/Task.m"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "571"
-            endingLineNumber = "571"
+            startingLineNumber = "1050"
+            endingLineNumber = "1050"
             landmarkName = "-elfExec:file:argv:envp:"
             landmarkType = "7">
          </BreakpointContent>
@@ -2093,8 +2077,8 @@
             filePath = "x86UserModeEmu/Task.m"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "596"
-            endingLineNumber = "596"
+            startingLineNumber = "1075"
+            endingLineNumber = "1075"
             landmarkName = "-elfExec:file:argv:envp:"
             landmarkType = "7">
          </BreakpointContent>
@@ -2109,8 +2093,8 @@
             filePath = "x86UserModeEmu/Task.m"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "601"
-            endingLineNumber = "601"
+            startingLineNumber = "1080"
+            endingLineNumber = "1080"
             landmarkName = "-elfExec:file:argv:envp:"
             landmarkType = "7">
          </BreakpointContent>
@@ -2125,8 +2109,8 @@
             filePath = "x86UserModeEmu/Task.m"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "600"
-            endingLineNumber = "600"
+            startingLineNumber = "1079"
+            endingLineNumber = "1079"
             landmarkName = "-elfExec:file:argv:envp:"
             landmarkType = "7">
          </BreakpointContent>
@@ -2141,8 +2125,8 @@
             filePath = "x86UserModeEmu/Task.m"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "608"
-            endingLineNumber = "608"
+            startingLineNumber = "1087"
+            endingLineNumber = "1087"
             landmarkName = "-elfExec:file:argv:envp:"
             landmarkType = "7">
          </BreakpointContent>
@@ -2157,8 +2141,8 @@
             filePath = "x86UserModeEmu/AppDelegate.m"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "48"
-            endingLineNumber = "48"
+            startingLineNumber = "50"
+            endingLineNumber = "50"
             landmarkName = "-applicationDidFinishLaunching:"
             landmarkType = "7">
          </BreakpointContent>
@@ -2189,8 +2173,8 @@
             filePath = "x86UserModeEmu/Task.m"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "643"
-            endingLineNumber = "643"
+            startingLineNumber = "1122"
+            endingLineNumber = "1122"
             landmarkName = "-elfExec:file:argv:envp:"
             landmarkType = "7">
          </BreakpointContent>
@@ -2205,8 +2189,8 @@
             filePath = "x86UserModeEmu/Task.m"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "715"
-            endingLineNumber = "715"
+            startingLineNumber = "1194"
+            endingLineNumber = "1194"
             landmarkName = "-elfExec:file:argv:envp:"
             landmarkType = "7">
          </BreakpointContent>
@@ -2221,8 +2205,8 @@
             filePath = "x86UserModeEmu/Task.m"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "660"
-            endingLineNumber = "660"
+            startingLineNumber = "1139"
+            endingLineNumber = "1139"
             landmarkName = "-elfExec:file:argv:envp:"
             landmarkType = "7">
          </BreakpointContent>
@@ -2237,8 +2221,8 @@
             filePath = "x86UserModeEmu/Task.m"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "666"
-            endingLineNumber = "666"
+            startingLineNumber = "1145"
+            endingLineNumber = "1145"
             landmarkName = "-elfExec:file:argv:envp:"
             landmarkType = "7">
          </BreakpointContent>
@@ -2253,8 +2237,8 @@
             filePath = "x86UserModeEmu/cpu/CPU.m"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "5811"
-            endingLineNumber = "5811"
+            startingLineNumber = "6031"
+            endingLineNumber = "6031"
             landmarkName = "-step:"
             landmarkType = "7">
          </BreakpointContent>
@@ -2269,8 +2253,8 @@
             filePath = "x86UserModeEmu/cpu/CPU.m"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "10904"
-            endingLineNumber = "10904"
+            startingLineNumber = "11124"
+            endingLineNumber = "11124"
             landmarkName = "-runloop"
             landmarkType = "7">
          </BreakpointContent>
@@ -2285,8 +2269,8 @@
             filePath = "x86UserModeEmu/cpu/CPU.m"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "8445"
-            endingLineNumber = "8445"
+            startingLineNumber = "8665"
+            endingLineNumber = "8665"
             landmarkName = "-step:"
             landmarkType = "7">
          </BreakpointContent>
@@ -2303,8 +2287,8 @@
             filePath = "x86UserModeEmu/cpu/CPU.m"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "8444"
-            endingLineNumber = "8444"
+            startingLineNumber = "8664"
+            endingLineNumber = "8664"
             landmarkName = "-step:"
             landmarkType = "7">
          </BreakpointContent>
@@ -2369,8 +2353,8 @@
             filePath = "x86UserModeEmu/cpu/CPU.m"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "5507"
-            endingLineNumber = "5507"
+            startingLineNumber = "5727"
+            endingLineNumber = "5727"
             landmarkName = "-step:"
             landmarkType = "7">
          </BreakpointContent>
@@ -2386,8 +2370,8 @@
             filePath = "x86UserModeEmu/cpu/CPU.m"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "5562"
-            endingLineNumber = "5562"
+            startingLineNumber = "5782"
+            endingLineNumber = "5782"
             landmarkName = "-step:"
             landmarkType = "7">
          </BreakpointContent>
@@ -2402,8 +2386,8 @@
             filePath = "x86UserModeEmu/cpu/CPU.m"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "10524"
-            endingLineNumber = "10524"
+            startingLineNumber = "10744"
+            endingLineNumber = "10744"
             landmarkName = "-step:"
             landmarkType = "7">
          </BreakpointContent>
@@ -2418,8 +2402,8 @@
             filePath = "x86UserModeEmu/cpu/CPU.m"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "8651"
-            endingLineNumber = "8651"
+            startingLineNumber = "8871"
+            endingLineNumber = "8871"
             landmarkName = "-step:"
             landmarkType = "7">
          </BreakpointContent>
@@ -2434,8 +2418,8 @@
             filePath = "x86UserModeEmu/cpu/CPU.m"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "10588"
-            endingLineNumber = "10588"
+            startingLineNumber = "10808"
+            endingLineNumber = "10808"
             landmarkName = "-getModRMAddress:opSize:"
             landmarkType = "7">
          </BreakpointContent>
@@ -2450,8 +2434,8 @@
             filePath = "x86UserModeEmu/cpu/CPU.m"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "10585"
-            endingLineNumber = "10585"
+            startingLineNumber = "10805"
+            endingLineNumber = "10805"
             landmarkName = "-getModRMAddress:opSize:"
             landmarkType = "7">
          </BreakpointContent>
@@ -2466,8 +2450,8 @@
             filePath = "x86UserModeEmu/cpu/CPU.m"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "10583"
-            endingLineNumber = "10583"
+            startingLineNumber = "10803"
+            endingLineNumber = "10803"
             landmarkName = "-getModRMAddress:opSize:"
             landmarkType = "7">
          </BreakpointContent>
@@ -2531,8 +2515,8 @@
             filePath = "x86UserModeEmu/Task.m"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "568"
-            endingLineNumber = "568"
+            startingLineNumber = "1047"
+            endingLineNumber = "1047"
             landmarkName = "-elfExec:file:argv:envp:"
             landmarkType = "7">
          </BreakpointContent>
@@ -2547,8 +2531,8 @@
             filePath = "x86UserModeEmu/Task.m"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "952"
-            endingLineNumber = "952"
+            startingLineNumber = "1424"
+            endingLineNumber = "1424"
             landmarkName = "-mmap:pageStart:numPages:offset:protectionFlags:flags:debugString:"
             landmarkType = "7">
          </BreakpointContent>
@@ -2563,8 +2547,8 @@
             filePath = "x86UserModeEmu/cpu/CPU.m"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "8565"
-            endingLineNumber = "8565"
+            startingLineNumber = "8785"
+            endingLineNumber = "8785"
             landmarkName = "-step:"
             landmarkType = "7">
          </BreakpointContent>
@@ -2579,8 +2563,8 @@
             filePath = "x86UserModeEmu/Task.m"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "621"
-            endingLineNumber = "621"
+            startingLineNumber = "1100"
+            endingLineNumber = "1100"
             landmarkName = "-elfExec:file:argv:envp:"
             landmarkType = "7">
          </BreakpointContent>
@@ -2595,8 +2579,8 @@
             filePath = "x86UserModeEmu/Task.m"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "589"
-            endingLineNumber = "589"
+            startingLineNumber = "1068"
+            endingLineNumber = "1068"
             landmarkName = "-elfExec:file:argv:envp:"
             landmarkType = "7">
          </BreakpointContent>
@@ -2611,8 +2595,8 @@
             filePath = "x86UserModeEmu/Task.m"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "565"
-            endingLineNumber = "565"
+            startingLineNumber = "1044"
+            endingLineNumber = "1044"
             landmarkName = "-elfExec:file:argv:envp:"
             landmarkType = "7">
          </BreakpointContent>
@@ -2627,8 +2611,8 @@
             filePath = "x86UserModeEmu/Task.m"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "441"
-            endingLineNumber = "441"
+            startingLineNumber = "920"
+            endingLineNumber = "920"
             landmarkName = "-findHoleForElf:ph:"
             landmarkType = "7">
          </BreakpointContent>
@@ -2643,8 +2627,8 @@
             filePath = "x86UserModeEmu/Task.m"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "439"
-            endingLineNumber = "439"
+            startingLineNumber = "918"
+            endingLineNumber = "918"
             landmarkName = "-findHoleForElf:ph:"
             landmarkType = "7">
          </BreakpointContent>
@@ -2691,8 +2675,8 @@
             filePath = "x86UserModeEmu/AppDelegate.m"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "100"
-            endingLineNumber = "100"
+            startingLineNumber = "102"
+            endingLineNumber = "102"
             landmarkName = "-applicationDidFinishLaunching:"
             landmarkType = "7">
          </BreakpointContent>
@@ -2707,8 +2691,8 @@
             filePath = "x86UserModeEmu/AppDelegate.m"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "112"
-            endingLineNumber = "112"
+            startingLineNumber = "114"
+            endingLineNumber = "114"
             landmarkName = "-applicationDidFinishLaunching:"
             landmarkType = "7">
          </BreakpointContent>
@@ -2723,8 +2707,8 @@
             filePath = "x86UserModeEmu/AppDelegate.m"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "97"
-            endingLineNumber = "97"
+            startingLineNumber = "99"
+            endingLineNumber = "99"
             landmarkName = "-applicationDidFinishLaunching:"
             landmarkType = "7">
          </BreakpointContent>
@@ -2739,57 +2723,9 @@
             filePath = "x86UserModeEmu/AppDelegate.m"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "106"
-            endingLineNumber = "106"
+            startingLineNumber = "108"
+            endingLineNumber = "108"
             landmarkName = "-applicationDidFinishLaunching:"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            uuid = "BED89277-EF32-4B2B-AFCC-31F4FB415C33"
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "x86UserModeEmu/Task.m"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1006"
-            endingLineNumber = "1006"
-            landmarkName = "-initWithParentTask:"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            uuid = "F7DEDFE5-2DC3-4A6C-92B6-96277F256290"
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "x86UserModeEmu/Task.m"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1020"
-            endingLineNumber = "1020"
-            landmarkName = "-initWithParentTask:"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            uuid = "D4FFA75A-6192-43AA-BE04-5B59474B9A86"
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "x86UserModeEmu/Task.m"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1062"
-            endingLineNumber = "1062"
-            landmarkName = "-initWithParentTask:"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -2836,8 +2772,8 @@
             filePath = "x86UserModeEmu/Task.m"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "800"
-            endingLineNumber = "800"
+            startingLineNumber = "1279"
+            endingLineNumber = "1279"
             landmarkName = "-doExecve:argv:envp:"
             landmarkType = "7">
          </BreakpointContent>
@@ -2868,8 +2804,8 @@
             filePath = "x86UserModeEmu/Task.m"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "815"
-            endingLineNumber = "815"
+            startingLineNumber = "1294"
+            endingLineNumber = "1294"
             landmarkName = "-doExecve:argv:envp:"
             landmarkType = "7">
          </BreakpointContent>
@@ -2884,8 +2820,8 @@
             filePath = "x86UserModeEmu/Task.m"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "751"
-            endingLineNumber = "751"
+            startingLineNumber = "1230"
+            endingLineNumber = "1230"
             landmarkName = "-elfExec:file:argv:envp:"
             landmarkType = "7">
          </BreakpointContent>
@@ -2900,8 +2836,8 @@
             filePath = "x86UserModeEmu/cpu/CPU.m"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "5513"
-            endingLineNumber = "5513"
+            startingLineNumber = "5733"
+            endingLineNumber = "5733"
             landmarkName = "-step:"
             landmarkType = "7">
          </BreakpointContent>
@@ -2916,8 +2852,8 @@
             filePath = "x86UserModeEmu/cpu/CPU.m"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "10861"
-            endingLineNumber = "10861"
+            startingLineNumber = "11081"
+            endingLineNumber = "11081"
             landmarkName = "-runloop"
             landmarkType = "7">
          </BreakpointContent>
@@ -2932,8 +2868,8 @@
             filePath = "x86UserModeEmu/cpu/CPU.m"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "10884"
-            endingLineNumber = "10884"
+            startingLineNumber = "11104"
+            endingLineNumber = "11104"
             landmarkName = "-runloop"
             landmarkType = "7">
          </BreakpointContent>
@@ -2948,8 +2884,8 @@
             filePath = "x86UserModeEmu/cpu/CPU.m"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "5508"
-            endingLineNumber = "5508"
+            startingLineNumber = "5728"
+            endingLineNumber = "5728"
             landmarkName = "-step:"
             landmarkType = "7">
          </BreakpointContent>
@@ -2964,8 +2900,8 @@
             filePath = "x86UserModeEmu/cpu/CPU.m"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "10407"
-            endingLineNumber = "10407"
+            startingLineNumber = "10627"
+            endingLineNumber = "10627"
             landmarkName = "-step:"
             landmarkType = "7">
          </BreakpointContent>
@@ -2980,8 +2916,8 @@
             filePath = "x86UserModeEmu/cpu/CPU.m"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "9142"
-            endingLineNumber = "9142"
+            startingLineNumber = "9362"
+            endingLineNumber = "9362"
             landmarkName = "-step:"
             landmarkType = "7">
          </BreakpointContent>

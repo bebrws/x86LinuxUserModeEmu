@@ -37,12 +37,11 @@ typedef struct {
 @interface Mount : NSObject {
     @public sqlite_stmts stmt;
     @public sqlite3 *db;
+    @public lock_t lock;
 }
 
 // Debug
 // @property (nonatomic, strong) NSString *path;
-
-@property (nonatomic, strong) NSLock *lock;
 
 @property (nonatomic, assign) NSString *point;
 @property (nonatomic, assign) NSString *source;

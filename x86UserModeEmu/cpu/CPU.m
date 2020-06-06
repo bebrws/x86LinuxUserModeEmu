@@ -14,7 +14,7 @@
 #import "debug.h"
 #import "log.h"
 #include "errno.h"
-
+#include "Globals.h"
 #include <stdio.h>
 
 #import "cpuid.h"
@@ -62,7 +62,163 @@
 
 
 
-// ---
+- (uint32_t) sys_exit:(uint32_t)status {
+    STRACE("exit(%d)\n", status);
+    [self.task doExit:status << 8];
+    // Shouldn't get here due ot the pthread_exit in do_exit
+    return 0;
+}
+
+- (uint32_t) sys_setresuid:(uid_t_)ruid euid:(uid_t_)euid suid:(uid_t_)suid {
+    STRACE("setresuid(%d, %d, %d)", ruid, euid, suid);
+    if (self.task->euid != 0) { // If not superuser
+        if (ruid != (uid_t) -1 && ruid != self.task->uid && ruid != self.task->euid && ruid != self.task->suid)
+            return _EPERM;
+        if (euid != (uid_t) -1 && euid != self.task->uid && euid != self.task->euid && euid != self.task->suid)
+            return _EPERM;
+        if (suid != (uid_t) -1 && suid != self.task->uid && suid != self.task->euid && suid != self.task->suid)
+            return _EPERM;
+    }
+    
+    if (ruid != (uid_t) -1) {
+        self.task->uid = ruid;
+    }
+    if (euid != (uid_t) -1) {
+        self.task->euid = euid;
+    }
+    if (suid != (uid_t) -1) {
+        self.task->suid = suid;
+    }
+    return 0;
+}
+
+- (uint32_t) sys_getresuid:(addr_t)ruid_addr euid_addr:(addr_t)euid_addr suid_addr:(addr_t)suid_addr {
+    STRACE("getresuid(%#x, %#x, %#x)", ruid_addr, euid_addr, suid_addr);
+    
+    if ([self.task userWrite:ruid_addr buf:self.task->uid count:sizeof(self.task->uid)]) {
+        return _EFAULT;
+    }
+    if ([self.task userWrite:euid_addr buf:self.task->euid count:sizeof(self.task->euid)]) {
+        return _EFAULT;
+    }
+    if ([self.task userWrite:suid_addr buf:self.task->suid count:sizeof(self.task->suid)]) {
+        return _EFAULT;
+    }
+    return 0;
+}
+
+- (uint32_t) sys_getgid32 {
+    STRACE("getgid32()");
+    return self.task->gid;
+}
+- (uint32_t) sys_getgid {
+    STRACE("getgid()");
+    return self.task->gid & 0xffff;
+}
+
+- (uint32_t) sys_getegid32 {
+    STRACE("getegid32()");
+    return self.task->egid;
+}
+- (uint32_t) sys_getegid {
+    STRACE("getegid()");
+    return self.task->egid & 0xffff;
+}
+
+- (uint32_t) sys_setgid:(uid_t_)gid {
+    STRACE("setgid(%d)", gid);
+    if (self.task->euid == 0) { // If superuser
+        self.task->gid = self.task->sgid = gid;
+    } else {
+        if (gid != self.task->gid && gid != self.task->sgid)
+            return _EPERM;
+    }
+    self.task->egid = gid;
+    return 0;
+}
+
+- (uint32_t) sys_setresgid:(uid_t_)rgid egid:(uid_t_)egid sgid:(uid_t_)sgid {
+    STRACE("setresgid(%d, %d, %d)", rgid, egid, sgid);
+    if (self.task->euid != 0) { // If not superuser
+        if (rgid != (uid_t) -1 && rgid != self.task->gid && rgid != self.task->egid && rgid != self.task->sgid) {
+            return _EPERM;
+        }
+        if (egid != (uid_t) -1 && egid != self.task->gid && egid != self.task->egid && egid != self.task->sgid) {
+            return _EPERM;
+        }
+        if (sgid != (uid_t) -1 && sgid != self.task->gid && sgid != self.task->egid && sgid != self.task->sgid) {
+            return _EPERM;
+        }
+    }
+    
+    if (rgid != (uid_t) -1) {
+        self.task->gid = rgid;
+    }
+    if (egid != (uid_t) -1) {
+        self.task->egid = egid;
+    }
+    if (sgid != (uid_t) -1) {
+        self.task->sgid = sgid;
+    }
+    return 0;
+}
+
+- (uint32_t) sys_getresgid:(addr_t)rgid_addr egid_addr:(addr_t)egid_addr sgid_addr:(addr_t)sgid_addr {
+    STRACE("getresgid(%#x, %#x, %#x)", rgid_addr, egid_addr, sgid_addr);
+    if ([self.task userWrite:rgid_addr buf:&self.task->gid count:sizeof(self.task->gid)]) {
+        return _EFAULT;
+    }
+    if ([self.task userWrite:egid_addr buf:&self.task->egid count:sizeof(self.task->egid)]) {
+        return _EFAULT;
+    }
+    if ([self.task userWrite:sgid_addr buf:&self.task->sgid count:sizeof(self.task->sgid)]) {
+        return _EFAULT;
+    }
+    return 0;
+}
+
+- (uint32_t) sys_getgroups:(uint32_t)size list:(addr_t)list {
+    if (size == 0)
+        return self.task->ngroups;
+    if (size < self.task->ngroups)
+        return _EINVAL;
+    
+    if ([self.task userWrite:list buf:self.task->groups count:size * sizeof(uid_t_)]) {
+        return _EFAULT;
+    }
+    return 0;
+}
+
+- (uint32_t) sys_setgroups:(uint32_t)size list:(addr_t)list {
+    if (size > MAX_GROUPS) {
+        return _EINVAL;
+    }
+    
+    if ([self.task userRead:list buf:self.task->groups count:size * sizeof(uid_t_)]) {
+        return _EFAULT;
+    }
+    self.task->ngroups = size;
+    return 0;
+}
+
+// this does not really work
+- (uint32_t) sys_capget:(addr_t)header_addr data_addr:(addr_t)data_addr {
+    STRACE("capget(%#x, %#x)", header_addr, data_addr);
+    return 0;
+}
+- (uint32_t) sys_capset:(addr_t)header_addr data_addr:(addr_t)data_addr {
+    STRACE("capset(%#x, %#x)", header_addr, data_addr);
+    return 0;
+}
+
+// minimal version according to Linux sys/personality.h
+- (uint32_t) sys_personality:(dword_t)pers {
+    if (pers == 0xffffffff)  // get personality, return default (Linux)
+        return 0x00000000;
+    if (pers == 0x00000000)  // set personality to Linux
+        return 0x00000000;
+    return _EINVAL;  // otherwise return error
+}
 
 - (pid_t_) sys_getpid {
     STRACE("getpid()");
@@ -75,12 +231,12 @@
 - (pid_t_) sys_getppid {
     STRACE("getppid()");
     pid_t_ ppid;
-    [pidsLock lock];
+    lock(&pidsLock);
     if (self.task.parent != NULL)
         ppid = self.task.parent.pid.id;
     else
         ppid = 0;
-    [pidsLock unlock];
+    unlock(&pidsLock);
     return ppid;
 }
 
@@ -150,38 +306,101 @@
             // syscall(self->state.ebx, self->state.ecx, self->state.edx, self->state.esi, self->state.edi, self->state.ebp)
             int result = -1;
             switch (self.syscall) {
+                case 1:
+                    result = [self sys_exit:self->state.ebx];
+                    break;
+                case 2:
+                    result = [self.task sys_fork];
+                    break;
+                case 3:
+                    result = [self.task sys_read:self->state.ebx buf_addr:self->state.ecx size:self->state.edx];
+                    break;
+                case 4:
+                    result = [self.task sys_write:self->state.ebx buf_addr:self->state.ecx size:self->state.edx];
+                    break;
+                case 5:
+                    result = [self.task sys_open:self->state.ebx flags:self->state.ecx mode:self->state.edx];
+                    break;
                 case 20:
                     result = [self sys_getpid];
                     break;
                 case 24:
                     result = [self sys_getuid];
                     break;
+                case 47:
+                    result = [self sys_getgid];
+                    break;
                 case 49:
                     result = [self sys_geteuid];
+                    break;
+                case 50:
+                    result = [self sys_getegid];
                     break;
                 case 64:
                     result = [self sys_getppid];
                     break;
+                case 80:
+                    result = [self sys_getgroups:self->state.ebx list:self->state.ecx];
+                    break;
+                case 81:
+                    result = [self sys_setgroups:self->state.ebx list:self->state.ecx];
+                    break;
                 case 125:
                     result = [self sysMProtect:self->state.ebx len:self->state.ecx protFlags:self->state.edx];
+                    break;
+                case 136:
+                    result = [self sys_personality:self->state.ebx];
+                    break;
+                case 184:
+                    result = [self sys_capget:self->state.ebx data_addr:self->state.ecx];
+                    break;
+                case 185:
+                    result = [self sys_capset:self->state.ebx data_addr:self->state.ecx];
+                    break;
+                case 190:
+                    result = [self.task sys_vfork];
                     break;
                 case 199:
                     result = [self sys_getuid32];
                     break;
+                case 200:
+                    result = [self sys_getgid32];
+                    break;
                 case 201:
                     result = [self sys_geteuid32];
                     break;
+                case 202:
+                    result = [self sys_getegid32];
+                    break;
+                case 208:
+                    result = [self sys_setresuid:self->state.ebx euid:self->state.ecx suid:self->state.edx];
+                    break;
+                case 209:
+                    result = [self sys_getresuid:self->state.ebx euid_addr:self->state.ecx suid_addr:self->state.edx];
+                    break;
+                case 210:
+                    result = [self sys_setresgid:self->state.ebx egid:self->state.ecx sgid:self->state.edx];
+                    break;
+                case 211:
+                    result = [self sys_getresgid:self->state.ebx egid_addr:self->state.ecx sgid_addr:self->state.edx];
+                    break;
                 case 213:
                     result = [self sys_setuid:self->state.ebx];
+                    break;
+                case 214:
+                    result = [self sys_setgid:self->state.ebx];
                     break;
                 case 224:
                     result = [self sys_gettid];
                     break;
                 case 243:
-                    result = [self sysSetThreadArea:self->state.ebx];
+                    result = [self.task sysSetThreadArea:self->state.ebx];
                     break;
                 case 258:
-                    result = [self sysSetTIDAddress:self->state.ebx];
+                    result = [self.task sysSetTIDAddress:self->state.ebx];
+                    break;
+                case 295:
+                    result = [self.task sys_openat:self->state.ebx path_addr:self->state.ecx flags:self->state.edx mode:self->state.esi];
                     break;
                 default:
                     result = -1;
@@ -253,7 +472,8 @@
     // TODO: Lock and wait for the current tasks group to be "unstopped" by recieving an ignore signal
     lock(&self.task.group->lock);
     while (self.task.group.stopped) {
-        [self.task waitForIgnoreSignals:&self.task.group->stoppedCond lock:&self.task.group->lock timeout:NULL];
+        // [self.task waitForIgnoreSignals:&self.task.group->lock timeout:NULL];
+        [self.task waitForIgnoreSignals:&self.task.group->cond lock:&self.task.group->lock timeout:NULL];
         //wait_for_ignore_signals(&self.task.group->stoppedCond, &self.task.group->lock, NULL);
     }
     unlock(&self.task.group->lock);
@@ -10896,9 +11116,9 @@
         while (true) {
             // If an interrupt occurs self.interrupt will be set
             
-            [CPUStepLock lock];
+            lock(&cpuStepLock);
             self.interrupt = [self step:0];
-            [CPUStepLock unlock];
+            unlock(&cpuStepLock);
             
             if (self.interrupt == INT_NONE && cycleCount++ >= NUM_CYCLES_TO_PROCESS_BEFORE_INT_TIMER) {
                 cycleCount = 0;

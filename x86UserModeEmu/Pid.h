@@ -9,7 +9,7 @@
 // @public dword_t id;
 }
 
-    @property (nonatomic, assign) dword_t id;
+    @property (nonatomic, assign) uint32_t id;
     @property (nonatomic, strong) Task *task;
     @property (nonatomic, strong) NSMutableArray *session;
     @property (nonatomic, strong) NSMutableArray *pgroup;

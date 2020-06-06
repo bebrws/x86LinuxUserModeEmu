@@ -39,9 +39,11 @@ static void establish_signal_handlers() {
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
     
-    pidsLock = [[NSLock alloc] init];
-    CPUStepLock = [[NSLock alloc] init];
-    // pids = [[NSMutableArray alloc] initWithCapacity:MAX_PID];
+    exit_hook = ios_handle_exit;
+    
+    lock_init(&pidsLock);
+    lock_init(&cpuStepLock);
+    
     pids = [NSMutableDictionary new];
     
     // Insert code here to initialize your application

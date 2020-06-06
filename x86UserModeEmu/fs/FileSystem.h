@@ -185,7 +185,9 @@ struct statfs64_ {
 
 @protocol FileSystemOperations;
 
-@interface FileSystem : NSObject
+@interface FileSystem : NSObject {
+    @public mode_t_ umask;
+}
 // DEBUG
 @property (nonatomic, strong) NSMutableString *recentOpens;
 

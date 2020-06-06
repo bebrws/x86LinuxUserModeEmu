@@ -28,10 +28,11 @@
     
     self.fs = fs;
     
-    self.lock = [NSLock new];
     self.refCount = 0;
     self.data = NULL;
     self.rootFD = 0;
+    
+    lock_init(&self->lock);
     
     return self;
 }

@@ -229,7 +229,7 @@
     
     if (fd_no < 0) {
         FileDescriptor *errFd = [FileDescriptor new];
-        errFd.err = errno_map();
+        errFd->err = errno_map();
         FFLog(@"Error opening file descriptor - actual openat failed with: %d", fd_no);
         return errFd;
     }
@@ -237,11 +237,11 @@
     FileDescriptor *fd = [FileDescriptor new];
     // Be default the correct FileDescriptorOperations class is used in this case
     // fd.fdOps = [RFileDescriptorOperaitons new];
-    fd.realFD = fd_no;
-    fd.dir = NULL;
+    fd->realFD = fd_no;
+    fd->dir = NULL;
 
     NSNumber *inodeNumber = [self.fakeFSStore getInodeForPath:path];
-    fd.fakeInode = [inodeNumber longValue];
+    fd->fakeInode = [inodeNumber longValue];
     if (flags & O_CREAT_) {
         struct ish_stat ishstat;
         // Adding inode here?
@@ -255,22 +255,22 @@
         // by inserting into the stat and paths tables
         // The inodes are just ints and don't mean anything other than that they are
         // unique (unless hardlinked)
-        if (fd.fakeInode == 0) {
+        if (fd->fakeInode == 0) {
             // TODO: Create a unique inode number and insert path and stat
             inodeNumber = [self.fakeFSStore getNewInodeNumber];
             [self.fakeFSStore updateInodeForPath:path inode:inodeNumber];
             [self.fakeFSStore updateStatDataForInode:inodeNumber stat:[NSData dataWithBytes:&ishstat length:16]];
             FFLog(@"BEB Setup path: %@ inode: %@", path, inodeNumber);
 //            [self createPathAndStatForInode:mount path:path stat:&ishstat];
-            fd.fakeInode = [inodeNumber longValue];
+            fd->fakeInode = [inodeNumber longValue];
         }
     }
     
-    if (fd.fakeInode == 0) {
+    if (fd->fakeInode == 0) {
         // metadata for this file is missing
         // TODO unlink the real file
         [fd close];
-        fd.err = _ENOENT;
+        fd->err = _ENOENT;
         FFLog(@"Error opening file descriptor - there is no inode for this path: %@", path);
         return fd;
     }
@@ -339,7 +339,7 @@
 - (int)fstat:(FileDescriptor *)fd stat:(struct statbuf*)stat {
     // Get the real fstat
     struct stat real;
-    int err = fstat(fd.realFD, &real);
+    int err = fstat(fd->realFD, &real);
     
     if (err < 0)
         err = errno_map();
@@ -348,7 +348,7 @@
     [self copyStat:stat real:&real];
     
     // Query for the stat in the DB by the inode number
-    NSNumber *inodeNumber = [NSNumber numberWithLong:fd.fakeInode];
+    NSNumber *inodeNumber = [NSNumber numberWithLong:fd->fakeInode];
     NSData *ishStatData = [self.fakeFSStore getStatDataForInode:inodeNumber];
     if (!ishStatData) {
         // NSString *statStr = [[FakeFSStore inodeToStat] valueForKey:[inodeNumber stringValue]];
@@ -358,7 +358,7 @@
     const struct ish_stat *ishstat = [ishStatData bytes];
     
     // And update our stat struct with the values we care about from the DB's stat
-    stat->inode = fd.fakeInode;
+    stat->inode = fd->fakeInode;
     stat->mode = ishstat->mode;
     stat->uid = ishstat->uid;
     stat->gid = ishstat->gid;
@@ -379,7 +379,7 @@
 - (int)getpath:(FileDescriptor *)fd buf:(NSMutableString *)buf {
     char tmpBuf[MAX_PATH];
     // TODO How does this work
-    int err = fcntl(fd.realFD, F_GETPATH, tmpBuf);
+    int err = fcntl(fd->realFD, F_GETPATH, tmpBuf);
     [buf setString:[NSString stringWithCString:tmpBuf encoding:NSUTF8StringEncoding]];
     if (err < 0)
         return err;

@@ -23,8 +23,9 @@
 
 //#import "Memory.h"
 //#import "CPU.h"
-//#import "FileDescriptor.h"
+#import "FileDescriptor.h"
 #import "FileSystem.h"
+
 
 
 #define MAX_GROUPS 32
@@ -54,6 +55,40 @@
 #define N_PARENT_DIR_WRITE 4
 
 
+
+
+// ############################## CLONE
+
+#define CSIGNAL_ 0x000000ff
+#define CLONE_VM_ 0x00000100
+#define CLONE_FS_ 0x00000200
+#define CLONE_FILES_ 0x00000400
+#define CLONE_SIGHAND_ 0x00000800
+#define CLONE_PTRACE_ 0x00002000
+#define CLONE_VFORK_ 0x00004000
+#define CLONE_PARENT_ 0x00008000
+#define CLONE_THREAD_ 0x00010000
+#define CLONE_NEWNS_ 0x00020000
+#define CLONE_SYSVSEM_ 0x00040000
+#define CLONE_SETTLS_ 0x00080000
+#define CLONE_PARENT_SETTID_ 0x00100000
+#define CLONE_CHILD_CLEARTID_ 0x00200000
+#define CLONE_DETACHED_ 0x00400000
+#define CLONE_UNTRACED_ 0x00800000
+#define CLONE_CHILD_SETTID_ 0x01000000
+#define CLONE_NEWCGROUP_ 0x02000000
+#define CLONE_NEWUTS_ 0x04000000
+#define CLONE_NEWIPC_ 0x08000000
+#define CLONE_NEWUSER_ 0x10000000
+#define CLONE_NEWPID_ 0x20000000
+#define CLONE_NEWNET_ 0x40000000
+#define CLONE_IO_ 0x80000000
+#define IMPLEMENTED_FLAGS (CLONE_VM_|CLONE_FILES_|CLONE_FS_|CLONE_SIGHAND_|CLONE_SYSVSEM_|CLONE_VFORK_|CLONE_THREAD_|\
+CLONE_SETTLS_|CLONE_CHILD_SETTID_|CLONE_PARENT_SETTID_|CLONE_CHILD_CLEARTID_|CLONE_DETACHED_)
+
+
+// ############################## END CLONE
+
 extern __thread sigjmp_buf unwind_buf;
 extern __thread bool should_unwind;
 static inline int sigunwind_start() {
@@ -71,9 +106,26 @@ static inline void sigunwind_end() {
 
 
 
+typedef struct user_desc {
+    dword_t entry_number;
+    dword_t base_addr;
+    dword_t limit;
+    unsigned int seg_32bit:1;
+    unsigned int contents:2;
+    unsigned int read_exec_only:1;
+    unsigned int limit_in_pages:1;
+    unsigned int seg_not_present:1;
+    unsigned int useable:1;
+} user_desc;
+
+
+
 #define SS_ONSTACK_ 1
 #define SS_DISABLE_ 2
 #define MINSIGSTKSZ_ 2048
+
+
+
 
 struct stack_t_ {
     addr_t stack;
@@ -197,8 +249,8 @@ extern int fxsave_extra;
 // TODO This came from kernel/task.h
 struct vfork_info {
     bool done;
-    NSCondition *cond;
-    NSLock *lock;
+    cond_t cond;
+    lock_t lock;
 };
 
 
@@ -223,7 +275,7 @@ struct vfork_info {
 
 @interface Task : NSObject {
     @public addr_t elfEntryPoint;
-    @public pthread_rwlock_t memLock;
+    @public pthread_rwlock_t memRWLock;
     @public lock_t generalLock;
     @public pthread_t thread;
     @public bool hasSavedMask;
@@ -250,15 +302,10 @@ struct vfork_info {
     @public uid_t_ suid;
     @public uid_t_ sgid;
     
-    // The atomic operations need to be doen with special functions or macros:
-    // https://developer.apple.com/library/archive/documentation/System/Conceptual/ManPages_iPhoneOS/man3/OSAtomicIncrement32.3.html#//apple_ref/doc/man/3/OSAtomicIncrement32
-    // TODO: Does this need to be a atomic property
-    @public atomic_uint mmRefCount;
-    // @property (nonatomic, assign) atomic_uint mmRefCount;
-    
     @public unsigned int ngroups;
+    @public uid_t_ groups[MAX_GROUPS];
     @public int changes;
-    @public int exit_signal;
+    @public int exitSignal;
     
     // locked by pids_lock
     @public dword_t exitCode;
@@ -299,7 +346,6 @@ struct vfork_info {
 
 @property (nonatomic, strong) ThreadGroup *group;
 @property (nonatomic, strong) NSMutableArray *groupLinks;
-@property (nonatomic, strong) NSMutableArray *groups;
 @property (nonatomic, strong) NSMutableString *command; // The command issued to execve to create this task
 
 // locked by pids_lock
@@ -312,12 +358,11 @@ struct vfork_info {
 
 @property (nonatomic, strong) NSMutableArray *elfEntryVMemInfo;
 
-// current condition/lock, so it can be notified in case of a signal
-//@property (nonatomic, strong) NSCondition *waitingCond;
-//@property (nonatomic, strong) NSLock *waitingCondLock;
-
 - (uint8_t)userReadOneBytes:(addr_t)addr;
 - (uint32_t)userReadFourBytes:(addr_t)addr;
+
+
++ (ThreadGroup *) threadgroupCopy:(ThreadGroup *)oldGroup;
 
 - (id)initWithParentTask:(Task *)parent;
 - (void)start;
@@ -342,12 +387,32 @@ struct vfork_info {
 - (int) readPrgHeaders:(FileDescriptor *)fd header:(struct elf_header)header ph_out:(struct prg_header **)ph_out;
 - (int) loadEntry:(FileDescriptor *)fd ph:(struct prg_header)ph bias:(int)bias;
 
+
 // Signals
+// - (int) waitForIgnoreSignals:(ThreadGroup *)group timeout:(struct timespec *)timeout;
 - (int) waitForIgnoreSignals:(cond_t *)cond lock:(lock_t *)lock timeout:(struct timespec *)timeout;
 - (void) sendSignalTo:(Task *)task signal:(int)signal sigInfo:(SigInfo*)sigInfo;
 - (void) deliverSignalTo:(Task *)task signal:(int)signal sigInfo:(SigInfo*)sigInfo;
 - (void) recieveSignals;
 - (void) recieveSignal:(SigInfo *)si;
+
+//Syscalls
+- (void) doExit:(uint32_t)status;
+- (uint32_t) sys_fork;
+- (uint32_t) sys_vfork;
+- (uint32_t) sys_read:(fd_t)fd_no buf_addr:(addr_t)buf_addr size:(uint32_t)size;
+- (uint32_t) sys_write:(fd_t)fd_no buf_addr:(addr_t)buf_addr size:(uint32_t)size;
+- (uint32_t)sysSetThreadArea:(addr_t) u_info_addr;
+- (uint32_t)sysSetTIDAddress:(addr_t) tid_addr;
+- (uint32_t)sysSetThreadArea:(addr_t) u_info_addr;
+- (uint32_t)setThreadArea:(addr_t) u_info_addr;
+- (fd_t) sys_open:(addr_t)path_addr flags:(dword_t)flags mode:(mode_t_)mode;
+- (fd_t) sys_openat:(fd_t)at_f path_addr:(addr_t)path_addr flags:(dword_t)flags mode:(mode_t_)mode;
+
+
+- (FileDescriptor *)f_install:(FileDescriptor *)fd flags:(int)flags;
+- (FileDescriptor *) at_fd:(fd_t)f;
+- (FileDescriptor *) f_get:(fd_t)f;
 
 @end
 

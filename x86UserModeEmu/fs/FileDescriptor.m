@@ -16,8 +16,23 @@
 
 @implementation FileDescriptor
 
+- (int)setFlags:(dword_t)flags {
+    // if (fd.fdOps setFlags) {
+    
+    // - (int)setflags:(FileDescriptor *)fd flags:(dword_t)flags;
+    if ([[self.fdOps class] instancesRespondToSelector:@selector(setflags:flags:)]) {
+    
+        return [self.fdOps setflags:self flags:flags];
+    }
+    self->flags = (self->flags & ~FD_ALLOWED_FLAGS) | (flags & FD_ALLOWED_FLAGS);
+
+    
+    return 0;
+}
+
+
 -(NSString *)description {
-    return [NSString stringWithFormat:@"%@ rl:%d flgs:%d off:%d rc:%d err:%d", self.originalPath, self.realFD, self.flags, self.offset, self.refCount, self.err];
+    return [NSString stringWithFormat:@"%@ rl:%d flgs:%d off:%d err:%d", self.originalPath, self->realFD, self->flags, self->offset, self->err];
 }
 
 - (id)init {
@@ -26,12 +41,11 @@
         return nil;
     }
     // By default use the Real File Descriptor
-    self.fdOps = [RFileDescriptorOperations new];
-    self.closeOnExec = false;
-    self.err = 0;
-    self.refCount = 1;
-    self.flags = 0;
-    self.offset = 0;
+    self.fdOps = [[RFileDescriptorOperations alloc] init];
+    self->closeOnExec = false;
+    self->err = 0;
+    self->flags = 0;
+    self->offset = 0;
     
     return self;
 }
@@ -39,10 +53,8 @@
 // TODO
 - (int)close {
     int err = 0;
-    self.refCount -= 1;
-    [self decrementRefCount];
     
-    if (self.refCount == 0)  {
+    //if (self.refCount == 0)  {
 //        lock(&fd->poll_lock);
         // This is related to keeping sockets open in ios
 //        struct poll_fd *poll_fd, *tmp;
@@ -69,20 +81,14 @@
         
 //        if (self.inode)
 //            inode_release(fd->inode);
-        if (self.mount)
+    if (self.mount) {
             [self.mount releaseMount];
     }
+    //}
     
     return err;
 }
 
-- (void)incrementRefCount {
-    self.refCount++;
-}
-
-- (void)decrementRefCount {
-    self.refCount--;
-}
 
 @end
 

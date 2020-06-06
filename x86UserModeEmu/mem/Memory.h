@@ -8,6 +8,7 @@
 #include <stdio.h>
 #include <errno.h>
 #import "misc.h"
+#include "sys/sync.h"
 
 
 #ifndef MEMORY_H
@@ -67,7 +68,7 @@ typedef dword_t pages_t;
 // Represent the mem struct from memory.h
 //`
 @interface Memory : NSObject {
-    @public pthread_rwlock_t lock;
+    @public lock_t lock;
 }
 
 // changes is used to see if memory changed over a period of time like during an interrupt
@@ -80,8 +81,6 @@ typedef dword_t pages_t;
 @property (nonatomic, strong) NSMutableArray *pages;
 
 @property (nonatomic, strong) Task *task;
-
-// @property (nonatomic, strong) NSLock *lock;
 
 // Todo maybe add an array of page table entries here to for faster iteration?
 

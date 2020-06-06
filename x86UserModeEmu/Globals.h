@@ -27,14 +27,19 @@ extern NSMutableDictionary *pids;
 //    //extern int cur_pid;
 extern FileDescriptor *AT_PWD;
 extern SigInfo *siginfo_nil;
-//    //extern NSLock *pidLock;
 
 size_t get_real_page_size();
 id get_siginfo_nil();
 
-extern NSLock *pidsLock;
+extern lock_t pidsLock;
+
+
+
+extern void (*exit_hook)(Task *task, int code);
+extern void ios_handle_exit(Task *task, int code);
+
 
 // Just for debugging logging in CPU
-extern NSLock *CPUStepLock;
+extern lock_t cpuStepLock;
 
 #endif
