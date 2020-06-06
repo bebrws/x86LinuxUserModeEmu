@@ -30,14 +30,13 @@ I also decided to ditch the classic page table hiearchy of multi layered page di
 
 Using a 1D page table is simple and easy.. my address lookup times are also fast. To lookup a page I just cut off the first 12 bits and index into my PageTableEntry array to find the correct page table entry. And again, no need to hassle with state of the TLB which is nice and saves some time (and I would love to find out if it was much of a speed improvement).
 
-## Anything else?
+### Readability?
 
 There is really only a handful of opcodes I broke down and used Macros for. And that could be helpful for learning macros for someone anyway if they were having a hard time finding a project they could read through easily.
 
 I have also messed with Ish enough that I was able to output a few JSON files with the CPU state for each process for every instruction/tick. (I might just push up a branch with the build of Ish I have been using to debug this project with at some point).
 
 I have actually verified that "my" implementation (in quotes because I had been referencing Ish while working on this, although minimally I hoped, and I cannot really call anything mine here) executes correctly up until the first syscall. That is something like 12,000 operations.
-
 
 I have made a bunch of other small changes as well, mostly just to challenge myself so that I didn't just copy and paste code from Ish over into a new project. My goal was to be able to describe what any particular line of code did, not to be able to write this on my own necessarily. I also thought it would be nice if I could document the code to a ridiculous standard so that it may provide useful for anyone else who was having a hard time finding material.
 
