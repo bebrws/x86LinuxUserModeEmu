@@ -32,6 +32,8 @@ extern SigInfo *siginfo_nil;
 size_t get_real_page_size();
 id get_siginfo_nil();
 
+extern NSLock *pidsLock;
+
 // Just for debugging logging in CPU
 extern NSLock *CPUStepLock;
 

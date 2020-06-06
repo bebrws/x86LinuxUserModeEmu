@@ -61,6 +61,60 @@
 // ########################################### HANDLE INTERRUPT
 
 
+
+// ---
+
+- (pid_t_) sys_getpid {
+    STRACE("getpid()");
+    return self.task->tgid;
+}
+- (pid_t_) sys_gettid {
+    STRACE("gettid()");
+    return self.task.pid.id;
+}
+- (pid_t_) sys_getppid {
+    STRACE("getppid()");
+    pid_t_ ppid;
+    [pidsLock lock];
+    if (self.task.parent != NULL)
+        ppid = self.task.parent.pid.id;
+    else
+        ppid = 0;
+    [pidsLock unlock];
+    return ppid;
+}
+
+- (uint32_t) sys_getuid32 {
+    STRACE("getuid32()");
+    return self.task->uid;
+}
+- (uint32_t) sys_getuid {
+    STRACE("getuid()");
+    return self.task->uid & 0xffff;
+}
+
+- (uint32_t) sys_geteuid32 {
+    STRACE("geteuid32()");
+    return self.task->euid;
+}
+- (uint32_t) sys_geteuid {
+    STRACE("geteuid()");
+    return self.task->euid & 0xffff;
+}
+
+- (uint32_t) sys_setuid:(uid_t_)uid {
+    STRACE("setuid(%d)", uid);
+    if (self.task->euid == 0) { // self.task->euid == 0 is superuser() this is checking if the executing uid is superuser, root
+        self.task->uid = self.task->suid = uid;
+    } else {
+        if (uid != self.task->uid && uid != self.task->suid)
+            return _EPERM;
+    }
+    self.task->euid = uid;
+    return 0;
+}
+
+
 - (uint32_t) sysMProtect:(addr_t)addr len:(uint32_t)len protFlags:(uint32_t) protFlags {
     // https://www.man7.org/linux/man-pages/man2/mprotect.2.html
     // changes the access protections for memory pages starting at addr and running through len length
@@ -96,8 +150,32 @@
             // syscall(self->state.ebx, self->state.ecx, self->state.edx, self->state.esi, self->state.edi, self->state.ebp)
             int result = -1;
             switch (self.syscall) {
+                case 20:
+                    result = [self sys_getpid];
+                    break;
+                case 24:
+                    result = [self sys_getuid];
+                    break;
+                case 49:
+                    result = [self sys_geteuid];
+                    break;
+                case 64:
+                    result = [self sys_getppid];
+                    break;
                 case 125:
                     result = [self sysMProtect:self->state.ebx len:self->state.ecx protFlags:self->state.edx];
+                    break;
+                case 199:
+                    result = [self sys_getuid32];
+                    break;
+                case 201:
+                    result = [self sys_geteuid32];
+                    break;
+                case 213:
+                    result = [self sys_setuid:self->state.ebx];
+                    break;
+                case 224:
+                    result = [self sys_gettid];
                     break;
                 case 243:
                     result = [self sysSetThreadArea:self->state.ebx];
