@@ -28,7 +28,7 @@ I can understand why a hardware TLB would be an improvement. A small cache for c
 
 I also decided to ditch the classic page table hiearchy of multi layered page directories and page tables to just use a simple 1D array. And it works!
 
-This way my address lookup times are fast. To lookup a page I just cut off the first 12 bits and index into my PageTableEntry array to find the correct page table entry. No need to hassle with state of the TLB which is nice and save some time (and I would love to find out if it was much of a speed improvement).
+Using a 1D page table is simple and easy.. my address lookup times are also fast. To lookup a page I just cut off the first 12 bits and index into my PageTableEntry array to find the correct page table entry. And again, no need to hassle with state of the TLB which is nice and saves some time (and I would love to find out if it was much of a speed improvement).
 
 ## Anything else?
 
