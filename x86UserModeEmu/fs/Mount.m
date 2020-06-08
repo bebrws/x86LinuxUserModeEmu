@@ -17,7 +17,7 @@
 @implementation Mount
 
 -(NSString *)description {
-    return [NSString stringWithFormat:@"rootFD:%d flgs:%d rc:%d point:%@ source:%@", self.rootFD, self.flags, self.refCount, self.point, self.source];
+    return [NSString stringWithFormat:@"rootFD:%d flgs:%d point:%@ source:%@", self.rootFD, self.flags, self.point, self.source];
 }
 
 - (id)initWithFS:(FileSystem *)fs {
@@ -28,7 +28,6 @@
     
     self.fs = fs;
     
-    self.refCount = 0;
     self.data = NULL;
     self.rootFD = 0;
     
@@ -38,23 +37,11 @@
 }
 
 - (int)remove {
-    if (self.refCount) {
-        return _EBUSY;
-    }
-    
     return [self.fs umount:self];
 }
 
 - (void)releaseMount {
-    [self decrementRefCount];
-}
-
-- (void)incrementRefCount {
-    self.refCount++;
-}
-
-- (void)decrementRefCount {
-    self.refCount--;
+    
 }
 
 @end

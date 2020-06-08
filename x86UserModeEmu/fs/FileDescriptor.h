@@ -50,7 +50,5 @@ struct dir_entry {
 - (int)setFlags:(dword_t)flags;
 - (id)init;
 - (int)close;
-- (void)incrementRefCount;
-- (void)decrementRefCount;
 @end
 

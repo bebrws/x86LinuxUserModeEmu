@@ -130,3 +130,16 @@ The majority of the rest of the work to getting a terminal up (when I would be h
 ### Thanks Ish
 
 Ish is an amazing project and I am glad that the author has open sourced it. I have learned a lot from reading through it and creating my broken clone. Thank you
+
+### License?
+
+I believe that Ish is licensed GNU GPL Version 3 so I will include a copy of that license here in LICENSE.ISH. There are a few files here that are even direct copies from Ish such as:
+
+    time.h
+    timer.c
+    timer.h
+    cpuid.h
+    float80.c - added some code for debugging
+    float80.h
+
+Note: that these files might be slightly modified, refer to the original repository.

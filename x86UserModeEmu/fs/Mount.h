@@ -46,20 +46,15 @@ typedef struct {
 @property (nonatomic, assign) NSString *point;
 @property (nonatomic, assign) NSString *source;
 @property (nonatomic, assign) int flags;
-@property (nonatomic, assign) atomic_uint refCount;
 @property (nonatomic, assign) void *data;
 
 @property (nonatomic, assign) int rootFD;
 
 @property (nonatomic, strong) FileSystem *fs;
-//@property (nonatomic, assign) int refcount;
 //- (void)genericOpen: (NSString *)path, int flags, int mode;
 - (id)initWithFS:(FileSystem *)fs;
 - (void)releaseMount;
 - (int)remove;
-
-- (void)incrementRefCount;
-- (void)decrementRefCount;
 
 @end
 

@@ -155,29 +155,11 @@
     for (page_t page = pageStart; page < pageStart + numPages; page++) {
         //PageTableEntry *ptentry = [self.pages objectAtIndex:page];
         PageTableEntry *ptentry = [self getPageTableEntry:page];
-        if (ptentry.isInUse) {
-            [ptentry.mappedMemory decrementRefCount];
-            
+        if (ptentry.isInUse) {            
             // If there arent anymore pageTableEntries using this mappedMemory then unmap/free it
-            if (ptentry.mappedMemory.refCount == 0) {
-                // vdso wasn't allocated with mmap, it's just in our data segment
-                if (ptentry.mappedMemory.isVdso) {
-                    // TODO This could be in dealloc for MappedMemory
-                    // This is where the memory is actually freed
-                    int err = munmap(ptentry.mappedMemory.data, ptentry.mappedMemory.sizeMappedData);
-                    if (err != 0)
-                        // TODO Make variable list argument die
-                        die("munmap(%p, %lu) failed: %s", ptentry.mappedMemory.data, ptentry.mappedMemory.sizeMappedData, strerror(errno));
-                }
-                if (ptentry.mappedMemory.fd) {
-                    [ptentry.mappedMemory.fd close];
-                }
-                // TODO Verify this is happening:
-                // free(data);
-                // By logging on
-                // dealloc
-                ptentry.mappedMemory = nil;
-            }
+            // if (ptentry.mappedMemory.refCount == 0) {
+            // Handled in mapped memory dealloc
+            // }
         }
     }
 }
@@ -227,8 +209,6 @@
             FLLog(@"Mapping memory to page table entries and ran into in use page table entry");
             [self unmapMemory:page];
         }
-        
-        [mappedMemory incrementRefCount];
         
         curPTEntry.isInUse = true;
         curPTEntry.mappedMemory = mappedMemory;
@@ -421,7 +401,6 @@
         // TODO What does this do? It looks like it is never used
         entry.flags &= ~P_COMPILED;
         
-        [entry.mappedMemory incrementRefCount];
         PageTableEntry *dstEntry = [dest getPageTableEntry:curPage];
         dstEntry.mappedMemory = entry.mappedMemory;
         dstEntry.offsetIntoMappedMemory = entry.offsetIntoMappedMemory;

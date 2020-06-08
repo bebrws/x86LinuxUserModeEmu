@@ -179,7 +179,6 @@
     }
     
     self.pwd = self.root;
-    [self.root incrementRefCount];
     
     return 0;
 }
@@ -196,7 +195,6 @@
     newMount.source = [source copy];
     newMount.flags = flags;
     newMount.data = NULL;
-    newMount.refCount = 0;
     
     int err = [self.fsOps mount:newMount];
     if (err < 0) {

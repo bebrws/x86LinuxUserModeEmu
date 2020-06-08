@@ -38,7 +38,6 @@
 @property (nonatomic, assign) char *data;
 // the size of the memory being mapped
 @property (nonatomic, assign) size_t sizeMappedData;
-@property (atomic, assign) atomic_uint refCount;
 @property (nonatomic, assign) bool isVdso;
 
 // for display in /proc/pid/maps
@@ -48,9 +47,6 @@
 // debug
 @property (nonatomic, assign) int pid;
 @property (nonatomic, assign) addr_t destVAddress;
-
-- (void)incrementRefCount;
-- (void)decrementRefCount;
 
 @end
 

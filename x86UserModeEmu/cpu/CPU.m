@@ -8335,12 +8335,7 @@
             // goto restart;
             break;
         case 0x66:
-            return [self step16];
-            // die("Hit an opcode that should just call the 16 bit cpu step");
-            // Like this:
-            // return cpu_step16(cpu, tlb);
-            // line 2752 is where its called from
-            // another line is on 5649
+            return [self step16: addr];
             break;
         case 0x67:
             // TODO: Why? Research why some of these opcodes skip the interrup checking step and just restart up here

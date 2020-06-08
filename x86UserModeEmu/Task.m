@@ -332,7 +332,6 @@ int get_random(char *buf, size_t len)
     if (flags & CLONE_FILES_) {
         // TODO: Important
         // task->_filesTable should be copied from the task already
-        // task->files->refcount++;
     } else {
         // task.filesTable
         // task->files = fdtable_copy(task->files);
@@ -349,7 +348,6 @@ int get_random(char *buf, size_t len)
     uint32_t err = _ENOMEM;
     if (flags & CLONE_FS_) {
         // TODO: Important
-        // task->fs->refcount++;
         // Set to point to same fs object
     } else {
         // TODO: Important
@@ -821,8 +819,6 @@ fail_free_mem:
     
     FFLog(@"Task ELF: First page for entry %x", PAGE(addr));
     
-    [fd incrementRefCount];
-    
     // If this is being mapped into memory allocated not ona page boundary there will be some number of bytes
     // before the start of the, this number of bytes is PGOFFSET(addr)
     // The offset from the elf header was based off of the file starting and index 0 and here
@@ -990,11 +986,9 @@ fail_free_mem:
     // from this point on, if any error occurs the process will have to be
     // killed before it even starts. please don't be too sad about it, it's
     // just a process.
-
-//    [self decrementRefCount];
+    
 //        task_set_mm(current, mm_new());
 //    write_wrlock(&self->memLock);
-//    [fd incrementRefCount];
     self.exeFile = fd;
 
     addr_t loadAddr; // used for AX_PHDR
@@ -1367,7 +1361,6 @@ fail_free_mem:
     newTask.exeFile = self.exeFile;
     newTask->startBrkAddress = self->startBrkAddress;
     newTask->brkAddress = self->brkAddress;
-//    newTask.taskMemoryRefCount = 1;
 
     if (newTask.exeFile) {
         [newTask.exeFile close];

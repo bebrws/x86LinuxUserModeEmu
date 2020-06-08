@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		B10DFFA92429425500F02B80 /* alpine in Resources */ = {isa = PBXBuildFile; fileRef = B10DFFA82429425500F02B80 /* alpine */; };
 		B134C71724092F9D00FDD5F6 /* Pid.m in Sources */ = {isa = PBXBuildFile; fileRef = B134C71624092F9D00FDD5F6 /* Pid.m */; };
 		B135B8CD240F44E30081DA23 /* Globals.m in Sources */ = {isa = PBXBuildFile; fileRef = B135B8CC240F44E30081DA23 /* Globals.m */; };
 		B135B8D6240F47FC0081DA23 /* exec.m in Sources */ = {isa = PBXBuildFile; fileRef = B135B8D5240F47FC0081DA23 /* exec.m */; };
@@ -21,7 +20,6 @@
 		B13A8789241686600082991D /* debug.c in Sources */ = {isa = PBXBuildFile; fileRef = B13A8788241686600082991D /* debug.c */; };
 		B141B6962421C30900CF35A3 /* FileDescriptorTable.m in Sources */ = {isa = PBXBuildFile; fileRef = B141B6952421C30800CF35A3 /* FileDescriptorTable.m */; };
 		B141B69A2421DE5E00CF35A3 /* ArgArgs.m in Sources */ = {isa = PBXBuildFile; fileRef = B141B6982421DE5D00CF35A3 /* ArgArgs.m */; };
-		B141B6A124220D3F00CF35A3 /* docs in Resources */ = {isa = PBXBuildFile; fileRef = B141B6A024220D3F00CF35A3 /* docs */; };
 		B141B6A4242289A100CF35A3 /* FRFileSystemOperations.m in Sources */ = {isa = PBXBuildFile; fileRef = B141B6A3242289A100CF35A3 /* FRFileSystemOperations.m */; };
 		B150913D243EDD5F00F8AC70 /* float80.c in Sources */ = {isa = PBXBuildFile; fileRef = B150913C243EDD5F00F8AC70 /* float80.c */; };
 		B150913E243EDD5F00F8AC70 /* float80.c in Sources */ = {isa = PBXBuildFile; fileRef = B150913C243EDD5F00F8AC70 /* float80.c */; };
@@ -35,6 +33,8 @@
 		B185636924372373004E927E /* misc.m in Sources */ = {isa = PBXBuildFile; fileRef = B185636724372373004E927E /* misc.m */; };
 		B185636E24373900004E927E /* NSString+BinaryRepresentation.m in Sources */ = {isa = PBXBuildFile; fileRef = B185636D24373900004E927E /* NSString+BinaryRepresentation.m */; };
 		B185636F24373900004E927E /* NSString+BinaryRepresentation.m in Sources */ = {isa = PBXBuildFile; fileRef = B185636D24373900004E927E /* NSString+BinaryRepresentation.m */; };
+		B18E9498248E6B1800303568 /* fakefs.json in Resources */ = {isa = PBXBuildFile; fileRef = B18E9497248E6B1700303568 /* fakefs.json */; };
+		B18E949A248E6B7700303568 /* alpine in Resources */ = {isa = PBXBuildFile; fileRef = B18E9499248E6B7700303568 /* alpine */; };
 		B1B3A7452430A3FA0083E9EA /* SigInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = B1B3A7442430A3FA0083E9EA /* SigInfo.m */; };
 		B1B3A7482430A41C0083E9EA /* SigHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = B1B3A7472430A41C0083E9EA /* SigHandler.m */; };
 		B1B3A74B2430A4DB0083E9EA /* SigQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = B1B3A74A2430A4DB0083E9EA /* SigQueue.m */; };
@@ -43,7 +43,6 @@
 		B1B3A7502430ABBA0083E9EA /* SigQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = B1B3A74A2430A4DB0083E9EA /* SigQueue.m */; };
 		B1B3A7512430ABBA0083E9EA /* SigInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = B1B3A7442430A3FA0083E9EA /* SigInfo.m */; };
 		B1B3A7522430ABBA0083E9EA /* SigAction.m in Sources */ = {isa = PBXBuildFile; fileRef = B1B3A74D2430A9210083E9EA /* SigAction.m */; };
-		B1BA6D2824255FFD00319C74 /* fakefs.json in Resources */ = {isa = PBXBuildFile; fileRef = B1BA6D2724255FFD00319C74 /* fakefs.json */; };
 		B1BA6D3C2425E7C900319C74 /* NSData+Base16.m in Sources */ = {isa = PBXBuildFile; fileRef = B1BA6D3A2425E7C800319C74 /* NSData+Base16.m */; };
 		B1BA6D902425F9FB00319C74 /* NSObject+Creation.m in Sources */ = {isa = PBXBuildFile; fileRef = B1BA6D6A2425F9E300319C74 /* NSObject+Creation.m */; };
 		B1BA6D912425F9FB00319C74 /* NSSet+Intersection.m in Sources */ = {isa = PBXBuildFile; fileRef = B1BA6D6C2425F9E500319C74 /* NSSet+Intersection.m */; };
@@ -248,7 +247,6 @@
 /* Begin PBXFileReference section */
 		B1017E8F2426E1D7005B0A32 /* log.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = log.h; path = x86UserModeEmu/misc/log.h; sourceTree = SOURCE_ROOT; };
 		B1017E9024274AE8005B0A32 /* bits.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = bits.h; sourceTree = "<group>"; };
-		B10DFFA82429425500F02B80 /* alpine */ = {isa = PBXFileReference; lastKnownFileType = folder; path = alpine; sourceTree = "<group>"; };
 		B134C71524092F2800FDD5F6 /* Pid.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Pid.h; sourceTree = "<group>"; };
 		B134C71624092F9D00FDD5F6 /* Pid.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Pid.m; sourceTree = "<group>"; };
 		B134C71824092FD300FDD5F6 /* Globals.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Globals.h; sourceTree = "<group>"; };
@@ -298,6 +296,8 @@
 		B185636C243738D9004E927E /* NSString+BinaryRepresentation.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NSString+BinaryRepresentation.h"; sourceTree = "<group>"; };
 		B185636D24373900004E927E /* NSString+BinaryRepresentation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSString+BinaryRepresentation.m"; sourceTree = "<group>"; };
 		B18DBBF0242FE2C900261A73 /* Group1OpCodes.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; name = Group1OpCodes.h; path = x86UserModeEmu/Group1OpCodes.h; sourceTree = SOURCE_ROOT; };
+		B18E9497248E6B1700303568 /* fakefs.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = fakefs.json; path = fsbackup/fakefs.json; sourceTree = "<group>"; };
+		B18E9499248E6B7700303568 /* alpine */ = {isa = PBXFileReference; lastKnownFileType = folder; path = alpine; sourceTree = "<group>"; };
 		B1B3A7432430A3FA0083E9EA /* SigInfo.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SigInfo.h; sourceTree = "<group>"; };
 		B1B3A7442430A3FA0083E9EA /* SigInfo.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SigInfo.m; sourceTree = "<group>"; };
 		B1B3A7462430A41C0083E9EA /* SigHandler.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SigHandler.h; sourceTree = "<group>"; };
@@ -306,7 +306,6 @@
 		B1B3A74A2430A4DB0083E9EA /* SigQueue.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SigQueue.m; sourceTree = "<group>"; };
 		B1B3A74C2430A9210083E9EA /* SigAction.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SigAction.h; sourceTree = "<group>"; };
 		B1B3A74D2430A9210083E9EA /* SigAction.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SigAction.m; sourceTree = "<group>"; };
-		B1BA6D2724255FFD00319C74 /* fakefs.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = fakefs.json; path = misc/fakefs.json; sourceTree = "<group>"; };
 		B1BA6D3A2425E7C800319C74 /* NSData+Base16.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSData+Base16.m"; sourceTree = "<group>"; };
 		B1BA6D3B2425E7C900319C74 /* NSData+Base16.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSData+Base16.h"; sourceTree = "<group>"; };
 		B1BA6D652425F9E100319C74 /* NSLock+Blocks.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSLock+Blocks.h"; sourceTree = "<group>"; };
@@ -1756,9 +1755,9 @@
 		FA443A4A23F8983D00AE4A51 = {
 			isa = PBXGroup;
 			children = (
-				B10DFFA82429425500F02B80 /* alpine */,
+				B18E9499248E6B7700303568 /* alpine */,
+				B18E9497248E6B1700303568 /* fakefs.json */,
 				B1C52F5024281EE3009F587F /* emuTestResources */,
-				B1BA6D2724255FFD00319C74 /* fakefs.json */,
 				B1C52F5124281EF5009F587F /* alpine */,
 				FA443A5523F8983D00AE4A51 /* x86UserModeEmu */,
 				FA443A6C23F8984000AE4A51 /* x86UserModeEmuTests */,
@@ -1916,9 +1915,9 @@
 			buildPhases = (
 				FA443A4F23F8983D00AE4A51 /* Sources */,
 				FA443A5023F8983D00AE4A51 /* Frameworks */,
+				B10DFFA72429392F00F02B80 /* ShellScript */,
 				FA443A5123F8983D00AE4A51 /* Resources */,
 				B1BA6D312425C7F900319C74 /* Embed Frameworks */,
-				B10DFFA72429392F00F02B80 /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -2028,12 +2027,11 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				B141B6A124220D3F00CF35A3 /* docs in Resources */,
 				FA443A5D23F8984000AE4A51 /* Assets.xcassets in Resources */,
-				B1BA6D2824255FFD00319C74 /* fakefs.json in Resources */,
 				FA443A6023F8984000AE4A51 /* Main.storyboard in Resources */,
+				B18E949A248E6B7700303568 /* alpine in Resources */,
 				B1721263242A1E0B00CCF3EC /* Aspect in Resources */,
-				B10DFFA92429425500F02B80 /* alpine in Resources */,
+				B18E9498248E6B1800303568 /* fakefs.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2069,7 +2067,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\necho \"Setting up FS for $CONFIGURATION_BUILD_DIR\"\ncp $SRCROOT/fsbackup/fakefs.json $CONFIGURATION_BUILD_DIR\nmkdir -p $CONFIGURATION_BUILD_DIR/alpine/data\ncp $SRCROOT/alpine.tar.gz $CONFIGURATION_BUILD_DIR/alpine/data\ncd $CONFIGURATION_BUILD_DIR/alpine/data\ntar -xvzf $CONFIGURATION_BUILD_DIR/alpine/data/alpine.tar.gz\n\n\n";
+			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\necho \"Setting up FS for $CONFIGURATION_BUILD_DIR\"\ncp $SRCROOT/fsbackup/fakefs.json $CONFIGURATION_BUILD_DIR\ncd $SRCROOT\nmkdir -p alpine/data\ncd alpine/data\nif [ -f alpine-minirootfs-3.11.2-x86.tar.gz ] then\n    echo \"Alpine tar already exists\"\nelse\n    wget http://dl-cdn.alpinelinux.org/alpine/v3.11/releases/x86/alpine-minirootfs-3.11.2-x86.tar.gz\nfi\n\ntar -xvzf alpine-minirootfs-3.11.2-x86.tar.gz\nrm alpine-minirootfs-3.11.2-x86.tar.gz \ncd $SRCROOT\n";
 		};
 		B1C53106242825AC009F587F /* Run Script */ = {
 			isa = PBXShellScriptBuildPhase;

@@ -51,8 +51,6 @@
     }
     
     if (mountFound != nil) {
-        [mountFound incrementRefCount];
-        
         // unlock on mounts
         return mountFound;
     } else {

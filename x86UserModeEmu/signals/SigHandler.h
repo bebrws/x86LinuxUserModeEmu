@@ -13,7 +13,6 @@
 
 @interface SigHandler : NSObject {
     @public id actions[NUM_SIGS];
-    @public atomic_uint refcount;
     @public addr_t altstack;
     @public dword_t altstack_size;
     @public lock_t lock;
