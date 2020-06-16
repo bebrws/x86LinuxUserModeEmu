@@ -408,6 +408,9 @@
                     die("Unimplemented syscall attempted.");
                     break;
             }
+            
+            self->state.eax = result;
+            
             // int result = syscall(self->state.ebx, self->state.ecx, self->state.edx, self->state.esi, self->state.edi, self->state.ebp);
             STRACE(@"SYSCALL #%d 0x%x Result: %d\n", self.syscall, self.syscall, result);
             
