@@ -2067,7 +2067,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\necho \"Setting up FS for $CONFIGURATION_BUILD_DIR\"\ncp $SRCROOT/fsbackup/fakefs.json $CONFIGURATION_BUILD_DIR\ncd $SRCROOT\nmkdir -p alpine/data\ncd alpine/data\nif [ -f alpine-minirootfs-3.11.2-x86.tar.gz ] then\n    echo \"Alpine tar already exists\"\nelse\n    wget http://dl-cdn.alpinelinux.org/alpine/v3.11/releases/x86/alpine-minirootfs-3.11.2-x86.tar.gz\nfi\n\ntar -xvzf alpine-minirootfs-3.11.2-x86.tar.gz\nrm alpine-minirootfs-3.11.2-x86.tar.gz \ncd $SRCROOT\n";
+			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\necho \"Setting up FS for $CONFIGURATION_BUILD_DIR\"\ncp $SRCROOT/fsbackup/fakefs.json $CONFIGURATION_BUILD_DIR\ncd $SRCROOT\nmkdir -p alpine/data\ncd alpine/data\nif [ -f alpine-minirootfs-3.11.2-x86.tar.gz ]; then\n    echo \"Alpine tar already exists\"\nelse\n    wget http://dl-cdn.alpinelinux.org/alpine/v3.11/releases/x86/alpine-minirootfs-3.11.2-x86.tar.gz\nfi\n\ntar -xvzf alpine-minirootfs-3.11.2-x86.tar.gz\nrm alpine-minirootfs-3.11.2-x86.tar.gz \ncd $SRCROOT\n";
 		};
 		B1C53106242825AC009F587F /* Run Script */ = {
 			isa = PBXShellScriptBuildPhase;
