@@ -5685,6 +5685,7 @@
 
 // restart32:
 
+    
     [self readByteIncIP:&firstOpByte];
     
     
@@ -5714,6 +5715,7 @@
             // CPULog("%x %x %x %x %x %x %x %x %x %x %x\n", self->instructionCount, self->state.eax, self->state.ebx, self->state.ecx, self->state.edx, self->state.esi, self->state.edi, self->state.ebp, self->state.esp, self->state.eip, self->state.eflags, self->state.res);
             // CPULog("%s %s %s %s %s %s %s %s %s %s %s %s\n", [parsedData[@"eax"] UTF8String], [parsedData[@"ebx"] UTF8String], [parsedData[@"ecx"] UTF8String], [parsedData[@"edx"] UTF8String], [parsedData[@"esi"] UTF8String], [parsedData[@"edi"] UTF8String], [parsedData[@"ebp"] UTF8String], [parsedData[@"esp"] UTF8String], [parsedData[@"eip"] UTF8String], [parsedData[@"eflags"] UTF8String], [parsedData[@"res"] UTF8String], [parsedData[@"insn"] UTF8String]);
             
+            
             // Compare against the current state
             if (self->instructionCount != 0 && !([parsedData[@"eax"] isEqualTo:[NSString stringWithFormat:@"%x", self->state.eax]] &&
                   [parsedData[@"ebx"] isEqualTo:[NSString stringWithFormat:@"%x", self->state.ebx]] &&
@@ -5730,10 +5732,11 @@
                   [parsedData[@"stack"] isEqualTo:[NSString stringWithFormat:@"%x", stackVar]] &&
                   [parsedData[@"res"] isEqualTo:[NSString stringWithFormat:@"%x", self->state.res]] )) {
                 
-                CPULog("%x\t%x\t%x\t%x\t%x\t%x\t%x\t%x\t%x\t%x\t%x\t%x\tflags\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%x - X86\n", self->state.eax, self->state.ebx, self->state.ecx, self->state.edx, self->state.esi, self->state.edi, self->state.ebp, self->state.esp, self->state.eip, self->state.eflags, self->state.res, stackVar, self->state.cf_bit, self->state.pf, self->state.af, self->state.zf, self->state.sf, self->state.tf, self->state.if_, self->state.df, self->state.of_bit, self->state.iopl, self->state.pf_res, self->state.sf_res, self->state.af_ops, self->state.cf, firstOpByte);
-                CPULog("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\tflags\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s - ISH\n", [parsedData[@"eax"] UTF8String], [parsedData[@"ebx"] UTF8String], [parsedData[@"ecx"] UTF8String], [parsedData[@"edx"] UTF8String], [parsedData[@"esi"] UTF8String], [parsedData[@"edi"] UTF8String], [parsedData[@"ebp"] UTF8String], [parsedData[@"esp"] UTF8String], [parsedData[@"eip"] UTF8String], [parsedData[@"eflags"] UTF8String], [parsedData[@"res"] UTF8String], [parsedData[@"stack"] UTF8String], [parsedData[@"cf_bit"] UTF8String], [parsedData[@"pf"] UTF8String], [parsedData[@"af"] UTF8String], [parsedData[@"zf"] UTF8String], [parsedData[@"sf"] UTF8String], [parsedData[@"tf"] UTF8String], [parsedData[@"if_"] UTF8String], [parsedData[@"df"] UTF8String], [parsedData[@"of_bit"] UTF8String], [parsedData[@"iopl"] UTF8String], [parsedData[@"pf_res"] UTF8String], [parsedData[@"sf_res"] UTF8String], [parsedData[@"af_ops"] UTF8String], [parsedData[@"cf"] UTF8String], [parsedData[@"insn"] UTF8String]);
+                CPULog("%x\t%x\t%x\t%x\t%x\t%x\t%x\t%x\t%x\t%x\t%x\t%x\tflags\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%x\t%d\t%d - X86\n", self->state.eax, self->state.ebx, self->state.ecx, self->state.edx, self->state.esi, self->state.edi, self->state.ebp, self->state.esp, self->state.eip, self->state.eflags, self->state.res, stackVar, self->state.cf_bit, self->state.pf, self->state.af, self->state.zf, self->state.sf, self->state.tf, self->state.if_, self->state.df, self->state.of_bit, self->state.iopl, self->state.pf_res, self->state.sf_res, self->state.af_ops, self->state.cf, firstOpByte);
+                CPULog("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\tflags\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s - ISH\n", [parsedData[@"eax"] UTF8String], [parsedData[@"ebx"] UTF8String], [parsedData[@"ecx"] UTF8String], [parsedData[@"edx"] UTF8String], [parsedData[@"esi"] UTF8String], [parsedData[@"edi"] UTF8String], [parsedData[@"ebp"] UTF8String], [parsedData[@"esp"] UTF8String], [parsedData[@"eip"] UTF8String], [parsedData[@"eflags"] UTF8String], [parsedData[@"res"] UTF8String], [parsedData[@"stack"] UTF8String], [parsedData[@"cf_bit"] UTF8String], [parsedData[@"pf"] UTF8String], [parsedData[@"af"] UTF8String], [parsedData[@"zf"] UTF8String], [parsedData[@"sf"] UTF8String], [parsedData[@"tf"] UTF8String], [parsedData[@"if_"] UTF8String], [parsedData[@"df"] UTF8String], [parsedData[@"of_bit"] UTF8String], [parsedData[@"iopl"] UTF8String], [parsedData[@"pf_res"] UTF8String], [parsedData[@"sf_res"] UTF8String], [parsedData[@"af_ops"] UTF8String], [parsedData[@"cf"] UTF8String], [parsedData[@"insn"] UTF8String]);
                 
                 CPULog("~~~ ERROR: Ish/X86 TRACE MISMATCH - Instruction number %d. EIP: %x\n", self->instructionCount, self->state.eip);
+                printf("\n");
             } else {
                 // CPULog("ISH and x86 match registers - Instruction number %d. EIP: %x\n", self->instructionCount, self->state.eip);
             }
@@ -5747,15 +5750,10 @@
 
     self->instructionCount += 1;
     
-    
-
-    
-    
-    
-
-
-    // TODO: What is this for or how is it related to segment:offset
     uint32_t addr = addrDefault;
+    
+
+
 
     uint8_t *moffs8;
     uint32_t *moffs32;
@@ -11101,6 +11099,29 @@
             [self.ishDebugState setValue:td forKey:k];
         }
     }
+    
+    
+    NSString *memDebugFilename = [NSString stringWithFormat:@"/Users/bbarrows/ishmemwrite-%d.json", self.task.pid.id];
+    CPULog(@"Tracing mem with file: %@\n", memDebugFilename);
+    NSString *memDebugFilenameContents = [NSString stringWithContentsOfFile:memDebugFilename encoding:NSUTF8StringEncoding error:nil];
+    
+    // first, separate by new line
+    NSArray *memDebugJsonStringsLineSeperated = [memDebugFilenameContents componentsSeparatedByCharactersInSet: [NSCharacterSet newlineCharacterSet]];
+    
+    self.ishMemDebugState = [[NSMutableDictionary alloc] init];;
+    
+    for (NSString *l in memDebugJsonStringsLineSeperated) {
+        NSData * jsonTraceData = [l dataUsingEncoding:NSUTF8StringEncoding];
+        NSError * error=nil;
+        NSDictionary *memWriteLine = [NSJSONSerialization JSONObjectWithData:jsonTraceData options:kNilOptions error:&error];
+        //self.ishOut[td[@"num"]] = td;
+        NSString *insnCountKey = memWriteLine[@"insn"];
+        if (insnCountKey) {
+            [self.ishMemDebugState setValue:memWriteLine forKey:insnCountKey];
+        }
+    }
+    
+    
     self->instructionCount = 0;
     // END TRACING
 

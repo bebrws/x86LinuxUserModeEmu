@@ -342,6 +342,7 @@ static inline const char *reg32_name(enum reg32 reg) {
 
 // DEBUG
 @property (nonatomic, strong) NSMutableDictionary *ishDebugState;
+@property (nonatomic, strong) NSMutableDictionary *ishMemDebugState;
 @property (nonatomic, strong) NSArray *debugJsonStringsLineSeperated;
 @property (nonatomic, strong) NSDictionary *parsedData;
 @end

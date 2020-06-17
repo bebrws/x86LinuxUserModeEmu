@@ -618,6 +618,38 @@ fail_free_mem:
 }
 
 - (int)userWriteTaskFromBuffer:(addr_t)addr buf:(char *)buf count:(size_t)count {
+    
+    
+    // Brads Debugging code:
+    if (self.cpu->instructionCount > 0) {
+        NSString *insnKeyString = [NSString stringWithFormat:@"%d", self.cpu->instructionCount];
+        NSDictionary *memDebugLine = self.cpu.ishMemDebugState[insnKeyString];
+        // pid insn addr size value
+        //             %x      %x
+        // all else %d
+        
+        uint32_t val;
+        if (count == 4) {
+            val = *(uint32_t *)buf;
+        } else if (count == 2) {
+            val = *(uint16_t *)buf;
+        } else if (count == 1) {
+            val = *(uint8_t *)buf;
+        }
+        
+        NSString *valueString = [NSString stringWithFormat:@"%x", val];
+        
+        if (![valueString isEqualToString:memDebugLine[@"value"]]) {
+            CLog(@"Value from x86: %@", valueString);
+            CLog(@"Value from Ish: %@", memDebugLine[@"value"]);
+            CLog(@"Value being written to mem is different than Ish");
+            fprintf(stderr, "Write to memory writing different value than ish.");
+        }
+    }
+    // END Brads Debugging code:
+    
+    
+    
     const char *cbuf = (const char *)buf;
     addr_t p = addr;
     while (p < addr + count) {
