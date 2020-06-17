@@ -639,11 +639,11 @@ fail_free_mem:
         
         NSString *valueString = [NSString stringWithFormat:@"%x", val];
         
-        if (![valueString isEqualToString:memDebugLine[@"value"]]) {
-            CLog(@"Value from x86: %@", valueString);
-            CLog(@"Value from Ish: %@", memDebugLine[@"value"]);
-            CLog(@"Value being written to mem is different than Ish");
-            fprintf(stderr, "Write to memory writing different value than ish.");
+        if (memDebugLine && ![valueString isEqualToString:memDebugLine[@"value"]]) {
+            CLog(@"Value from x86: %@\n", valueString);
+            CLog(@"Value from Ish: %@\n", memDebugLine[@"value"]);
+            CLog(@"Value being written to mem is different than Ish\n");
+            fprintf(stderr, "Write to memory writing different value than ish.\n");
         }
     }
     // END Brads Debugging code:
