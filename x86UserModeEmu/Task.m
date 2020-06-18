@@ -1252,11 +1252,8 @@ fail_free_mem:
         }
         envp_addr += [self userStrlen:envp_addr] + 1;
         p += sizeof(dword_t);
-        CLog(@"P: %d\n", p);
     }
-    CLog(@"P: %d\n", p);
     p += sizeof(dword_t); // null terminator
-    CLog(@"P: %d\n", p);
 
     // http://articles.manugarg.com/aboutelfauxiliaryvectors.html
     // "ELF auxiliary vectors are a mechanism to transfer certain kernel level information to the user processes." - Link above

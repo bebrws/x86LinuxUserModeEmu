@@ -345,8 +345,8 @@
             filePath = "x86UserModeEmu/Task.m"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1451"
-            endingLineNumber = "1451"
+            startingLineNumber = "1448"
+            endingLineNumber = "1448"
             landmarkName = "-mmap:pageStart:numPages:offset:protectionFlags:flags:debugString:"
             landmarkType = "7">
          </BreakpointContent>
@@ -355,7 +355,7 @@
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
             uuid = "24E96286-6D24-424E-A21A-1A836A049F41"
-            shouldBeEnabled = "Yes"
+            shouldBeEnabled = "No"
             condition = "self-&gt;instructionCount &gt;= 12600"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
@@ -381,22 +381,6 @@
             startingLineNumber = "715"
             endingLineNumber = "715"
             landmarkName = "-step:"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            uuid = "32E3A7A7-B067-4F38-A950-9B189C8C355B"
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "x86UserModeEmu/Task.m"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1260"
-            endingLineNumber = "1260"
-            landmarkName = "-elfExec:file:argv:envp:"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>

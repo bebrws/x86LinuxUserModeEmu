@@ -3180,18 +3180,14 @@
         case 0x3d:
             // CMP    EAX    imm8
             //
-            [self readByteIncIP:&modRMByte];
-            mrm = [self decodeModRMByte:modRMByte];
             regPtr = [self getRegPointer:reg_eax opSize:32];
 
-            if ([self readByteIncIP:&imm8]) {
+            if ([self readFourBytesIncIP:&imm32]) {
                 SEGFAULT
             }
 
-            self->state.cf = __builtin_sub_overflow(*((uint32_t *)regPtr), (uint32_t)imm8, (uint32_t *)&temp8);
-            self->state.of = __builtin_sub_overflow(*((int32_t *)regPtr), (int32_t)imm8, (int32_t *)&temp8);
-            self->state.res = (int32_t)temp8;
-            // sets cf and of
+            self->state.cf = __builtin_sub_overflow(*((uint32_t *)regPtr), (uint32_t)imm32, (uint32_t *)&self->state.res);
+            self->state.of = __builtin_sub_overflow(*((int32_t *)regPtr), (int32_t)imm32, (int32_t *)&self->state.res);
 
             self->state.af_ops = 1;
             self->state.zf_res = self->state.sf_res = self->state.pf_res = 1;
@@ -8276,18 +8272,14 @@
         case 0x3d:
             // CMP    EAX    imm8
             //
-            [self readByteIncIP:&modRMByte];
-            mrm = [self decodeModRMByte:modRMByte];
             regPtr = [self getRegPointer:reg_eax opSize:16];
             
-            if ([self readByteIncIP:&imm8]) {
+            if ([self readTwoBytesIncIP:&imm16]) {
                 SEGFAULT
             }
             
-            self->state.cf = __builtin_sub_overflow(*((uint16_t *)regPtr), (uint16_t)imm8, (uint16_t *)&temp8);
-            self->state.of = __builtin_sub_overflow(*((int16_t *)regPtr), (int16_t)imm8, (int16_t *)&temp8);
-            self->state.res = (int16_t)temp8;
-            // sets cf and of
+            self->state.cf = __builtin_sub_overflow(*((uint16_t *)regPtr), (uint16_t)imm16, (uint16_t *)&self->state.res);
+            self->state.of = __builtin_sub_overflow(*((int16_t *)regPtr), (int16_t)imm16, (int16_t *)&self->state.res);
             
             self->state.af_ops = 1;
             self->state.zf_res = self->state.sf_res = self->state.pf_res = 1;
