@@ -3327,10 +3327,6 @@
             [self readByteIncIP:&modRMByte];
             // CLog(@"MODRM %x\n", modRMByte);
             mrm = [self decodeModRMByte:modRMByte];
-            if (mrm.reg != reg_ebp) {
-                self->state.eip = saved_ip;
-                return INT_UNDEFINED;
-            }
             regPtr = [self getRegPointer:mrm.reg opSize:32];
             if (mrm.type == modrm_register) {
                 rmWritePtr = [self getRegPointer:mrm.base opSize:32];
@@ -3362,10 +3358,6 @@
             [self readByteIncIP:&modRMByte];
             // CLog(@"MODRM %x\n", modRMByte);
             mrm = [self decodeModRMByte:modRMByte];
-            if (mrm.reg != reg_ebp) {
-                self->state.eip = saved_ip;
-                return INT_UNDEFINED;
-            }
             regPtr = [self getRegPointer:mrm.reg opSize:32];
             if (mrm.type == modrm_register) {
                 rmWritePtr = [self getRegPointer:mrm.base opSize:32];
@@ -3878,10 +3870,6 @@
             [self readByteIncIP:&modRMByte];
             // CLog(@"MODRM %x\n", modRMByte);
             mrm = [self decodeModRMByte:modRMByte];
-            if (mrm.reg != reg_ebp) {
-                self->state.eip = saved_ip;
-                return INT_UNDEFINED;
-            }
             regPtr = [self getRegPointer:mrm.reg opSize:32];
             if (mrm.type == modrm_register) {
                 rmWritePtr = [self getRegPointer:mrm.base opSize:32];
@@ -8423,10 +8411,6 @@
             [self readByteIncIP:&modRMByte];
             // CLog(@"MODRM %x\n", modRMByte);
             mrm = [self decodeModRMByte:modRMByte];
-            if (mrm.reg != reg_ebp) {
-                self->state.eip = saved_ip;
-                return INT_UNDEFINED;
-            }
             regPtr = [self getRegPointer:mrm.reg opSize:16];
             if (mrm.type == modrm_register) {
                 rmWritePtr = [self getRegPointer:mrm.base opSize:16];
@@ -8457,10 +8441,6 @@
             [self readByteIncIP:&modRMByte];
             // CLog(@"MODRM %x\n", modRMByte);
             mrm = [self decodeModRMByte:modRMByte];
-            if (mrm.reg != reg_ebp) {
-                self->state.eip = saved_ip;
-                return INT_UNDEFINED;
-            }
             regPtr = [self getRegPointer:mrm.reg opSize:16];
             if (mrm.type == modrm_register) {
                 rmWritePtr = [self getRegPointer:mrm.base opSize:16];
@@ -8973,10 +8953,7 @@
             [self readByteIncIP:&modRMByte];
             // CLog(@"MODRM %x\n", modRMByte);
             mrm = [self decodeModRMByte:modRMByte];
-            if (mrm.reg != reg_ebp) {
-                self->state.eip = saved_ip;
-                return INT_UNDEFINED;
-            }
+
             regPtr = [self getRegPointer:mrm.reg opSize:16];
             if (mrm.type == modrm_register) {
                 rmWritePtr = [self getRegPointer:mrm.base opSize:16];
