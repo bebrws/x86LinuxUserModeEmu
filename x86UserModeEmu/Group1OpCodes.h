@@ -14,7 +14,7 @@
 // Operands are in groups
 // http://www.mlsite.net/8086/#tbl_ext
 
-CLog(@"Handling Group1 sizes: rm %d imm %d\n", RM_SZ, IMM_SZ);
+// CLog(@"Handling Group1 sizes: rm %d imm %d\n", RM_SZ, IMM_SZ);
 
 
 // Read in and decode the ModRM byte
@@ -33,16 +33,14 @@ if (mrm.type == modrm_register) {
         return 13;
     }
     memcpy(&rmReadValue, rmReadPtr, sizeof(GP1UINT(RM_SZ)));
-//    CLog(@" Reg %@ ", [CPU getRegisterString:mrm.base]);
 } else {
     addr_t modrmAddress = [self getModRMAddress:mrm opSize:RM_SZ];
-//    CLog(@" Addr 0x%x ", modrmAddress);
     rmReadPtr  = [self.task.mem getPointer:modrmAddress type:MEM_READ];
     if (!rmReadPtr) {
         return 13;
     }
     memcpy(&rmReadValue, rmReadPtr, sizeof(GP1UINT(RM_SZ)));
-    // when modrm.reg == 0x7 this is a CMP opcode and the modrm byte is not used to write to just read from
+    // when modrm.reg == 0x7 this is a CMP opcode and the modrm byte is not used to write to just read from so skip getting the rmWritePtr
     if (mrm.reg != 7) {
         rmWritePtr = [self.task.mem getPointer:modrmAddress type:MEM_WRITE];
     }
@@ -50,19 +48,9 @@ if (mrm.type == modrm_register) {
 
 
 // The code below is to get the imm value cast to the RM_SIZE size and type int :
-//
-//  Neither of these will work:
-
-//  IMMV(RM_SZ) = (GP1INT(RM_SZ))IMMV(IMM_SZ);
-//  CLog(@"imm%d = (int%d_t)imm%d\n", RM_SZ, RM_SZ, IMM_SZ);
-
-//  IMMV(IMM_SZ) = (GP1UINT(IMM_SZ))IMMV(IMM_SZ);
-//  CLog(@"imm%d = (int%d_t)imm%d\n", IMM_SZ, IMM_SZ, IMM_SZ);
-
 //  This works though, kinda weird it needs the extra int cast of imm size before the rm cast of int rm size:
-
 IMMV(RM_SZ) = (GP1INT(RM_SZ))((GP1INT(IMM_SZ))IMMV(IMM_SZ));
-CLog(@"imm%d = (int%d_t)((int%d_t)imm%d)\n", RM_SZ, RM_SZ, IMM_SZ, IMM_SZ);
+// CLog(@"imm%d = (int%d_t)((int%d_t)imm%d)\n", RM_SZ, RM_SZ, IMM_SZ, IMM_SZ);
 
 
 switch (mrm.reg) {

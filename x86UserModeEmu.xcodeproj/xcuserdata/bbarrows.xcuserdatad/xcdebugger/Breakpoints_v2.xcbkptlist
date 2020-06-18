@@ -354,25 +354,9 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "1749F17B-EB53-4807-96D6-85B15158AEE2"
-            shouldBeEnabled = "Yes"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "x86UserModeEmu/cpu/CPU.m"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "308"
-            endingLineNumber = "308"
-            landmarkName = "-handleInterrupt:"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
             uuid = "24E96286-6D24-424E-A21A-1A836A049F41"
             shouldBeEnabled = "Yes"
-            condition = "self-&gt;instructionCount &gt;= 12586"
+            condition = "self-&gt;instructionCount &gt;= 12600"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "x86UserModeEmu/cpu/CPU.m"
@@ -429,6 +413,22 @@
             startingLineNumber = "623"
             endingLineNumber = "623"
             landmarkName = "-userWriteTaskFromBuffer:buf:count:"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "E7FC7972-78A5-41E5-AC92-958B5DAF1D97"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "x86UserModeEmu/cpu/CPU.m"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "308"
+            endingLineNumber = "308"
+            landmarkName = "-handleInterrupt:"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
