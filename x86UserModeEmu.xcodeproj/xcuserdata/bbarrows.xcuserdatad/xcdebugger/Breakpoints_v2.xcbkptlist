@@ -355,8 +355,8 @@
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
             uuid = "24E96286-6D24-424E-A21A-1A836A049F41"
-            shouldBeEnabled = "No"
-            condition = "self-&gt;instructionCount &gt;= 12600"
+            shouldBeEnabled = "Yes"
+            condition = "self-&gt;instructionCount &gt;= 12649"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "x86UserModeEmu/cpu/CPU.m"
@@ -477,23 +477,6 @@
             startingLineNumber = "422"
             endingLineNumber = "422"
             landmarkName = "-handleInterrupt:"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            uuid = "D2A73B01-AEC0-4242-8228-288F5D2328ED"
-            shouldBeEnabled = "Yes"
-            condition = "self-&gt;instructionCount &gt;= 12648"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "x86UserModeEmu/cpu/CPU.m"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "698"
-            endingLineNumber = "698"
-            landmarkName = "-step:"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
