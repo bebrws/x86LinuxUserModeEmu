@@ -710,8 +710,9 @@
                   [parsedData[@"stack"] isEqualTo:[NSString stringWithFormat:@"%x", stackVar]] &&
                   [parsedData[@"res"] isEqualTo:[NSString stringWithFormat:@"%x", self->state.res]] )) {
                 
-                CPULog("%x\t%x\t%x\t%x\t%x\t%x\t%x\t%x\t%x\t%x\t%x\t%x\tflags\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%x - X86\n", self->state.eax, self->state.ebx, self->state.ecx, self->state.edx, self->state.esi, self->state.edi, self->state.ebp, self->state.esp, self->state.eip, self->state.eflags, self->state.res, stackVar, self->state.cf_bit, self->state.pf, self->state.af, self->state.zf, self->state.sf, self->state.tf, self->state.if_, self->state.df, self->state.of_bit, self->state.iopl, self->state.pf_res, self->state.sf_res, self->state.af_ops, self->state.cf, firstOpByte);
-                CPULog("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\tflags\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s - ISH\n", [parsedData[@"eax"] UTF8String], [parsedData[@"ebx"] UTF8String], [parsedData[@"ecx"] UTF8String], [parsedData[@"edx"] UTF8String], [parsedData[@"esi"] UTF8String], [parsedData[@"edi"] UTF8String], [parsedData[@"ebp"] UTF8String], [parsedData[@"esp"] UTF8String], [parsedData[@"eip"] UTF8String], [parsedData[@"eflags"] UTF8String], [parsedData[@"res"] UTF8String], [parsedData[@"stack"] UTF8String], [parsedData[@"cf_bit"] UTF8String], [parsedData[@"pf"] UTF8String], [parsedData[@"af"] UTF8String], [parsedData[@"zf"] UTF8String], [parsedData[@"sf"] UTF8String], [parsedData[@"tf"] UTF8String], [parsedData[@"if_"] UTF8String], [parsedData[@"df"] UTF8String], [parsedData[@"of_bit"] UTF8String], [parsedData[@"iopl"] UTF8String], [parsedData[@"pf_res"] UTF8String], [parsedData[@"sf_res"] UTF8String], [parsedData[@"af_ops"] UTF8String], [parsedData[@"cf"] UTF8String], [parsedData[@"insn"] UTF8String]);
+                CPULog("eax %x\tebx %x\tecx %x\tedx %x\tesi %x\tedi %x\tebp %x\tesp %x\teip %x\teflags %x\tres %x\tstack %x\tflags\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%x - X86\n", self->state.eax, self->state.ebx, self->state.ecx, self->state.edx, self->state.esi, self->state.edi, self->state.ebp, self->state.esp, self->state.eip, self->state.eflags, self->state.res, stackVar, self->state.cf_bit, self->state.pf, self->state.af, self->state.zf, self->state.sf, self->state.tf, self->state.if_, self->state.df, self->state.of_bit, self->state.iopl, self->state.pf_res, self->state.sf_res, self->state.af_ops, self->state.cf, firstOpByte);
+                CPULog("eax %s\tebx %s\tecx %s\tedx %s\tesi %s\tedi %s\tebp %s\tesp %s\teip %s\teflags %s\tres %s\tstack %s\tflags\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s - ISH\n",
+                   [parsedData[@"eax"] UTF8String], [parsedData[@"ebx"] UTF8String], [parsedData[@"ecx"] UTF8String], [parsedData[@"edx"] UTF8String], [parsedData[@"esi"] UTF8String], [parsedData[@"edi"] UTF8String], [parsedData[@"ebp"] UTF8String], [parsedData[@"esp"] UTF8String], [parsedData[@"eip"] UTF8String], [parsedData[@"eflags"] UTF8String], [parsedData[@"res"] UTF8String], [parsedData[@"stack"] UTF8String], [parsedData[@"cf_bit"] UTF8String], [parsedData[@"pf"] UTF8String], [parsedData[@"af"] UTF8String], [parsedData[@"zf"] UTF8String], [parsedData[@"sf"] UTF8String], [parsedData[@"tf"] UTF8String], [parsedData[@"if_"] UTF8String], [parsedData[@"df"] UTF8String], [parsedData[@"of_bit"] UTF8String], [parsedData[@"iopl"] UTF8String], [parsedData[@"pf_res"] UTF8String], [parsedData[@"sf_res"] UTF8String], [parsedData[@"af_ops"] UTF8String], [parsedData[@"cf"] UTF8String], [parsedData[@"insn"] UTF8String]);
                 
                 CPULog("~~~ ERROR: Ish/X86 TRACE MISMATCH - Instruction number %d. EIP: %x\n", self->instructionCount, self->state.eip);
                 printf("\n");
@@ -3386,7 +3387,7 @@
             }
             if (self->state.of) {
                 // TODO: Possibly cast this as int16_t to work with 16 bit instructions
-                self->state.eip += (int8_t)imm8;
+                self->state.eip += (uint32_t)(int8_t)imm8;
             }
             break;
         case 0x71:
@@ -3396,7 +3397,7 @@
             }
             if (!self->state.of) {
                 // TODO: Possibly cast this as int16_t to work with 16 bit instructions
-                self->state.eip += (int8_t)imm8;
+                self->state.eip += (uint32_t)(int8_t)imm8;
             }
             break;
         case 0x72:
@@ -3409,7 +3410,7 @@
             }
             if (self->state.cf) {
                 // TODO: Possibly cast this as int16_t to work with 16 bit instructions
-                self->state.eip += (int8_t)imm8;
+                self->state.eip += (uint32_t)(int8_t)imm8;
             }
             break;
         case 0x73:
@@ -3434,7 +3435,7 @@
             }
             if (self->state.zf_res ? self->state.res == 0 : self->state.zf) {
                 // TODO: Possibly cast this as int16_t to work with 16 bit instructions
-                self->state.eip += (int8_t)imm8;
+                self->state.eip += (uint32_t)(int8_t)imm8;
             }
             break;
         case 0x75:
@@ -3448,7 +3449,7 @@
             // Otherwise just check the last zf flag
             if (!(self->state.zf_res ? self->state.res == 0 : self->state.zf)) {
                 // TODO: Possibly cast this as int16_t to work with 16 bit instructions
-                self->state.eip += (int32_t)(int8_t)imm8;
+                self->state.eip += (uint32_t)(int8_t)imm8;
             }
             break;
         case 0x76:
@@ -3462,7 +3463,7 @@
             // Otherwise just check the last zf flag
             if (self->state.cf | (self->state.zf_res ? self->state.res == 0 : self->state.zf)) {
                 // TODO: Possibly cast this as int16_t to work with 16 bit instructions
-                self->state.eip += (int8_t)imm8;
+                self->state.eip += (uint32_t)(int8_t)imm8;
             }
             break;
         case 0x77:
@@ -3476,7 +3477,7 @@
             // Otherwise just check the last zf flag
             if (!(self->state.cf | (self->state.zf_res ? self->state.res == 0 : self->state.zf))) {
                 // TODO: Possibly cast this as int16_t to work with 16 bit instructions
-                self->state.eip += (int8_t)imm8;
+                self->state.eip += (uint32_t)(int8_t)imm8;
             }
             break;
         case 0x78:
@@ -3489,7 +3490,7 @@
             // Otherwise just check the last zf flag
             if (self->state.sf_res ? self->state.res < 0 : self->state.sf) {
                 // TODO: Possibly cast this as int16_t to work with 16 bit instructions
-                self->state.eip += (int8_t)imm8;
+                self->state.eip += (uint32_t)(int8_t)imm8;
             }
             break;
         case 0x79:
@@ -3502,7 +3503,7 @@
             // Otherwise just check the last zf flag
             if (!(self->state.sf_res ? self->state.res < 0 : self->state.sf)) {
                 // TODO: Possibly cast this as int16_t to work with 16 bit instructions
-                self->state.eip += (int8_t)imm8;
+                self->state.eip += (uint32_t)(int8_t)imm8;
             }
             break;
         case 0x7a:
@@ -3516,7 +3517,7 @@
             // Otherwise just check the last zf flag
             if (self->state.pf_res ? !__builtin_parity(self->state.res & 0xff) : self->state.pf) {
                 // TODO: Possibly cast this as int16_t to work with 16 bit instructions
-                self->state.eip += (int8_t)imm8;
+                self->state.eip += (uint32_t)(int8_t)imm8;
             }
             break;
         case 0x7b:
@@ -3530,7 +3531,7 @@
             // Otherwise just check the last zf flag
             if (!(self->state.pf_res ? !__builtin_parity(self->state.res & 0xff) : self->state.pf)) {
                 // TODO: Possibly cast this as int16_t to work with 16 bit instructions
-                self->state.eip += (int8_t)imm8;
+                self->state.eip += (uint32_t)(int8_t)imm8;
             }
             break;
         case 0x7c:
@@ -3545,7 +3546,7 @@
             // Meaning sign flag XOR overflow flag is only true when one is 1 and the other is 0
             if ((self->state.sf_res ? self->state.res == 0 : self->state.sf) ^ self->state.of) {
                 // TODO: Possibly cast this as int16_t to work with 16 bit instructions
-                self->state.eip += (int8_t)imm8;
+                self->state.eip += (uint32_t)(int8_t)imm8;
             }
             break;
         case 0x7d:
@@ -3557,7 +3558,7 @@
             }
             if (!((self->state.sf_res ? (int32_t)self->state.res < 0 : self->state.sf) ^ self->state.of)) {
                 // TODO: Possibly cast this as int16_t to work with 16 bit instructions
-                self->state.eip += (int8_t)imm8;
+                self->state.eip += (uint32_t)(int8_t)imm8;
             }
             break;
         case 0x7e:
@@ -3569,7 +3570,7 @@
             }
             if (self->state.zf_res ? self->state.res == 0 : self->state.zf | ((self->state.sf_res ? (int32_t)self->state.res < 0 : self->state.sf) ^ self->state.of)) {
                 // TODO: Possibly cast this as int16_t to work with 16 bit instructions
-                self->state.eip += (int8_t)imm8;
+                self->state.eip += (uint32_t)(int8_t)imm8;
             }
             break;
         case 0x7f:
@@ -3583,7 +3584,7 @@
             // Otherwise just check the last zf flag
             if (!(((self->state.sf_res ? (int32_t)self->state.res < 0 : self->state.sf) ^ (self->state.of)) | (self->state.zf_res ? self->state.res == 0 : self->state.zf))) {
                 // TODO: Possibly cast this as int16_t to work with 16 bit instructions
-                self->state.eip += (int8_t)imm8;
+                self->state.eip += (uint32_t)(int8_t)imm8;
             }
             break;
         case 0x80:
@@ -5338,7 +5339,7 @@
                 SEGFAULT
             }
             if (self->state.ecx == 0) {
-                self->state.eip += (int8_t)imm8;
+                self->state.eip += (uint32_t)(int8_t)imm8;
             }
             break;
         case 0xe8:
@@ -5351,7 +5352,7 @@
             }
             self->state.esp -= 4;
 
-            self->state.eip += (int32_t)imm32;
+            self->state.eip += (uint32_t)(int32_t)imm32;
             // TODO: If this is a 16bit CALL then & eip by 0xffff after this eip += imm
             break;
 
@@ -5360,7 +5361,7 @@
             if ([self readFourBytesIncIP:&imm32]) {
                 SEGFAULT
             }
-            self->state.eip += (int32_t)imm32;
+            self->state.eip += (uint32_t)(int32_t)imm32;
             break;
 
         case 0xeb:
@@ -5368,7 +5369,7 @@
             if ([self readByteIncIP:&imm8]) {
                 SEGFAULT
             }
-            self->state.eip += (int8_t)imm8;
+            self->state.eip += (uint32_t)(int8_t)imm8;
             break;
         case 0xf6:
             [self readByteIncIP:&modRMByte];
@@ -8469,7 +8470,7 @@
             }
             if (self->state.of) {
                 // TODO: Possibly cast this as int16_t to work with 16 bit instructions
-                self->state.eip += (int8_t)imm8;
+                self->state.eip += (uint32_t)(int8_t)imm8;
             }
             break;
         case 0x71:
@@ -8479,7 +8480,7 @@
             }
             if (!self->state.of) {
                 // TODO: Possibly cast this as int16_t to work with 16 bit instructions
-                self->state.eip += (int8_t)imm8;
+                self->state.eip += (uint32_t)(int8_t)imm8;
             }
             break;
         case 0x72:
@@ -8492,7 +8493,7 @@
             }
             if (self->state.cf) {
                 // TODO: Possibly cast this as int16_t to work with 16 bit instructions
-                self->state.eip += (int8_t)imm8;
+                self->state.eip += (uint32_t)(int8_t)imm8;
             }
             break;
         case 0x73:
@@ -8517,7 +8518,7 @@
             }
             if (self->state.zf_res ? self->state.res == 0 : self->state.zf) {
                 // TODO: Possibly cast this as int16_t to work with 16 bit instructions
-                self->state.eip += (int8_t)imm8;
+                self->state.eip += (uint32_t)(int8_t)imm8;
             }
             break;
         case 0x75:
@@ -8531,7 +8532,7 @@
             // Otherwise just check the last zf flag
             if (!(self->state.zf_res ? self->state.res == 0 : self->state.zf)) {
                 // TODO: Possibly cast this as int16_t to work with 16 bit instructions
-                self->state.eip += (int16_t)(int8_t)imm8;
+                self->state.eip += (uint16_t)(int8_t)imm8;
             }
             break;
         case 0x76:
@@ -8545,7 +8546,7 @@
             // Otherwise just check the last zf flag
             if (self->state.cf | (self->state.zf_res ? self->state.res == 0 : self->state.zf)) {
                 // TODO: Possibly cast this as int16_t to work with 16 bit instructions
-                self->state.eip += (int8_t)imm8;
+                self->state.eip += (uint32_t)(int8_t)imm8;
             }
             break;
         case 0x77:
@@ -8559,7 +8560,7 @@
             // Otherwise just check the last zf flag
             if (!(self->state.cf | (self->state.zf_res ? self->state.res == 0 : self->state.zf))) {
                 // TODO: Possibly cast this as int16_t to work with 16 bit instructions
-                self->state.eip += (int8_t)imm8;
+                self->state.eip += (uint32_t)(int8_t)imm8;
             }
             break;
         case 0x78:
@@ -8572,7 +8573,7 @@
             // Otherwise just check the last zf flag
             if (self->state.sf_res ? self->state.res < 0 : self->state.sf) {
                 // TODO: Possibly cast this as int16_t to work with 16 bit instructions
-                self->state.eip += (int8_t)imm8;
+                self->state.eip += (uint32_t)(int8_t)imm8;
             }
             break;
         case 0x79:
@@ -8585,7 +8586,7 @@
             // Otherwise just check the last zf flag
             if (!(self->state.sf_res ? self->state.res < 0 : self->state.sf)) {
                 // TODO: Possibly cast this as int16_t to work with 16 bit instructions
-                self->state.eip += (int8_t)imm8;
+                self->state.eip += (uint32_t)(int8_t)imm8;
             }
             break;
         case 0x7a:
@@ -8599,7 +8600,7 @@
             // Otherwise just check the last zf flag
             if (self->state.pf_res ? !__builtin_parity(self->state.res & 0xff) : self->state.pf) {
                 // TODO: Possibly cast this as int16_t to work with 16 bit instructions
-                self->state.eip += (int8_t)imm8;
+                self->state.eip += (uint32_t)(int8_t)imm8;
             }
             break;
         case 0x7b:
@@ -8613,7 +8614,7 @@
             // Otherwise just check the last zf flag
             if (!(self->state.pf_res ? !__builtin_parity(self->state.res & 0xff) : self->state.pf)) {
                 // TODO: Possibly cast this as int16_t to work with 16 bit instructions
-                self->state.eip += (int8_t)imm8;
+                self->state.eip += (uint32_t)(int8_t)imm8;
             }
             break;
         case 0x7c:
@@ -8628,7 +8629,7 @@
             // Meaning sign flag XOR overflow flag is only true when one is 1 and the other is 0
             if ((self->state.sf_res ? self->state.res == 0 : self->state.sf) ^ self->state.of) {
                 // TODO: Possibly cast this as int16_t to work with 16 bit instructions
-                self->state.eip += (int8_t)imm8;
+                self->state.eip += (uint32_t)(int8_t)imm8;
             }
             break;
         case 0x7d:
@@ -8640,7 +8641,7 @@
             }
             if (!((self->state.sf_res ? (int16_t)self->state.res < 0 : self->state.sf) ^ self->state.of)) {
                 // TODO: Possibly cast this as int16_t to work with 16 bit instructions
-                self->state.eip += (int8_t)imm8;
+                self->state.eip += (uint32_t)(int8_t)imm8;
             }
             break;
         case 0x7e:
@@ -8652,7 +8653,7 @@
             }
             if (self->state.zf_res ? self->state.res == 0 : self->state.zf | ((self->state.sf_res ? (int16_t)self->state.res < 0 : self->state.sf) ^ self->state.of)) {
                 // TODO: Possibly cast this as int16_t to work with 16 bit instructions
-                self->state.eip += (int8_t)imm8;
+                self->state.eip += (uint32_t)(int8_t)imm8;
             }
             break;
         case 0x7f:
@@ -8666,7 +8667,7 @@
             // Otherwise just check the last zf flag
             if (!(((self->state.sf_res ? (int16_t)self->state.res < 0 : self->state.sf) ^ (self->state.of)) | (self->state.zf_res ? self->state.res == 0 : self->state.zf))) {
                 // TODO: Possibly cast this as int16_t to work with 16 bit instructions
-                self->state.eip += (int8_t)imm8;
+                self->state.eip += (uint32_t)(int8_t)imm8;
             }
             break;
         case 0x80:
@@ -10422,7 +10423,7 @@
                 SEGFAULT
             }
             if (self->state.ecx == 0) {
-                self->state.eip += (int8_t)imm8;
+                self->state.eip += (uint32_t)(int8_t)imm8;
             }
             break;
         case 0xe8:
@@ -10435,7 +10436,7 @@
             }
             self->state.esp -= 2;
             
-            self->state.eip += (int16_t)imm16;
+            self->state.eip += (uint16_t)(int16_t)imm16;
             // TODO: If this is a 16bit CALL then & eip by 0xffff after this eip += imm
             break;
             
@@ -10444,7 +10445,7 @@
             if ([self readTwoBytesIncIP:&imm16]) {
                 SEGFAULT
             }
-            self->state.eip += (int16_t)imm16;
+            self->state.eip += (uint16_t)(int16_t)imm16;
             break;
             
         case 0xeb:
@@ -10452,7 +10453,7 @@
             if ([self readByteIncIP:&imm8]) {
                 SEGFAULT
             }
-            self->state.eip += (int8_t)imm8;
+            self->state.eip += (uint32_t)(int8_t)imm8;
             break;
         case 0xf6:
             [self readByteIncIP:&modRMByte];
