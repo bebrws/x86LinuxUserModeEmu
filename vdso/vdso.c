@@ -9,10 +9,9 @@ __asm__(".data\n"
         ".global vdso_data_start\n"
         "vdso_data_start:\n"
         ".incbin \"../libvdso.so.elf\"\n"
-        ".skip (1 << 12) - (. - vdso_data_start)\n"
+        ".skip "str(VDSO_PAGES)" * (1 << 12) - (. - vdso_data_start)\n"
         "vdso_data_end:\n"
         );
-        // ".skip "str(VDSO_PAGES)" * (1 << 12) - (. - vdso_data_start)\n");
 
 int vdso_symbol(const char *name) {
     struct elf_header *header = (void *) vdso_data;

@@ -619,6 +619,9 @@ fail_free_mem:
 
 - (int)userWriteTaskFromBuffer:(addr_t)addr buf:(char *)buf count:(size_t)count {
     
+//    if (addr <= 4294958840 && addr + count >= 4294958840 ) {
+//        printf("Found it");
+//    }
     
 //    // Brads Debugging code:
 //    if (self.cpu->instructionCount > 0) {
@@ -1255,6 +1258,8 @@ fail_free_mem:
     p += sizeof(dword_t); // null terminator
     CLog(@"P: %d\n", p);
 
+    // http://articles.manugarg.com/aboutelfauxiliaryvectors.html
+    // "ELF auxiliary vectors are a mechanism to transfer certain kernel level information to the user processes." - Link above
     // copy auxv
     if ([self userWrite:p buf:&aux count:sizeof(aux)]) {
 //        write_wrunlock(&self->memLock);
