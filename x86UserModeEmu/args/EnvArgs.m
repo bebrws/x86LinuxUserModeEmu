@@ -76,7 +76,7 @@
         memcpy(dest, [key UTF8String], writeLen);
         dest += writeLen;
         
-        dest++;
+        //dest++;
         *dest = '=';
         
         dest++;
@@ -117,5 +117,6 @@
 }
 - (void)removeKey:(NSString *)key {
     [self.args removeObjectForKey:key];
+    [self _updateArgsString];
 }
 @end

@@ -620,33 +620,33 @@ fail_free_mem:
 - (int)userWriteTaskFromBuffer:(addr_t)addr buf:(char *)buf count:(size_t)count {
     
     
-    // Brads Debugging code:
-    if (self.cpu->instructionCount > 0) {
-        NSString *insnKeyString = [NSString stringWithFormat:@"%d", self.cpu->instructionCount];
-        NSDictionary *memDebugLine = self.cpu.ishMemDebugState[insnKeyString];
-        // pid insn addr size value
-        //             %x      %x
-        // all else %d
-        
-        uint32_t val;
-        if (count == 4) {
-            val = *(uint32_t *)buf;
-        } else if (count == 2) {
-            val = *(uint16_t *)buf;
-        } else if (count == 1) {
-            val = *(uint8_t *)buf;
-        }
-        
-        NSString *valueString = [NSString stringWithFormat:@"%x", val];
-        
-        if (memDebugLine && ![valueString isEqualToString:memDebugLine[@"value"]]) {
-            CLog(@"Value from x86: %@\n", valueString);
-            CLog(@"Value from Ish: %@\n", memDebugLine[@"value"]);
-            CLog(@"Value being written to mem is different than Ish\n");
-            fprintf(stderr, "Write to memory writing different value than ish.\n");
-        }
-    }
-    // END Brads Debugging code:
+//    // Brads Debugging code:
+//    if (self.cpu->instructionCount > 0) {
+//        NSString *insnKeyString = [NSString stringWithFormat:@"%d", self.cpu->instructionCount];
+//        NSDictionary *memDebugLine = self.cpu.ishMemDebugState[insnKeyString];
+//        // pid insn addr size value
+//        //             %x      %x
+//        // all else %d
+//        
+//        uint32_t val;
+//        if (count == 4) {
+//            val = *(uint32_t *)buf;
+//        } else if (count == 2) {
+//            val = *(uint16_t *)buf;
+//        } else if (count == 1) {
+//            val = *(uint8_t *)buf;
+//        }
+//        
+//        NSString *valueString = [NSString stringWithFormat:@"%x", val];
+//        
+//        if (memDebugLine && ![valueString isEqualToString:memDebugLine[@"value"]]) {
+//            CLog(@"Value from x86: %@\n", valueString);
+//            CLog(@"Value from Ish: %@\n", memDebugLine[@"value"]);
+//            CLog(@"Value being written to mem is different than Ish\n");
+//            fprintf(stderr, "Write to memory writing different value than ish.\n");
+//        }
+//    }
+//    // END Brads Debugging code:
     
     
     
@@ -1226,12 +1226,16 @@ fail_free_mem:
 
     // argc
     int argvCount = [argv count];
-    if ([self userWrite:p buf:&argvCount count:sizeof(argvCount)]) return _EFAULT;
+    if ([self userWrite:p buf:&argvCount count:sizeof(argvCount)]) {
+        return _EFAULT;
+    }
     p += sizeof(dword_t);
 
     // argv
     while (argvCount-- > 0) {
-        if ([self userWrite:p buf:&argv_addr count:sizeof(argv_addr)]) return _EFAULT;
+        if ([self userWrite:p buf:&argv_addr count:sizeof(argv_addr)]) {
+            return _EFAULT;
+        }
         argv_addr += [self userStrlen:argv_addr] + 1;
         p += sizeof(dword_t); // null terminator
     }
@@ -1240,11 +1244,16 @@ fail_free_mem:
     // envp
     size_t envc = [envp count];
     while (envc-- > 0) {
-        if ([self userWrite:p buf:&envp_addr count:sizeof(envp_addr)]) return _EFAULT;
+        if ([self userWrite:p buf:&envp_addr count:sizeof(envp_addr)]) {
+            return _EFAULT;
+        }
         envp_addr += [self userStrlen:envp_addr] + 1;
         p += sizeof(dword_t);
+        CLog(@"P: %d\n", p);
     }
+    CLog(@"P: %d\n", p);
     p += sizeof(dword_t); // null terminator
+    CLog(@"P: %d\n", p);
 
     // copy auxv
     if ([self userWrite:p buf:&aux count:sizeof(aux)]) {
