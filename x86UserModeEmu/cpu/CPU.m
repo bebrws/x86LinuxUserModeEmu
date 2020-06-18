@@ -49,8 +49,10 @@
 
 
 #define DBADDR(addr)   if (self->state.eip == addr) { __debugbreak(); /*__builtin_trap();*/ }
-#define SEGFAULT     self->state.eip = saved_ip; self->state.segfault_addr = self->state.esp - 32 / 8; return 13;
-#define UNDEFINED_OP self->state.eip = saved_ip; return 6;
+#define SEGFAULT     self->state.eip = saved_ip; self->state.segfault_addr = self->state.esp - 32 / 8; return INT_GPF;
+
+// Used by Group1Opcodes.h :
+#define UNDEFINED_OP self->state.eip = saved_ip; return INT_UNDEFINED;
 
 @class MappedMemory;
 @class Memory;
@@ -789,7 +791,7 @@
                     } else {
                         addr = [self getModRMAddress:mrm opSize:8];
                         if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                            return 13;
+                            return INT_GPF;
                         }
                         memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
                         rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -812,7 +814,7 @@
                     } else {
                         addr = [self getModRMAddress:mrm opSize:32];
                         if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                            return 13;
+                            return INT_GPF;
                         }
                         memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
                         rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -836,7 +838,7 @@
                     } else {
                         addr = [self getModRMAddress:mrm opSize:8];
                         if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                            return 13;
+                            return INT_GPF;
                         }
                         memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
                         rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -859,7 +861,7 @@
                     } else {
                         addr = [self getModRMAddress:mrm opSize:32];
                         if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                            return 13;
+                            return INT_GPF;
                         }
                         memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
                     }
@@ -909,7 +911,7 @@
                     } else {
                         addr = [self getModRMAddress:mrm opSize:8];
                         if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                            return 13;
+                            return INT_GPF;
                         }
                         memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
                         rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -932,7 +934,7 @@
                     } else {
                         addr = [self getModRMAddress:mrm opSize:32];
                         if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                            return 13;
+                            return INT_GPF;
                         }
                         memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
                         rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -955,7 +957,7 @@
                     } else {
                         addr = [self getModRMAddress:mrm opSize:8];
                         if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                            return 13;
+                            return INT_GPF;
                         }
                         memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
                         rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -978,7 +980,7 @@
                     } else {
                         addr = [self getModRMAddress:mrm opSize:32];
                         if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                            return 13;
+                            return INT_GPF;
                         }
                         memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
                         rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -1024,11 +1026,11 @@
                 case 0x28:
                     // MOVAPS    xmm    xmm/m128
                     self->state.eip = saved_ip;
-                    return 6;
+                    return INT_UNDEFINED;
                     break;
                 case 0x29:
                     self->state.eip = saved_ip;
-                    return 6;
+                    return INT_UNDEFINED;
                     break;
                 case 0x31:
                     /*
@@ -1048,7 +1050,7 @@
                     } else {
                         addr = [self getModRMAddress:mrm opSize:32];
                         if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                            return 13;
+                            return INT_GPF;
                         }
                         memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
                         rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -1069,7 +1071,7 @@
                     } else {
                         addr = [self getModRMAddress:mrm opSize:32];
                         if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                            return 13;
+                            return INT_GPF;
                         }
                         memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
                         rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -1092,7 +1094,7 @@
                     } else {
                         addr = [self getModRMAddress:mrm opSize:32];
                         if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                            return 13;
+                            return INT_GPF;
                         }
                         memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
                         rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -1115,7 +1117,7 @@
                     } else {
                         addr = [self getModRMAddress:mrm opSize:32];
                         if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                            return 13;
+                            return INT_GPF;
                         }
                         memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
                         rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -1137,7 +1139,7 @@
                     } else {
                         addr = [self getModRMAddress:mrm opSize:32];
                         if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                            return 13;
+                            return INT_GPF;
                         }
                         memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
                         rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -1159,7 +1161,7 @@
                     } else {
                         addr = [self getModRMAddress:mrm opSize:32];
                         if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                            return 13;
+                            return INT_GPF;
                         }
                         memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
                         rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -1181,7 +1183,7 @@
                     } else {
                         addr = [self getModRMAddress:mrm opSize:32];
                         if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                            return 13;
+                            return INT_GPF;
                         }
                         memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
                         rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -1203,7 +1205,7 @@
                     } else {
                         addr = [self getModRMAddress:mrm opSize:32];
                         if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                            return 13;
+                            return INT_GPF;
                         }
                         memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
                         rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -1224,7 +1226,7 @@
                     } else {
                         addr = [self getModRMAddress:mrm opSize:32];
                         if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                            return 13;
+                            return INT_GPF;
                         }
                         memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
                         rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -1245,7 +1247,7 @@
                     } else {
                         addr = [self getModRMAddress:mrm opSize:32];
                         if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                            return 13;
+                            return INT_GPF;
                         }
                         memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
                         rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -1267,7 +1269,7 @@
                     } else {
                         addr = [self getModRMAddress:mrm opSize:32];
                         if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                            return 13;
+                            return INT_GPF;
                         }
                         memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
                         rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -1289,7 +1291,7 @@
                     } else {
                         addr = [self getModRMAddress:mrm opSize:32];
                         if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                            return 13;
+                            return INT_GPF;
                         }
                         memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
                         rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -1311,7 +1313,7 @@
                     } else {
                         addr = [self getModRMAddress:mrm opSize:32];
                         if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                            return 13;
+                            return INT_GPF;
                         }
                         memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
                         rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -1333,7 +1335,7 @@
                     } else {
                         addr = [self getModRMAddress:mrm opSize:32];
                         if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                            return 13;
+                            return INT_GPF;
                         }
                         memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
                         rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -1355,7 +1357,7 @@
                     } else {
                         addr = [self getModRMAddress:mrm opSize:32];
                         if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                            return 13;
+                            return INT_GPF;
                         }
                         memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
                         rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -1377,7 +1379,7 @@
                     } else {
                         addr = [self getModRMAddress:mrm opSize:32];
                         if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                            return 13;
+                            return INT_GPF;
                         }
                         memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
                         rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -1404,7 +1406,7 @@
                 case 0x6f:
                     // MOVDQA    xmm    xmm/m128            sse2                        Move Aligned Double Quadword
                     self->state.eip = saved_ip;
-                    return 6;
+                    return INT_UNDEFINED;
                     break;
                 case 0x73:
                     // PSRLQ    mm    imm8            mmx                        Shift Packed Data Right Logical
@@ -1416,7 +1418,7 @@
                     } else {
                         addr = [self getModRMAddress:mrm opSize:32];
                         if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                            return 13;
+                            return INT_GPF;
                         }
                         memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
                         rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -1426,7 +1428,7 @@
                             
                         default:
                             self->state.eip = saved_ip;
-                            return 6;
+                            return INT_UNDEFINED;
                             break;
                     }
                     break;
@@ -1437,12 +1439,12 @@
                 case 0x7e:
                     // MOVD    r/m32    mm            mmx                        Move Doubleword
                     self->state.eip = saved_ip;
-                    return 6;
+                    return INT_UNDEFINED;
                     break;
                 case 0x7f:
                     // MOVQ    mm/m64    mm            mmx                        Move Quadword
                     self->state.eip = saved_ip;
-                    return 6;
+                    return INT_UNDEFINED;
                     break;
                 case 0x80:
                     // JO    rel16/32                    o.......                    Jump near if overflow (OF=1)
@@ -1596,7 +1598,7 @@
                     } else {
                         addr = [self getModRMAddress:mrm opSize:8];
                         if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                            return 13;
+                            return INT_GPF;
                         }
                         memcpy(&rmReadValue, rmReadPtr, sizeof(uint8_t));
                         rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -1614,7 +1616,7 @@
                     } else {
                         addr = [self getModRMAddress:mrm opSize:8];
                         if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                            return 13;
+                            return INT_GPF;
                         }
                         memcpy(&rmReadValue, rmReadPtr, sizeof(uint8_t));
                         rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -1634,7 +1636,7 @@
                     } else {
                         addr = [self getModRMAddress:mrm opSize:8];
                         if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                            return 13;
+                            return INT_GPF;
                         }
                         memcpy(&rmReadValue, rmReadPtr, sizeof(uint8_t));
                         rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -1654,7 +1656,7 @@
                     } else {
                         addr = [self getModRMAddress:mrm opSize:8];
                         if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                            return 13;
+                            return INT_GPF;
                         }
                         memcpy(&rmReadValue, rmReadPtr, sizeof(uint8_t));
                         rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -1673,7 +1675,7 @@
                     } else {
                         addr = [self getModRMAddress:mrm opSize:8];
                         if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                            return 13;
+                            return INT_GPF;
                         }
                         memcpy(&rmReadValue, rmReadPtr, sizeof(uint8_t));
                         rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -1692,7 +1694,7 @@
                     } else {
                         addr = [self getModRMAddress:mrm opSize:8];
                         if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                            return 13;
+                            return INT_GPF;
                         }
                         memcpy(&rmReadValue, rmReadPtr, sizeof(uint8_t));
                         rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -1711,7 +1713,7 @@
                     } else {
                         addr = [self getModRMAddress:mrm opSize:8];
                         if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                            return 13;
+                            return INT_GPF;
                         }
                         memcpy(&rmReadValue, rmReadPtr, sizeof(uint8_t));
                         rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -1730,7 +1732,7 @@
                     } else {
                         addr = [self getModRMAddress:mrm opSize:8];
                         if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                            return 13;
+                            return INT_GPF;
                         }
                         memcpy(&rmReadValue, rmReadPtr, sizeof(uint8_t));
                         rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -1748,7 +1750,7 @@
                     } else {
                         addr = [self getModRMAddress:mrm opSize:8];
                         if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                            return 13;
+                            return INT_GPF;
                         }
                         memcpy(&rmReadValue, rmReadPtr, sizeof(uint8_t));
                         rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -1766,7 +1768,7 @@
                     } else {
                         addr = [self getModRMAddress:mrm opSize:8];
                         if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                            return 13;
+                            return INT_GPF;
                         }
                         memcpy(&rmReadValue, rmReadPtr, sizeof(uint8_t));
                         rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -1785,7 +1787,7 @@
                     } else {
                         addr = [self getModRMAddress:mrm opSize:8];
                         if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                            return 13;
+                            return INT_GPF;
                         }
                         memcpy(&rmReadValue, rmReadPtr, sizeof(uint8_t));
                         rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -1804,7 +1806,7 @@
                     } else {
                         addr = [self getModRMAddress:mrm opSize:8];
                         if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                            return 13;
+                            return INT_GPF;
                         }
                         memcpy(&rmReadValue, rmReadPtr, sizeof(uint8_t));
                         rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -1823,7 +1825,7 @@
                     } else {
                         addr = [self getModRMAddress:mrm opSize:8];
                         if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                            return 13;
+                            return INT_GPF;
                         }
                         memcpy(&rmReadValue, rmReadPtr, sizeof(uint8_t));
                         rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -1842,7 +1844,7 @@
                     } else {
                         addr = [self getModRMAddress:mrm opSize:8];
                         if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                            return 13;
+                            return INT_GPF;
                         }
                         memcpy(&rmReadValue, rmReadPtr, sizeof(uint8_t));
                         rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -1861,7 +1863,7 @@
                     } else {
                         addr = [self getModRMAddress:mrm opSize:8];
                         if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                            return 13;
+                            return INT_GPF;
                         }
                         memcpy(&rmReadValue, rmReadPtr, sizeof(uint8_t));
                         rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -1880,7 +1882,7 @@
                     } else {
                         addr = [self getModRMAddress:mrm opSize:8];
                         if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                            return 13;
+                            return INT_GPF;
                         }
                         memcpy(&rmReadValue, rmReadPtr, sizeof(uint8_t));
                         rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -1903,7 +1905,7 @@
                         addr = [self getModRMAddress:mrm opSize:32];
                         // The register contains a byte offset added to the address
                         if (!(rmReadPtr = [self.task.mem getPointer:(addr + ([self getRegisterValue:mrm.reg opSize:32] / 8)) type:MEM_READ])) {
-                            return 13;
+                            return INT_GPF;
                         }
                         memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
                     }
@@ -1922,7 +1924,7 @@
                     } else {
                         addr = [self getModRMAddress:mrm opSize:32];
                         if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                            return 13;
+                            return INT_GPF;
                         }
                         memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
                         rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -1950,7 +1952,7 @@
                     } else {
                         addr = [self getModRMAddress:mrm opSize:32];
                         if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                            return 13;
+                            return INT_GPF;
                         }
                         memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
                         rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -1976,7 +1978,7 @@
                         addr = [self getModRMAddress:mrm opSize:32];
                         // The register contains a byte offset added to the address
                         if (!(rmReadPtr = [self.task.mem getPointer:(addr + ([self getRegisterValue:mrm.reg opSize:32] / 8)) type:MEM_READ])) {
-                            return 13;
+                            return INT_GPF;
                         }
                         memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
                         rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -1997,7 +1999,7 @@
                     } else {
                         addr = [self getModRMAddress:mrm opSize:32];
                         if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                            return 13;
+                            return INT_GPF;
                         }
                         memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
                         rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -2025,7 +2027,7 @@
                     } else {
                         addr = [self getModRMAddress:mrm opSize:32];
                         if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                            return 13;
+                            return INT_GPF;
                         }
                         memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
                         rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -2050,7 +2052,7 @@
                     } else {
                         addr = [self getModRMAddress:mrm opSize:32];
                         if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                            return 13;
+                            return INT_GPF;
                         }
                         memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
                         rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -2072,7 +2074,7 @@
                     } else {
                         addr = [self getModRMAddress:mrm opSize:8];
                         if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                            return 13;
+                            return INT_GPF;
                         }
                         memcpy(&rmReadValue, rmReadPtr, sizeof(uint8_t));
                         rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -2099,7 +2101,7 @@
                     } else {
                         addr = [self getModRMAddress:mrm opSize:32];
                         if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                            return 13;
+                            return INT_GPF;
                         }
                         memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
                         rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -2127,7 +2129,7 @@
                         addr = [self getModRMAddress:mrm opSize:32];
                         // The register contains a byte offset added to the address
                         if (!(rmReadPtr = [self.task.mem getPointer:(addr + ([self getRegisterValue:mrm.reg opSize:32] / 8)) type:MEM_READ])) {
-                            return 13;
+                            return INT_GPF;
                         }
                         memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
                         rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -2148,7 +2150,7 @@
                     } else {
                         addr = [self getModRMAddress:mrm opSize:8];
                         if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                            return 13;
+                            return INT_GPF;
                         }
                         memcpy(&rmReadValue, rmReadPtr, sizeof(uint8_t));
                     }
@@ -2167,7 +2169,7 @@
                     } else {
                         addr = [self getModRMAddress:mrm opSize:16];
                         if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                            return 13;
+                            return INT_GPF;
                         }
                         memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                     }
@@ -2191,7 +2193,7 @@
                         addr = [self getModRMAddress:mrm opSize:32];
                         // The register contains a byte offset added to the address
                         if (!(rmReadPtr = [self.task.mem getPointer:(addr + (imm8 / 8)) type:MEM_READ])) {
-                            return 13;
+                            return INT_GPF;
                         }
                         memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
                         rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -2215,7 +2217,7 @@
                             break;
                         default:
                             self->state.eip = saved_ip;
-                            return 6;
+                            return INT_UNDEFINED;
                             break;
                     }
                     
@@ -2232,7 +2234,7 @@
                         addr = [self getModRMAddress:mrm opSize:32];
                         // The register contains a byte offset added to the address
                         if (!(rmReadPtr = [self.task.mem getPointer:(addr + ([self getRegisterValue:mrm.reg opSize:32] / 8)) type:MEM_READ])) {
-                            return 13;
+                            return INT_GPF;
                         }
                         memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
                         rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -2253,7 +2255,7 @@
                         addr = [self getModRMAddress:mrm opSize:32];
                         // The register contains a byte offset added to the address
                         if (!(rmReadPtr = [self.task.mem getPointer:(addr + ([self getRegisterValue:mrm.reg opSize:32] / 8)) type:MEM_READ])) {
-                            return 13;
+                            return INT_GPF;
                         }
                         memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
                         rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -2279,7 +2281,7 @@
                         addr = [self getModRMAddress:mrm opSize:32];
                         // The register contains a byte offset added to the address
                         if (!(rmReadPtr = [self.task.mem getPointer:(addr + ([self getRegisterValue:mrm.reg opSize:32] / 8)) type:MEM_READ])) {
-                            return 13;
+                            return INT_GPF;
                         }
                         memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
                         rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -2304,7 +2306,7 @@
                     } else {
                         addr = [self getModRMAddress:mrm opSize:8];
                         if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                            return 13;
+                            return INT_GPF;
                         }
                         memcpy(&rmReadValue, rmReadPtr, sizeof(uint8_t));
                         rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -2324,7 +2326,7 @@
                     } else {
                         addr = [self getModRMAddress:mrm opSize:16];
                         if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                            return 13;
+                            return INT_GPF;
                         }
                         memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                         rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -2344,7 +2346,7 @@
                     } else {
                         addr = [self getModRMAddress:mrm opSize:8];
                         if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                            return 13;
+                            return INT_GPF;
                         }
                         memcpy(&rmReadValue, rmReadPtr, sizeof(uint8_t));
                         rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -2370,7 +2372,7 @@
                     } else {
                         addr = [self getModRMAddress:mrm opSize:32];
                         if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                            return 13;
+                            return INT_GPF;
                         }
                         memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
                         rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -2435,7 +2437,7 @@
                     } else {
                         addr = [self getModRMAddress:mrm opSize:8];
                         if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                            return 13;
+                            return INT_GPF;
                         }
                         memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
                         rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -2460,7 +2462,7 @@
                     } else {
                         addr = [self getModRMAddress:mrm opSize:32];
                         if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                            return 13;
+                            return INT_GPF;
                         }
                         memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
                         rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -2485,7 +2487,7 @@
                     } else {
                         addr = [self getModRMAddress:mrm opSize:8];
                         if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                            return 13;
+                            return INT_GPF;
                         }
                         memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
                         rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -2510,7 +2512,7 @@
                     } else {
                         addr = [self getModRMAddress:mrm opSize:32];
                         if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                            return 13;
+                            return INT_GPF;
                         }
                         memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
                         rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -2570,7 +2572,7 @@
                     } else {
                         addr = [self getModRMAddress:mrm opSize:8];
                         if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                            return 13;
+                            return INT_GPF;
                         }
                         memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
                         rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -2595,7 +2597,7 @@
                     } else {
                         addr = [self getModRMAddress:mrm opSize:32];
                         if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                            return 13;
+                            return INT_GPF;
                         }
                         memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
                         rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -2620,7 +2622,7 @@
                     } else {
                         addr = [self getModRMAddress:mrm opSize:8];
                         if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                            return 13;
+                            return INT_GPF;
                         }
                         memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
                         rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -2645,7 +2647,7 @@
                     } else {
                         addr = [self getModRMAddress:mrm opSize:32];
                         if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                            return 13;
+                            return INT_GPF;
                         }
                         memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
                         rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -2702,7 +2704,7 @@
                     } else {
                         addr = [self getModRMAddress:mrm opSize:8];
                         if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                            return 13;
+                            return INT_GPF;
                         }
                         memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
                         rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -2725,7 +2727,7 @@
                     } else {
                         addr = [self getModRMAddress:mrm opSize:32];
                         if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                            return 13;
+                            return INT_GPF;
                         }
                         memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
                         rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -2748,7 +2750,7 @@
                     } else {
                         addr = [self getModRMAddress:mrm opSize:8];
                         if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                            return 13;
+                            return INT_GPF;
                         }
                         memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
                         rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -2769,7 +2771,7 @@
                     } else {
                         addr = [self getModRMAddress:mrm opSize:32];
                         if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                            return 13;
+                            return INT_GPF;
                         }
                         memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
                         rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -2824,7 +2826,7 @@
                     } else {
                         addr = [self getModRMAddress:mrm opSize:8];
                         if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                            return 13;
+                            return INT_GPF;
                         }
                         memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
                         rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -2847,7 +2849,7 @@
                     } else {
                         addr = [self getModRMAddress:mrm opSize:32];
                         if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                            return 13;
+                            return INT_GPF;
                         }
                         memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
                         rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -2870,7 +2872,7 @@
                     } else {
                         addr = [self getModRMAddress:mrm opSize:8];
                         if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                            return 13;
+                            return INT_GPF;
                         }
                         memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
                         rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -2893,7 +2895,7 @@
                     } else {
                         addr = [self getModRMAddress:mrm opSize:32];
                         if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                            return 13;
+                            return INT_GPF;
                         }
                         memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
                     }
@@ -2944,7 +2946,7 @@
             } else {
                 addr = [self getModRMAddress:mrm opSize:8];
                 if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                    return 13;
+                    return INT_GPF;
                 }
                 memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
                 rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -2967,7 +2969,7 @@
             } else {
                 addr = [self getModRMAddress:mrm opSize:32];
                 if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                    return 13;
+                    return INT_GPF;
                 }
                 memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
                 rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -2990,7 +2992,7 @@
             } else {
                 addr = [self getModRMAddress:mrm opSize:8];
                 if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                    return 13;
+                    return INT_GPF;
                 }
                 memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
             }
@@ -3012,7 +3014,7 @@
             } else {
                 addr = [self getModRMAddress:mrm opSize:32];
                 if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                    return 13;
+                    return INT_GPF;
                 }
                 memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
             }
@@ -3067,7 +3069,7 @@
             } else {
                 addr = [self getModRMAddress:mrm opSize:8];
                 if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                    return 13;
+                    return INT_GPF;
                 }
                 memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
                 rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -3093,7 +3095,7 @@
             } else {
                 addr = [self getModRMAddress:mrm opSize:32];
                 if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                    return 13;
+                    return INT_GPF;
                 }
                 memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
                 rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -3118,7 +3120,7 @@
             } else {
                 addr = [self getModRMAddress:mrm opSize:8];
                 if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                    return 13;
+                    return INT_GPF;
                 }
                 memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
                 rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -3144,7 +3146,7 @@
             } else {
                 addr = [self getModRMAddress:mrm opSize:32];
                 if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                    return 13;
+                    return INT_GPF;
                 }
                 memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
                 rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -3327,7 +3329,7 @@
             mrm = [self decodeModRMByte:modRMByte];
             if (mrm.reg != reg_ebp) {
                 self->state.eip = saved_ip;
-                return 6;
+                return INT_UNDEFINED;
             }
             regPtr = [self getRegPointer:mrm.reg opSize:32];
             if (mrm.type == modrm_register) {
@@ -3337,7 +3339,7 @@
             } else {
                 addr = [self getModRMAddress:mrm opSize:32];
                 if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                    return 13;
+                    return INT_GPF;
                 }
                 memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
                 rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -3362,7 +3364,7 @@
             mrm = [self decodeModRMByte:modRMByte];
             if (mrm.reg != reg_ebp) {
                 self->state.eip = saved_ip;
-                return 6;
+                return INT_UNDEFINED;
             }
             regPtr = [self getRegPointer:mrm.reg opSize:32];
             if (mrm.type == modrm_register) {
@@ -3372,7 +3374,7 @@
             } else {
                 addr = [self getModRMAddress:mrm opSize:32];
                 if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                    return 13;
+                    return INT_GPF;
                 }
                 memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
                 rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -3656,7 +3658,7 @@
             } else {
                 addr = [self getModRMAddress:mrm opSize:8];
                 if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                    return 13;
+                    return INT_GPF;
                 }
                 memcpy(&rmReadValue, rmReadPtr, sizeof(uint8_t));
                 rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -3678,7 +3680,7 @@
             } else {
                 addr = [self getModRMAddress:mrm opSize:32];
                 if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                    return 13;
+                    return INT_GPF;
                 }
                 memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
                 rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -3700,7 +3702,7 @@
             } else {
                 addr = [self getModRMAddress:mrm opSize:8];
                 if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                    return 13;
+                    return INT_GPF;
                 }
                 memcpy(&rmReadValue, rmReadPtr, sizeof(uint8_t));
                 rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -3721,7 +3723,7 @@
             } else {
                 addr = [self getModRMAddress:mrm opSize:32];
                 if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                    return 13;
+                    return INT_GPF;
                 }
                 memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
                 rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -3772,7 +3774,7 @@
                 addr = [self getModRMAddress:mrm opSize:8];
                 /*
                 if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                    return 13;
+                    return INT_GPF;
                 }
                 memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
                 */
@@ -3796,7 +3798,7 @@
                 rmReadValue = [self.task userReadFourBytes:addr];
                 /*
                 if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                    return 13;
+                    return INT_GPF;
                 }
                 memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
                 */
@@ -3811,7 +3813,7 @@
             mrm = [self decodeModRMByte:modRMByte];
             if (mrm.reg != reg_ebp) {
                 self->state.eip = saved_ip;
-                return 6;
+                return INT_UNDEFINED;
             }
             regPtr = [self getRegPointer:mrm.reg opSize:32];
             if (mrm.type == modrm_register) {
@@ -3821,7 +3823,7 @@
             } else {
                 addr = [self getModRMAddress:mrm opSize:32];
                 if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                    return 13;
+                    return INT_GPF;
                 }
                 memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
                 rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -3838,7 +3840,7 @@
             regPtr = [self getRegPointer:mrm.reg opSize:32];
             if (mrm.type == modrm_register) {
                 self->state.eip = saved_ip;
-                return 6;
+                return INT_UNDEFINED;
             }
 
             addr = [self getModRMAddress:mrm opSize:32];
@@ -3852,7 +3854,7 @@
             mrm = [self decodeModRMByte:modRMByte];
             if (mrm.reg != reg_ebp) {
                 self->state.eip = saved_ip;
-                return 6;
+                return INT_UNDEFINED;
             }
             regPtr = [self getRegPointer:mrm.reg opSize:32];
             if (mrm.type == modrm_register) {
@@ -3862,7 +3864,7 @@
             } else {
                 addr = [self getModRMAddress:mrm opSize:32];
                 if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                    return 13;
+                    return INT_GPF;
                 }
                 memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
             }
@@ -3878,7 +3880,7 @@
             mrm = [self decodeModRMByte:modRMByte];
             if (mrm.reg != reg_ebp) {
                 self->state.eip = saved_ip;
-                return 6;
+                return INT_UNDEFINED;
             }
             regPtr = [self getRegPointer:mrm.reg opSize:32];
             if (mrm.type == modrm_register) {
@@ -3888,7 +3890,7 @@
             } else {
                 addr = [self getModRMAddress:mrm opSize:32];
                 if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                    return 13;
+                    return INT_GPF;
                 }
                 memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
                 rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -4056,7 +4058,7 @@
             } else {
                 addr = [self getModRMAddress:mrm opSize:8];
                 if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                    return 13;
+                    return INT_GPF;
                 }
                 memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
                 rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -4089,7 +4091,7 @@
             } else {
                 addr = [self getModRMAddress:mrm opSize:32];
                 if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                    return 13;
+                    return INT_GPF;
                 }
                 memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
                 rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -4144,7 +4146,7 @@
             } else {
                 addr = [self getModRMAddress:mrm opSize:8];
                 if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                    return 13;
+                    return INT_GPF;
                 }
                 memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
                 rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -4217,7 +4219,7 @@
             } else {
                 addr = [self getModRMAddress:mrm opSize:32];
                 if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                    return 13;
+                    return INT_GPF;
                 }
                 memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
                 rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -4347,7 +4349,7 @@
             } else {
                 addr = [self getModRMAddress:mrm opSize:8];
                 if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                    return 13;
+                    return INT_GPF;
                 }
                 memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
                 rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -4430,7 +4432,7 @@
             } else {
                 addr = [self getModRMAddress:mrm opSize:32];
                 if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                    return 13;
+                    return INT_GPF;
                 }
                 memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
                 rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -4514,7 +4516,7 @@
             } else {
                 addr = [self getModRMAddress:mrm opSize:8];
                 if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                    return 13;
+                    return INT_GPF;
                 }
                 memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
                 rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -4585,7 +4587,7 @@
             } else {
                 addr = [self getModRMAddress:mrm opSize:32];
                 if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                    return 13;
+                    return INT_GPF;
                 }
                 memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
                 rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -4669,7 +4671,7 @@
             } else {
                 addr = [self getModRMAddress:mrm opSize:32];
                 if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                    return 13;
+                    return INT_GPF;
                 }
                 memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
                 rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -4763,7 +4765,7 @@
             } else {
                 addr = [self getModRMAddress:mrm opSize:32];
                 if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                    return 13;
+                    return INT_GPF;
                 }
                 memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
                 rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -4839,7 +4841,7 @@
             } else {
                 addr = [self getModRMAddress:mrm opSize:32];
                 if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                    return 13;
+                    return INT_GPF;
                 }
                 memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
                 rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -4856,11 +4858,11 @@
                     break;
                 case 0x2:
                     self->state.eip = saved_ip;
-                    return 6;
+                    return INT_UNDEFINED;
                     break;
                 case 0x3:
                     self->state.eip = saved_ip;
-                    return 6;
+                    return INT_UNDEFINED;
                     self->state.top += 1;
                     break;
                 case 0x4:
@@ -4895,7 +4897,7 @@
             } else {
                 addr = [self getModRMAddress:mrm opSize:32];
                 if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                    return 13;
+                    return INT_GPF;
                 }
                 memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
                 rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -4963,7 +4965,7 @@
             } else {
                 addr = [self getModRMAddress:mrm opSize:32];
                 if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                    return 13;
+                    return INT_GPF;
                 }
                 memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
                 rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -5059,7 +5061,7 @@
             } else {
                 addr = [self getModRMAddress:mrm opSize:32];
                 if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                    return 13;
+                    return INT_GPF;
                 }
                 memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
                 rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -5144,7 +5146,7 @@
             } else {
                 addr = [self getModRMAddress:mrm opSize:32];
                 if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                    return 13;
+                    return INT_GPF;
                 }
                 memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
                 rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -5175,7 +5177,7 @@
                         die("Could happen, just remove this if block for only the else block");
                     } else {
                         self->state.eip = saved_ip;
-                        return 6;
+                        return INT_UNDEFINED;
                     }
                     self->state.top += 1;
                     break;
@@ -5184,7 +5186,7 @@
                         die("Could happen, just remove this if block for only the else block");
                     } else {
                         self->state.eip = saved_ip;
-                        return 6;
+                        return INT_UNDEFINED;
                     }
                     self->state.top += 1;
                     break;
@@ -5244,7 +5246,7 @@
             } else {
                 addr = [self getModRMAddress:mrm opSize:32];
                 if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                    return 13;
+                    return INT_GPF;
                 }
                 memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
                 rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -5391,7 +5393,7 @@
             } else {
                 addr = [self getModRMAddress:mrm opSize:8];
                 if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                    return 13;
+                    return INT_GPF;
                 }
                 memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
                 rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -5437,7 +5439,7 @@
                     __debugbreak();
 
                     // TODO: Was implemented as:
-                    // uint64_t tmp = ((uint8_t)cpu->eax) * (uint64_t)(modrm.type == modrm_reg ? (*(uint8_t *)(((char *)cpu) + (modrm_base).reg8_id)) : ({ uint8_t val; if (!tlb_read(tlb, addr, &val, 8/8)) { cpu->eip = saved_ip; cpu->segfault_addr = addr; return 13; } val; }));
+                    // uint64_t tmp = ((uint8_t)cpu->eax) * (uint64_t)(modrm.type == modrm_reg ? (*(uint8_t *)(((char *)cpu) + (modrm_base).reg8_id)) : ({ uint8_t val; if (!tlb_read(tlb, addr, &val, 8/8)) { cpu->eip = saved_ip; cpu->segfault_addr = addr; return INT_GPF; } val; }));
                     // *(uint8_t *)&cpu->eax = tmp;
                     // *(uint8_t *)&cpu->edx = tmp >> 8;
 
@@ -5471,7 +5473,7 @@
                         // Divide by 0
                         if (divisor8 == 0) {
                             //break;
-                            return 0;
+                            return INT_DIV;
                         }
 
                         FFLog(@"\n\n\n  Check this op! \n\n\n");
@@ -5492,7 +5494,7 @@
                         // Divide by 0
                         if (divisor8 == 0) {
                             //break;
-                            return 0;
+                            return INT_DIV;
                         }
 
                         FFLog(@"\n\n\n  Check this op! \n\n\n");
@@ -5521,7 +5523,7 @@
             } else {
                 addr = [self getModRMAddress:mrm opSize:32];
                 if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                    return 13;
+                    return INT_GPF;
                 }
                 memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
                 rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -5594,7 +5596,7 @@
                         // Divide by 0
                         if (divisor32 == 0) {
                             //break;
-                            return 0;
+                            return INT_DIV;
                         }
 
                         
@@ -5614,7 +5616,7 @@
                         // Divide by 0
                         if (divisor32 == 0) {
                             //break;
-                            return 0;
+                            return INT_DIV;
                         }
 
                         FFLog(@"\n\n\n  Check this op! \n\n\n");
@@ -5652,7 +5654,7 @@
             } else {
                 addr = [self getModRMAddress:mrm opSize:8];
                 if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                    return 13;
+                    return INT_GPF;
                 }
                 memcpy(&rmReadValue, rmReadPtr, sizeof(uint8_t));
                 rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -5694,7 +5696,7 @@
             } else {
                 addr = [self getModRMAddress:mrm opSize:32];
                 if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                    return 13;
+                    return INT_GPF;
                 }
                 memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
                 rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -5731,7 +5733,7 @@
                 case 0x3:
                     // CALLF    r/m16/32
                     self->state.eip = saved_ip;
-                    return 6;
+                    return INT_UNDEFINED;
                     break;
                 case 0x4:
                     // JMP    r/m16/32
@@ -5740,7 +5742,7 @@
                 case 0x5:
                     // JMPF    r/m16/32
                     self->state.eip = saved_ip;
-                    return 6;
+                    return INT_UNDEFINED;
                     break;
                 case 0x6:
                     // PUSH    r/m16/32
@@ -5881,7 +5883,7 @@
                     } else {
                         addr = [self getModRMAddress:mrm opSize:8];
                         if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                            return 13;
+                            return INT_GPF;
                         }
                         memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                         rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -5904,7 +5906,7 @@
                     } else {
                         addr = [self getModRMAddress:mrm opSize:16];
                         if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                            return 13;
+                            return INT_GPF;
                         }
                         memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                         rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -5928,7 +5930,7 @@
                     } else {
                         addr = [self getModRMAddress:mrm opSize:8];
                         if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                            return 13;
+                            return INT_GPF;
                         }
                         memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                         rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -5951,7 +5953,7 @@
                     } else {
                         addr = [self getModRMAddress:mrm opSize:16];
                         if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                            return 13;
+                            return INT_GPF;
                         }
                         memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                     }
@@ -6001,7 +6003,7 @@
                     } else {
                         addr = [self getModRMAddress:mrm opSize:8];
                         if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                            return 13;
+                            return INT_GPF;
                         }
                         memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                         rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -6024,7 +6026,7 @@
                     } else {
                         addr = [self getModRMAddress:mrm opSize:16];
                         if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                            return 13;
+                            return INT_GPF;
                         }
                         memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                         rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -6047,7 +6049,7 @@
                     } else {
                         addr = [self getModRMAddress:mrm opSize:8];
                         if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                            return 13;
+                            return INT_GPF;
                         }
                         memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                         rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -6070,7 +6072,7 @@
                     } else {
                         addr = [self getModRMAddress:mrm opSize:16];
                         if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                            return 13;
+                            return INT_GPF;
                         }
                         memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                         rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -6116,11 +6118,11 @@
                 case 0x28:
                     // MOVAPS    xmm    xmm/m128
                     self->state.eip = saved_ip;
-                    return 6;
+                    return INT_UNDEFINED;
                     break;
                 case 0x29:
                     self->state.eip = saved_ip;
-                    return 6;
+                    return INT_UNDEFINED;
                     break;
                 case 0x31:
                     /*
@@ -6140,7 +6142,7 @@
                     } else {
                         addr = [self getModRMAddress:mrm opSize:16];
                         if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                            return 13;
+                            return INT_GPF;
                         }
                         memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                         rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -6161,7 +6163,7 @@
                     } else {
                         addr = [self getModRMAddress:mrm opSize:16];
                         if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                            return 13;
+                            return INT_GPF;
                         }
                         memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                         rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -6184,7 +6186,7 @@
                     } else {
                         addr = [self getModRMAddress:mrm opSize:16];
                         if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                            return 13;
+                            return INT_GPF;
                         }
                         memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                         rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -6207,7 +6209,7 @@
                     } else {
                         addr = [self getModRMAddress:mrm opSize:16];
                         if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                            return 13;
+                            return INT_GPF;
                         }
                         memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                         rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -6229,7 +6231,7 @@
                     } else {
                         addr = [self getModRMAddress:mrm opSize:16];
                         if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                            return 13;
+                            return INT_GPF;
                         }
                         memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                         rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -6251,7 +6253,7 @@
                     } else {
                         addr = [self getModRMAddress:mrm opSize:16];
                         if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                            return 13;
+                            return INT_GPF;
                         }
                         memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                         rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -6273,7 +6275,7 @@
                     } else {
                         addr = [self getModRMAddress:mrm opSize:16];
                         if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                            return 13;
+                            return INT_GPF;
                         }
                         memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                         rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -6295,7 +6297,7 @@
                     } else {
                         addr = [self getModRMAddress:mrm opSize:16];
                         if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                            return 13;
+                            return INT_GPF;
                         }
                         memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                         rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -6316,7 +6318,7 @@
                     } else {
                         addr = [self getModRMAddress:mrm opSize:16];
                         if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                            return 13;
+                            return INT_GPF;
                         }
                         memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                         rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -6337,7 +6339,7 @@
                     } else {
                         addr = [self getModRMAddress:mrm opSize:16];
                         if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                            return 13;
+                            return INT_GPF;
                         }
                         memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                         rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -6359,7 +6361,7 @@
                     } else {
                         addr = [self getModRMAddress:mrm opSize:16];
                         if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                            return 13;
+                            return INT_GPF;
                         }
                         memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                         rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -6381,7 +6383,7 @@
                     } else {
                         addr = [self getModRMAddress:mrm opSize:16];
                         if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                            return 13;
+                            return INT_GPF;
                         }
                         memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                         rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -6403,7 +6405,7 @@
                     } else {
                         addr = [self getModRMAddress:mrm opSize:16];
                         if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                            return 13;
+                            return INT_GPF;
                         }
                         memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                         rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -6425,7 +6427,7 @@
                     } else {
                         addr = [self getModRMAddress:mrm opSize:16];
                         if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                            return 13;
+                            return INT_GPF;
                         }
                         memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                         rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -6447,7 +6449,7 @@
                     } else {
                         addr = [self getModRMAddress:mrm opSize:16];
                         if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                            return 13;
+                            return INT_GPF;
                         }
                         memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                         rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -6469,7 +6471,7 @@
                     } else {
                         addr = [self getModRMAddress:mrm opSize:16];
                         if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                            return 13;
+                            return INT_GPF;
                         }
                         memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                         rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -6496,7 +6498,7 @@
                 case 0x6f:
                     // MOVDQA    xmm    xmm/m128            sse2                        Move Aligned Double Quadword
                     self->state.eip = saved_ip;
-                    return 6;
+                    return INT_UNDEFINED;
                     break;
                 case 0x73:
                     // PSRLQ    mm    imm8            mmx                        Shift Packed Data Right Logical
@@ -6508,7 +6510,7 @@
                     } else {
                         addr = [self getModRMAddress:mrm opSize:16];
                         if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                            return 13;
+                            return INT_GPF;
                         }
                         memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                         rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -6518,7 +6520,7 @@
                             
                         default:
                             self->state.eip = saved_ip;
-                            return 6;
+                            return INT_UNDEFINED;
                             break;
                     }
                     break;
@@ -6529,12 +6531,12 @@
                 case 0x7e:
                     // MOVD    r/m32    mm            mmx                        Move Doubleword
                     self->state.eip = saved_ip;
-                    return 6;
+                    return INT_UNDEFINED;
                     break;
                 case 0x7f:
                     // MOVQ    mm/m64    mm            mmx                        Move Quadword
                     self->state.eip = saved_ip;
-                    return 6;
+                    return INT_UNDEFINED;
                     break;
                 case 0x80:
                     // JO    rel16/32                    o.......                    Jump near if overflow (OF=1)
@@ -6688,7 +6690,7 @@
                     } else {
                         addr = [self getModRMAddress:mrm opSize:8];
                         if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                            return 13;
+                            return INT_GPF;
                         }
                         memcpy(&rmReadValue, rmReadPtr, sizeof(uint8_t));
                         rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -6706,7 +6708,7 @@
                     } else {
                         addr = [self getModRMAddress:mrm opSize:8];
                         if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                            return 13;
+                            return INT_GPF;
                         }
                         memcpy(&rmReadValue, rmReadPtr, sizeof(uint8_t));
                         rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -6726,7 +6728,7 @@
                     } else {
                         addr = [self getModRMAddress:mrm opSize:8];
                         if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                            return 13;
+                            return INT_GPF;
                         }
                         memcpy(&rmReadValue, rmReadPtr, sizeof(uint8_t));
                         rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -6746,7 +6748,7 @@
                     } else {
                         addr = [self getModRMAddress:mrm opSize:8];
                         if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                            return 13;
+                            return INT_GPF;
                         }
                         memcpy(&rmReadValue, rmReadPtr, sizeof(uint8_t));
                         rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -6765,7 +6767,7 @@
                     } else {
                         addr = [self getModRMAddress:mrm opSize:8];
                         if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                            return 13;
+                            return INT_GPF;
                         }
                         memcpy(&rmReadValue, rmReadPtr, sizeof(uint8_t));
                         rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -6784,7 +6786,7 @@
                     } else {
                         addr = [self getModRMAddress:mrm opSize:8];
                         if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                            return 13;
+                            return INT_GPF;
                         }
                         memcpy(&rmReadValue, rmReadPtr, sizeof(uint8_t));
                         rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -6803,7 +6805,7 @@
                     } else {
                         addr = [self getModRMAddress:mrm opSize:8];
                         if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                            return 13;
+                            return INT_GPF;
                         }
                         memcpy(&rmReadValue, rmReadPtr, sizeof(uint8_t));
                         rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -6822,7 +6824,7 @@
                     } else {
                         addr = [self getModRMAddress:mrm opSize:8];
                         if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                            return 13;
+                            return INT_GPF;
                         }
                         memcpy(&rmReadValue, rmReadPtr, sizeof(uint8_t));
                         rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -6840,7 +6842,7 @@
                     } else {
                         addr = [self getModRMAddress:mrm opSize:8];
                         if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                            return 13;
+                            return INT_GPF;
                         }
                         memcpy(&rmReadValue, rmReadPtr, sizeof(uint8_t));
                         rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -6858,7 +6860,7 @@
                     } else {
                         addr = [self getModRMAddress:mrm opSize:8];
                         if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                            return 13;
+                            return INT_GPF;
                         }
                         memcpy(&rmReadValue, rmReadPtr, sizeof(uint8_t));
                         rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -6877,7 +6879,7 @@
                     } else {
                         addr = [self getModRMAddress:mrm opSize:8];
                         if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                            return 13;
+                            return INT_GPF;
                         }
                         memcpy(&rmReadValue, rmReadPtr, sizeof(uint8_t));
                         rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -6896,7 +6898,7 @@
                     } else {
                         addr = [self getModRMAddress:mrm opSize:8];
                         if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                            return 13;
+                            return INT_GPF;
                         }
                         memcpy(&rmReadValue, rmReadPtr, sizeof(uint8_t));
                         rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -6915,7 +6917,7 @@
                     } else {
                         addr = [self getModRMAddress:mrm opSize:8];
                         if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                            return 13;
+                            return INT_GPF;
                         }
                         memcpy(&rmReadValue, rmReadPtr, sizeof(uint8_t));
                         rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -6934,7 +6936,7 @@
                     } else {
                         addr = [self getModRMAddress:mrm opSize:8];
                         if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                            return 13;
+                            return INT_GPF;
                         }
                         memcpy(&rmReadValue, rmReadPtr, sizeof(uint8_t));
                         rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -6953,7 +6955,7 @@
                     } else {
                         addr = [self getModRMAddress:mrm opSize:8];
                         if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                            return 13;
+                            return INT_GPF;
                         }
                         memcpy(&rmReadValue, rmReadPtr, sizeof(uint8_t));
                         rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -6972,7 +6974,7 @@
                     } else {
                         addr = [self getModRMAddress:mrm opSize:8];
                         if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                            return 13;
+                            return INT_GPF;
                         }
                         memcpy(&rmReadValue, rmReadPtr, sizeof(uint8_t));
                         rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -6995,7 +6997,7 @@
                         addr = [self getModRMAddress:mrm opSize:16];
                         // The register contains a byte offset added to the address
                         if (!(rmReadPtr = [self.task.mem getPointer:(addr + ([self getRegisterValue:mrm.reg opSize:16] / 8)) type:MEM_READ])) {
-                            return 13;
+                            return INT_GPF;
                         }
                         memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                     }
@@ -7014,7 +7016,7 @@
                     } else {
                         addr = [self getModRMAddress:mrm opSize:16];
                         if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                            return 13;
+                            return INT_GPF;
                         }
                         memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                         rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -7042,7 +7044,7 @@
                     } else {
                         addr = [self getModRMAddress:mrm opSize:16];
                         if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                            return 13;
+                            return INT_GPF;
                         }
                         memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                         rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -7068,7 +7070,7 @@
                         addr = [self getModRMAddress:mrm opSize:16];
                         // The register contains a byte offset added to the address
                         if (!(rmReadPtr = [self.task.mem getPointer:(addr + ([self getRegisterValue:mrm.reg opSize:16] / 8)) type:MEM_READ])) {
-                            return 13;
+                            return INT_GPF;
                         }
                         memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                         rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -7089,7 +7091,7 @@
                     } else {
                         addr = [self getModRMAddress:mrm opSize:16];
                         if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                            return 13;
+                            return INT_GPF;
                         }
                         memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                         rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -7117,7 +7119,7 @@
                     } else {
                         addr = [self getModRMAddress:mrm opSize:16];
                         if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                            return 13;
+                            return INT_GPF;
                         }
                         memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                         rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -7142,7 +7144,7 @@
                     } else {
                         addr = [self getModRMAddress:mrm opSize:16];
                         if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                            return 13;
+                            return INT_GPF;
                         }
                         memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                         rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -7164,7 +7166,7 @@
                     } else {
                         addr = [self getModRMAddress:mrm opSize:8];
                         if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                            return 13;
+                            return INT_GPF;
                         }
                         memcpy(&rmReadValue, rmReadPtr, sizeof(uint8_t));
                         rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -7191,7 +7193,7 @@
                     } else {
                         addr = [self getModRMAddress:mrm opSize:16];
                         if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                            return 13;
+                            return INT_GPF;
                         }
                         memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                         rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -7219,7 +7221,7 @@
                         addr = [self getModRMAddress:mrm opSize:16];
                         // The register contains a byte offset added to the address
                         if (!(rmReadPtr = [self.task.mem getPointer:(addr + ([self getRegisterValue:mrm.reg opSize:16] / 8)) type:MEM_READ])) {
-                            return 13;
+                            return INT_GPF;
                         }
                         memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                         rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -7240,7 +7242,7 @@
                     } else {
                         addr = [self getModRMAddress:mrm opSize:8];
                         if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                            return 13;
+                            return INT_GPF;
                         }
                         memcpy(&rmReadValue, rmReadPtr, sizeof(uint8_t));
                     }
@@ -7259,7 +7261,7 @@
                     } else {
                         addr = [self getModRMAddress:mrm opSize:16];
                         if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                            return 13;
+                            return INT_GPF;
                         }
                         memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                     }
@@ -7283,7 +7285,7 @@
                         addr = [self getModRMAddress:mrm opSize:16];
                         // The register contains a byte offset added to the address
                         if (!(rmReadPtr = [self.task.mem getPointer:(addr + (imm8 / 8)) type:MEM_READ])) {
-                            return 13;
+                            return INT_GPF;
                         }
                         memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                         rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -7307,7 +7309,7 @@
                             break;
                         default:
                             self->state.eip = saved_ip;
-                            return 6;
+                            return INT_UNDEFINED;
                             break;
                     }
                     
@@ -7324,7 +7326,7 @@
                         addr = [self getModRMAddress:mrm opSize:16];
                         // The register contains a byte offset added to the address
                         if (!(rmReadPtr = [self.task.mem getPointer:(addr + ([self getRegisterValue:mrm.reg opSize:16] / 8)) type:MEM_READ])) {
-                            return 13;
+                            return INT_GPF;
                         }
                         memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                         rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -7345,7 +7347,7 @@
                         addr = [self getModRMAddress:mrm opSize:16];
                         // The register contains a byte offset added to the address
                         if (!(rmReadPtr = [self.task.mem getPointer:(addr + ([self getRegisterValue:mrm.reg opSize:16] / 8)) type:MEM_READ])) {
-                            return 13;
+                            return INT_GPF;
                         }
                         memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                         rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -7371,7 +7373,7 @@
                         addr = [self getModRMAddress:mrm opSize:16];
                         // The register contains a byte offset added to the address
                         if (!(rmReadPtr = [self.task.mem getPointer:(addr + ([self getRegisterValue:mrm.reg opSize:16] / 8)) type:MEM_READ])) {
-                            return 13;
+                            return INT_GPF;
                         }
                         memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                         rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -7396,7 +7398,7 @@
                     } else {
                         addr = [self getModRMAddress:mrm opSize:8];
                         if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                            return 13;
+                            return INT_GPF;
                         }
                         memcpy(&rmReadValue, rmReadPtr, sizeof(uint8_t));
                         rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -7416,7 +7418,7 @@
                     } else {
                         addr = [self getModRMAddress:mrm opSize:16];
                         if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                            return 13;
+                            return INT_GPF;
                         }
                         memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                         rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -7436,7 +7438,7 @@
                     } else {
                         addr = [self getModRMAddress:mrm opSize:8];
                         if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                            return 13;
+                            return INT_GPF;
                         }
                         memcpy(&rmReadValue, rmReadPtr, sizeof(uint8_t));
                         rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -7462,7 +7464,7 @@
                     } else {
                         addr = [self getModRMAddress:mrm opSize:16];
                         if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                            return 13;
+                            return INT_GPF;
                         }
                         memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                         rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -7527,7 +7529,7 @@
                     } else {
                         addr = [self getModRMAddress:mrm opSize:8];
                         if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                            return 13;
+                            return INT_GPF;
                         }
                         memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                         rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -7552,7 +7554,7 @@
                     } else {
                         addr = [self getModRMAddress:mrm opSize:16];
                         if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                            return 13;
+                            return INT_GPF;
                         }
                         memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                         rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -7577,7 +7579,7 @@
                     } else {
                         addr = [self getModRMAddress:mrm opSize:8];
                         if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                            return 13;
+                            return INT_GPF;
                         }
                         memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                         rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -7602,7 +7604,7 @@
                     } else {
                         addr = [self getModRMAddress:mrm opSize:16];
                         if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                            return 13;
+                            return INT_GPF;
                         }
                         memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                         rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -7662,7 +7664,7 @@
                     } else {
                         addr = [self getModRMAddress:mrm opSize:8];
                         if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                            return 13;
+                            return INT_GPF;
                         }
                         memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                         rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -7687,7 +7689,7 @@
                     } else {
                         addr = [self getModRMAddress:mrm opSize:16];
                         if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                            return 13;
+                            return INT_GPF;
                         }
                         memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                         rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -7712,7 +7714,7 @@
                     } else {
                         addr = [self getModRMAddress:mrm opSize:8];
                         if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                            return 13;
+                            return INT_GPF;
                         }
                         memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                         rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -7737,7 +7739,7 @@
                     } else {
                         addr = [self getModRMAddress:mrm opSize:16];
                         if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                            return 13;
+                            return INT_GPF;
                         }
                         memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                         rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -7794,7 +7796,7 @@
                     } else {
                         addr = [self getModRMAddress:mrm opSize:8];
                         if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                            return 13;
+                            return INT_GPF;
                         }
                         memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                         rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -7817,7 +7819,7 @@
                     } else {
                         addr = [self getModRMAddress:mrm opSize:16];
                         if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                            return 13;
+                            return INT_GPF;
                         }
                         memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                         rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -7840,7 +7842,7 @@
                     } else {
                         addr = [self getModRMAddress:mrm opSize:8];
                         if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                            return 13;
+                            return INT_GPF;
                         }
                         memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                         rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -7861,7 +7863,7 @@
                     } else {
                         addr = [self getModRMAddress:mrm opSize:16];
                         if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                            return 13;
+                            return INT_GPF;
                         }
                         memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                         rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -7916,7 +7918,7 @@
                     } else {
                         addr = [self getModRMAddress:mrm opSize:8];
                         if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                            return 13;
+                            return INT_GPF;
                         }
                         memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                         rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -7939,7 +7941,7 @@
                     } else {
                         addr = [self getModRMAddress:mrm opSize:16];
                         if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                            return 13;
+                            return INT_GPF;
                         }
                         memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                         rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -7962,7 +7964,7 @@
                     } else {
                         addr = [self getModRMAddress:mrm opSize:8];
                         if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                            return 13;
+                            return INT_GPF;
                         }
                         memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                         rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -7985,7 +7987,7 @@
                     } else {
                         addr = [self getModRMAddress:mrm opSize:16];
                         if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                            return 13;
+                            return INT_GPF;
                         }
                         memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                     }
@@ -8036,7 +8038,7 @@
             } else {
                 addr = [self getModRMAddress:mrm opSize:8];
                 if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                    return 13;
+                    return INT_GPF;
                 }
                 memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                 rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -8059,7 +8061,7 @@
             } else {
                 addr = [self getModRMAddress:mrm opSize:16];
                 if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                    return 13;
+                    return INT_GPF;
                 }
                 memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                 rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -8082,7 +8084,7 @@
             } else {
                 addr = [self getModRMAddress:mrm opSize:8];
                 if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                    return 13;
+                    return INT_GPF;
                 }
                 memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
             }
@@ -8104,7 +8106,7 @@
             } else {
                 addr = [self getModRMAddress:mrm opSize:16];
                 if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                    return 13;
+                    return INT_GPF;
                 }
                 memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
             }
@@ -8159,7 +8161,7 @@
             } else {
                 addr = [self getModRMAddress:mrm opSize:8];
                 if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                    return 13;
+                    return INT_GPF;
                 }
                 memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                 rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -8185,7 +8187,7 @@
             } else {
                 addr = [self getModRMAddress:mrm opSize:16];
                 if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                    return 13;
+                    return INT_GPF;
                 }
                 memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                 rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -8210,7 +8212,7 @@
             } else {
                 addr = [self getModRMAddress:mrm opSize:8];
                 if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                    return 13;
+                    return INT_GPF;
                 }
                 memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                 rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -8236,7 +8238,7 @@
             } else {
                 addr = [self getModRMAddress:mrm opSize:16];
                 if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                    return 13;
+                    return INT_GPF;
                 }
                 memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                 rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -8423,7 +8425,7 @@
             mrm = [self decodeModRMByte:modRMByte];
             if (mrm.reg != reg_ebp) {
                 self->state.eip = saved_ip;
-                return 6;
+                return INT_UNDEFINED;
             }
             regPtr = [self getRegPointer:mrm.reg opSize:16];
             if (mrm.type == modrm_register) {
@@ -8433,7 +8435,7 @@
             } else {
                 addr = [self getModRMAddress:mrm opSize:16];
                 if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                    return 13;
+                    return INT_GPF;
                 }
                 memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                 rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -8457,7 +8459,7 @@
             mrm = [self decodeModRMByte:modRMByte];
             if (mrm.reg != reg_ebp) {
                 self->state.eip = saved_ip;
-                return 6;
+                return INT_UNDEFINED;
             }
             regPtr = [self getRegPointer:mrm.reg opSize:16];
             if (mrm.type == modrm_register) {
@@ -8467,7 +8469,7 @@
             } else {
                 addr = [self getModRMAddress:mrm opSize:16];
                 if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                    return 13;
+                    return INT_GPF;
                 }
                 memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                 rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -8751,7 +8753,7 @@
             } else {
                 addr = [self getModRMAddress:mrm opSize:8];
                 if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                    return 13;
+                    return INT_GPF;
                 }
                 memcpy(&rmReadValue, rmReadPtr, sizeof(uint8_t));
                 rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -8773,7 +8775,7 @@
             } else {
                 addr = [self getModRMAddress:mrm opSize:16];
                 if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                    return 13;
+                    return INT_GPF;
                 }
                 memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                 rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -8795,7 +8797,7 @@
             } else {
                 addr = [self getModRMAddress:mrm opSize:8];
                 if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                    return 13;
+                    return INT_GPF;
                 }
                 memcpy(&rmReadValue, rmReadPtr, sizeof(uint8_t));
                 rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -8816,7 +8818,7 @@
             } else {
                 addr = [self getModRMAddress:mrm opSize:16];
                 if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                    return 13;
+                    return INT_GPF;
                 }
                 memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                 rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -8867,7 +8869,7 @@
                 addr = [self getModRMAddress:mrm opSize:8];
                 /*
                  if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                 return 13;
+                 return INT_GPF;
                  }
                  memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                  */
@@ -8891,7 +8893,7 @@
                 rmReadValue = [self.task userReadFourBytes:addr];
                 /*
                  if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                 return 13;
+                 return INT_GPF;
                  }
                  memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                  */
@@ -8906,7 +8908,7 @@
             mrm = [self decodeModRMByte:modRMByte];
             if (mrm.reg != reg_ebp) {
                 self->state.eip = saved_ip;
-                return 6;
+                return INT_UNDEFINED;
             }
             regPtr = [self getRegPointer:mrm.reg opSize:16];
             if (mrm.type == modrm_register) {
@@ -8916,7 +8918,7 @@
             } else {
                 addr = [self getModRMAddress:mrm opSize:16];
                 if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                    return 13;
+                    return INT_GPF;
                 }
                 memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                 rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -8933,7 +8935,7 @@
             regPtr = [self getRegPointer:mrm.reg opSize:16];
             if (mrm.type == modrm_register) {
                 self->state.eip = saved_ip;
-                return 6;
+                return INT_UNDEFINED;
             }
             
             addr = [self getModRMAddress:mrm opSize:16];
@@ -8947,7 +8949,7 @@
             mrm = [self decodeModRMByte:modRMByte];
             if (mrm.reg != reg_ebp) {
                 self->state.eip = saved_ip;
-                return 6;
+                return INT_UNDEFINED;
             }
             regPtr = [self getRegPointer:mrm.reg opSize:16];
             if (mrm.type == modrm_register) {
@@ -8957,7 +8959,7 @@
             } else {
                 addr = [self getModRMAddress:mrm opSize:16];
                 if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                    return 13;
+                    return INT_GPF;
                 }
                 memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
             }
@@ -8973,7 +8975,7 @@
             mrm = [self decodeModRMByte:modRMByte];
             if (mrm.reg != reg_ebp) {
                 self->state.eip = saved_ip;
-                return 6;
+                return INT_UNDEFINED;
             }
             regPtr = [self getRegPointer:mrm.reg opSize:16];
             if (mrm.type == modrm_register) {
@@ -8983,7 +8985,7 @@
             } else {
                 addr = [self getModRMAddress:mrm opSize:16];
                 if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                    return 13;
+                    return INT_GPF;
                 }
                 memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                 rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -9151,7 +9153,7 @@
             } else {
                 addr = [self getModRMAddress:mrm opSize:8];
                 if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                    return 13;
+                    return INT_GPF;
                 }
                 memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                 rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -9184,7 +9186,7 @@
             } else {
                 addr = [self getModRMAddress:mrm opSize:16];
                 if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                    return 13;
+                    return INT_GPF;
                 }
                 memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                 rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -9239,7 +9241,7 @@
             } else {
                 addr = [self getModRMAddress:mrm opSize:8];
                 if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                    return 13;
+                    return INT_GPF;
                 }
                 memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                 rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -9312,7 +9314,7 @@
             } else {
                 addr = [self getModRMAddress:mrm opSize:16];
                 if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                    return 13;
+                    return INT_GPF;
                 }
                 memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                 rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -9442,7 +9444,7 @@
             } else {
                 addr = [self getModRMAddress:mrm opSize:8];
                 if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                    return 13;
+                    return INT_GPF;
                 }
                 memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                 rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -9525,7 +9527,7 @@
             } else {
                 addr = [self getModRMAddress:mrm opSize:16];
                 if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                    return 13;
+                    return INT_GPF;
                 }
                 memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                 rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -9609,7 +9611,7 @@
             } else {
                 addr = [self getModRMAddress:mrm opSize:8];
                 if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                    return 13;
+                    return INT_GPF;
                 }
                 memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                 rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -9680,7 +9682,7 @@
             } else {
                 addr = [self getModRMAddress:mrm opSize:16];
                 if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                    return 13;
+                    return INT_GPF;
                 }
                 memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                 rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -9764,7 +9766,7 @@
             } else {
                 addr = [self getModRMAddress:mrm opSize:16];
                 if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                    return 13;
+                    return INT_GPF;
                 }
                 memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                 rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -9858,7 +9860,7 @@
             } else {
                 addr = [self getModRMAddress:mrm opSize:16];
                 if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                    return 13;
+                    return INT_GPF;
                 }
                 memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                 rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -9934,7 +9936,7 @@
             } else {
                 addr = [self getModRMAddress:mrm opSize:16];
                 if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                    return 13;
+                    return INT_GPF;
                 }
                 memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                 rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -9951,11 +9953,11 @@
                     break;
                 case 0x2:
                     self->state.eip = saved_ip;
-                    return 6;
+                    return INT_UNDEFINED;
                     break;
                 case 0x3:
                     self->state.eip = saved_ip;
-                    return 6;
+                    return INT_UNDEFINED;
                     self->state.top += 1;
                     break;
                 case 0x4:
@@ -9990,7 +9992,7 @@
             } else {
                 addr = [self getModRMAddress:mrm opSize:16];
                 if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                    return 13;
+                    return INT_GPF;
                 }
                 memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                 rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -10058,7 +10060,7 @@
             } else {
                 addr = [self getModRMAddress:mrm opSize:16];
                 if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                    return 13;
+                    return INT_GPF;
                 }
                 memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                 rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -10154,7 +10156,7 @@
             } else {
                 addr = [self getModRMAddress:mrm opSize:16];
                 if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                    return 13;
+                    return INT_GPF;
                 }
                 memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                 rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -10239,7 +10241,7 @@
             } else {
                 addr = [self getModRMAddress:mrm opSize:16];
                 if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                    return 13;
+                    return INT_GPF;
                 }
                 memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                 rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -10270,7 +10272,7 @@
                         die("Could happen, just remove this if block for only the else block");
                     } else {
                         self->state.eip = saved_ip;
-                        return 6;
+                        return INT_UNDEFINED;
                     }
                     self->state.top += 1;
                     break;
@@ -10279,7 +10281,7 @@
                         die("Could happen, just remove this if block for only the else block");
                     } else {
                         self->state.eip = saved_ip;
-                        return 6;
+                        return INT_UNDEFINED;
                     }
                     self->state.top += 1;
                     break;
@@ -10339,7 +10341,7 @@
             } else {
                 addr = [self getModRMAddress:mrm opSize:16];
                 if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                    return 13;
+                    return INT_GPF;
                 }
                 memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                 rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -10486,7 +10488,7 @@
             } else {
                 addr = [self getModRMAddress:mrm opSize:8];
                 if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                    return 13;
+                    return INT_GPF;
                 }
                 memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                 rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -10532,7 +10534,7 @@
                     __debugbreak();
                     
                     // TODO: Was implemented as:
-                    // uint64_t tmp = ((uint8_t)cpu->eax) * (uint64_t)(modrm.type == modrm_reg ? (*(uint8_t *)(((char *)cpu) + (modrm_base).reg8_id)) : ({ uint8_t val; if (!tlb_read(tlb, addr, &val, 8/8)) { cpu->eip = saved_ip; cpu->segfault_addr = addr; return 13; } val; }));
+                    // uint64_t tmp = ((uint8_t)cpu->eax) * (uint64_t)(modrm.type == modrm_reg ? (*(uint8_t *)(((char *)cpu) + (modrm_base).reg8_id)) : ({ uint8_t val; if (!tlb_read(tlb, addr, &val, 8/8)) { cpu->eip = saved_ip; cpu->segfault_addr = addr; return INT_GPF; } val; }));
                     // *(uint8_t *)&cpu->eax = tmp;
                     // *(uint8_t *)&cpu->edx = tmp >> 8;
                     
@@ -10566,7 +10568,7 @@
                         // Divide by 0
                         if (divisor8 == 0) {
                             //break;
-                            return 0;
+                            return INT_DIV;
                         }
                         
                         FFLog(@"\n\n\n  Check this op! \n\n\n");
@@ -10587,7 +10589,7 @@
                         // Divide by 0
                         if (divisor8 == 0) {
                             //break;
-                            return 0;
+                            return INT_DIV;
                         }
                         
                         FFLog(@"\n\n\n  Check this op! \n\n\n");
@@ -10616,7 +10618,7 @@
             } else {
                 addr = [self getModRMAddress:mrm opSize:16];
                 if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                    return 13;
+                    return INT_GPF;
                 }
                 memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                 rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -10689,7 +10691,7 @@
                         // Divide by 0
                         if (divisor16 == 0) {
                             //break;
-                            return 0;
+                            return INT_DIV;
                         }
                         
                         
@@ -10709,7 +10711,7 @@
                         // Divide by 0
                         if (divisor16 == 0) {
                             //break;
-                            return 0;
+                            return INT_DIV;
                         }
                         
                         FFLog(@"\n\n\n  Check this op! \n\n\n");
@@ -10747,7 +10749,7 @@
             } else {
                 addr = [self getModRMAddress:mrm opSize:8];
                 if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                    return 13;
+                    return INT_GPF;
                 }
                 memcpy(&rmReadValue, rmReadPtr, sizeof(uint8_t));
                 rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -10789,7 +10791,7 @@
             } else {
                 addr = [self getModRMAddress:mrm opSize:16];
                 if (!(rmReadPtr = [self.task.mem getPointer:addr type:MEM_READ])) {
-                    return 13;
+                    return INT_GPF;
                 }
                 memcpy(&rmReadValue, rmReadPtr, sizeof(uint16_t));
                 rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
@@ -10826,7 +10828,7 @@
                 case 0x3:
                     // CALLF    r/m16/32
                     self->state.eip = saved_ip;
-                    return 6;
+                    return INT_UNDEFINED;
                     break;
                 case 0x4:
                     // JMP    r/m16/32
@@ -10835,7 +10837,7 @@
                 case 0x5:
                     // JMPF    r/m16/32
                     self->state.eip = saved_ip;
-                    return 6;
+                    return INT_UNDEFINED;
                     break;
                 case 0x6:
                     // PUSH    r/m16/32
