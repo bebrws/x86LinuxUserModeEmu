@@ -530,7 +530,7 @@
 }
 
 - (NSString *)description {
-    return [[NSString alloc] initWithFormat:@"P: %d eax: %x ebx: %x ecx: %x edx: %x esi: %x edi: %x ebp: %x esp: %x eip: %x eflags: %x res: %x\ncf_bit %d pf %d af %d zf %d sf %d tf %d if_ %d df %d of_bit %d iopl %d pf_res %d sf_res %d af_ops %d cf %d\n", self.task.pid.id, self->state.eax, self->state.ebx, self->state.ecx, self->state.edx, self->state.esi, self->state.edi, self->state.ebp, self->state.esp, self->state.eip, self->state.eflags, (int32_t)self->state.res, self->state.cf_bit, self->state.pf, self->state.af, self->state.zf, self->state.sf, self->state.tf, self->state.if_, self->state.df, self->state.of_bit, self->state.iopl, self->state.pf_res, self->state.sf_res, self->state.af_ops, self->state.cf];
+    return [[NSString alloc] initWithFormat:@"P: %d insn#: %d - eax: %x ebx: %x ecx: %x edx: %x esi: %x edi: %x ebp: %x esp: %x eip: %x eflags: %x res: %x\ncf_bit %d pf %d af %d zf %d sf %d tf %d if_ %d df %d of_bit %d iopl %d pf_res %d sf_res %d af_ops %d cf %d\n", self.task.pid.id, self->instructionCount, self->state.eax, self->state.ebx, self->state.ecx, self->state.edx, self->state.esi, self->state.edi, self->state.ebp, self->state.esp, self->state.eip, self->state.eflags, (int32_t)self->state.res, self->state.cf_bit, self->state.pf, self->state.af, self->state.zf, self->state.sf, self->state.tf, self->state.if_, self->state.df, self->state.of_bit, self->state.iopl, self->state.pf_res, self->state.sf_res, self->state.af_ops, self->state.cf];
 }
 
 // Reads the next byte pointed to by the instruction pointer then increments the instruction
@@ -663,10 +663,11 @@
 
 // restart32:
 
-    CPULog("%@", [self description]);
+
     
     [self readByteIncIP:&firstOpByte];
     
+//    CPULog("%@", [self description]);
     
     
     // # ifdef BDEBUG
@@ -711,8 +712,9 @@
                   [parsedData[@"stack"] isEqualTo:[NSString stringWithFormat:@"%x", stackVar]] &&
                   [parsedData[@"res"] isEqualTo:[NSString stringWithFormat:@"%x", self->state.res]] )) {
                 
-                CPULog("eax %x\tebx %x\tecx %x\tedx %x\tesi %x\tedi %x\tebp %x\tesp %x\teip %x\teflags %x\tres %x\tstack %x\tflags\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%x - X86\n", self->state.eax, self->state.ebx, self->state.ecx, self->state.edx, self->state.esi, self->state.edi, self->state.ebp, self->state.esp, self->state.eip, self->state.eflags, self->state.res, stackVar, self->state.cf_bit, self->state.pf, self->state.af, self->state.zf, self->state.sf, self->state.tf, self->state.if_, self->state.df, self->state.of_bit, self->state.iopl, self->state.pf_res, self->state.sf_res, self->state.af_ops, self->state.cf, firstOpByte);
-                CPULog("eax %s\tebx %s\tecx %s\tedx %s\tesi %s\tedi %s\tebp %s\tesp %s\teip %s\teflags %s\tres %s\tstack %s\tflags\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s - ISH\n",
+                CLog(@"\n\nError Diff on insn %d:\n\nx86 then ish:\n", self->instructionCount);
+                CPULog("\nx86 - eax %x\tebx %x\tecx %x\tedx %x\tesi %x\tedi %x\tebp %x\tesp %x\teip %x\teflags %x\tres %x\tstack %x\tflags\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%x - X86\n", self->state.eax, self->state.ebx, self->state.ecx, self->state.edx, self->state.esi, self->state.edi, self->state.ebp, self->state.esp, self->state.eip, self->state.eflags, self->state.res, stackVar, self->state.cf_bit, self->state.pf, self->state.af, self->state.zf, self->state.sf, self->state.tf, self->state.if_, self->state.df, self->state.of_bit, self->state.iopl, self->state.pf_res, self->state.sf_res, self->state.af_ops, self->state.cf, firstOpByte);
+                CPULog("\nish - eax %s\tebx %s\tecx %s\tedx %s\tesi %s\tedi %s\tebp %s\tesp %s\teip %s\teflags %s\tres %s\tstack %s\tflags\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s - ISH\n",
                    [parsedData[@"eax"] UTF8String], [parsedData[@"ebx"] UTF8String], [parsedData[@"ecx"] UTF8String], [parsedData[@"edx"] UTF8String], [parsedData[@"esi"] UTF8String], [parsedData[@"edi"] UTF8String], [parsedData[@"ebp"] UTF8String], [parsedData[@"esp"] UTF8String], [parsedData[@"eip"] UTF8String], [parsedData[@"eflags"] UTF8String], [parsedData[@"res"] UTF8String], [parsedData[@"stack"] UTF8String], [parsedData[@"cf_bit"] UTF8String], [parsedData[@"pf"] UTF8String], [parsedData[@"af"] UTF8String], [parsedData[@"zf"] UTF8String], [parsedData[@"sf"] UTF8String], [parsedData[@"tf"] UTF8String], [parsedData[@"if_"] UTF8String], [parsedData[@"df"] UTF8String], [parsedData[@"of_bit"] UTF8String], [parsedData[@"iopl"] UTF8String], [parsedData[@"pf_res"] UTF8String], [parsedData[@"sf_res"] UTF8String], [parsedData[@"af_ops"] UTF8String], [parsedData[@"cf"] UTF8String], [parsedData[@"insn"] UTF8String]);
                 
                 CPULog("~~~ ERROR: Ish/X86 TRACE MISMATCH - Instruction number %d. EIP: %x\n", self->instructionCount, self->state.eip);
@@ -724,6 +726,8 @@
         } else {
             CPULog("No comparison data for this instruction. insn #:%d\n", self->instructionCount);
         }
+    
+//    CPULog("\nEIP Comps %@ %@\n", parsedData[@"eip"] , [NSString stringWithFormat:@"%x", self->state.eip] );
     
     
 
@@ -3343,9 +3347,12 @@
                 rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
             }
 
-            [self readFourBytesIncSP:&imm32];
+            [self readFourBytesIncIP:&imm32];
 
             self->state.cf = self->state.of = __builtin_mul_overflow((int32_t)rmReadValue, (int32_t)imm32, (int32_t *)&self->state.res);
+            *(int32_t *)regPtr = (int32_t)self->state.res;
+            
+            self->state.pf_res = 1;
             self->state.zf = self->state.sf = self->state.zf_res = self->state.sf_res = 0;
             break;
 
@@ -8427,9 +8434,12 @@
                 rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
             }
             
-            [self readTwoBytesIncSP:&imm16];
+            [self readTwoBytesIncIP:&imm16];
             
             self->state.cf = self->state.of = __builtin_mul_overflow((int16_t)rmReadValue, (int16_t)imm16, (int16_t *)&self->state.res);
+            *(int16_t *)regPtr = (int16_t)self->state.res;
+            
+            self->state.pf_res = 1;
             self->state.zf = self->state.sf = self->state.zf_res = self->state.sf_res = 0;
             break;
             
