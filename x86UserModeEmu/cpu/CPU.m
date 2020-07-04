@@ -3502,7 +3502,7 @@
             }
             // Is the "zf flag if res" flag is checked then check the res to determine the zf flag
             // Otherwise just check the last zf flag
-            if (self->state.sf_res ? self->state.res < 0 : self->state.sf) {
+            if (self->state.sf_res ? (int32_t)self->state.res < 0 : self->state.sf) {
                 // TODO: Possibly cast this as int16_t to work with 16 bit instructions
                 self->state.eip += (uint32_t)(int8_t)imm8;
             }
@@ -3515,7 +3515,7 @@
             }
             // Is the "zf flag if res" flag is checked then check the res to determine the zf flag
             // Otherwise just check the last zf flag
-            if (!(self->state.sf_res ? self->state.res < 0 : self->state.sf)) {
+            if (!(self->state.sf_res ? (int32_t)self->state.res < 0 : self->state.sf)) {
                 // TODO: Possibly cast this as int16_t to work with 16 bit instructions
                 self->state.eip += (uint32_t)(int8_t)imm8;
             }
@@ -8588,7 +8588,7 @@
             }
             // Is the "zf flag if res" flag is checked then check the res to determine the zf flag
             // Otherwise just check the last zf flag
-            if (self->state.sf_res ? self->state.res < 0 : self->state.sf) {
+            if (self->state.sf_res ? (int32_t)self->state.res < 0 : self->state.sf) {
                 // TODO: Possibly cast this as int16_t to work with 16 bit instructions
                 self->state.eip += (uint32_t)(int8_t)imm8;
             }
@@ -8601,7 +8601,7 @@
             }
             // Is the "zf flag if res" flag is checked then check the res to determine the zf flag
             // Otherwise just check the last zf flag
-            if (!(self->state.sf_res ? self->state.res < 0 : self->state.sf)) {
+            if (!(self->state.sf_res ? (int32_t)self->state.res < 0 : self->state.sf)) {
                 // TODO: Possibly cast this as int16_t to work with 16 bit instructions
                 self->state.eip += (uint32_t)(int8_t)imm8;
             }
