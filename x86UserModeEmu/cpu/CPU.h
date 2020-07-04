@@ -324,11 +324,13 @@ static inline const char *reg32_name(enum reg32 reg) {
     @public long instructionCount;
 }
 
-- (int)step16;
-- (int)step;
+- (int)step:(uint32_t) addrDefault;
+- (int)step16:(uint32_t) addrDefault;
 - (void)collapseFlags;
 - (id)initWithTask:(Task *)task;
 - (void)start;
+- (void)runLoop;
+- (void)test;
 
 // syscalls
 

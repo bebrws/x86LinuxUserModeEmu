@@ -186,7 +186,7 @@ int get_random(char *buf, size_t len)
         return PTR_ERR(fd);
     }*/
     
-    return [self f_install:fd flags:flags]; 
+    return [self f_install:fd flags:flags];
 }
 
 - (fd_t) sys_open:(addr_t)path_addr flags:(dword_t)flags mode:(mode_t_)mode {
@@ -630,7 +630,7 @@ fail_free_mem:
 //        // pid insn addr size value
 //        //             %x      %x
 //        // all else %d
-//        
+//
 //        uint32_t val;
 //        if (count == 4) {
 //            val = *(uint32_t *)buf;
@@ -639,9 +639,9 @@ fail_free_mem:
 //        } else if (count == 1) {
 //            val = *(uint8_t *)buf;
 //        }
-//        
+//
 //        NSString *valueString = [NSString stringWithFormat:@"%x", val];
-//        
+//
 //        if (memDebugLine && ![valueString isEqualToString:memDebugLine[@"value"]]) {
 //            CLog(@"Value from x86: %@\n", valueString);
 //            CLog(@"Value from Ish: %@\n", memDebugLine[@"value"]);
@@ -1646,6 +1646,15 @@ fail_free_mem:
 
 - (void)start {
     [self.cpu start];
+
+//    dispatch_queue_t queue = dispatch_get_main_queue();
+//    dispatch_async(queue, ^{
+//        [self.cpu runLoop];
+//    });
+    
+//    dispatch_async(dispatch_get_global_queue( DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void){
+//        [self.cpu runLoop];
+//    });
 }
 
 
