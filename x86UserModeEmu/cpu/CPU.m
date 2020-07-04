@@ -772,7 +772,7 @@
     uint32_t *rmWritePtr;
     enum reg32 opReg;
     
-    if (self->instructionCount >= 12757) {
+    if (self->instructionCount >= 13123) {
         // 12773
         CLog(@"break");
     }
@@ -8837,7 +8837,7 @@
                 addr = [self getModRMAddress:mrm opSize:8];
                 rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
             }
-            *((dword_t *)rmWritePtr) = *((dword_t *)regPtr);
+            *((uint8_t *)rmWritePtr) = *((uint8_t *)regPtr);
             break;
         case 0x89:
             // MOV    r/m16/32/64    r16/32/64
