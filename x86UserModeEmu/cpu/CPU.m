@@ -55,7 +55,7 @@
     }
 #define SEGFAULT                                                               \
     self->state.eip = saved_ip;                                                \
-    self->state.segfault_addr = self->state.esp - 32 / 8;                      \
+    self->state.segfault_addr = self->state.esp - 4;                      \
     return INT_GPF;
 
 // Used by Group1Opcodes.h :
@@ -749,6 +749,7 @@
 
     uint8_t firstOpByte;
     uint8_t secondOpByte;
+    uint8_t innerOpByte;
 
     // restart32:
 
@@ -2659,7 +2660,7 @@
                     } else {
                         addr = [self getModRMAddress:mrm opSize:32];
                         // The register contains a byte offset added to the address
-                        if (!(rmReadPtr = [self.task.mem getPointer:(addr + (imm8 / 8))
+                        if (!(rmReadPtr = [self.task.mem getPointer:(addr + (imm8))
                                                                type:MEM_READ])) {
                             return INT_GPF;
                         }
@@ -6875,7 +6876,7 @@
             }
             break;
         default:
-            fprintf(stderr, "Unimplemented OP %x", firstOpByte);
+            fprintf(stderr, "\n\n\n!!!!!!!!!!!!!!!\n\n\n\nUnimplemented OP %x\n\n\n\n\n", firstOpByte);
             die("Unimplemented OP");
             break;
     }
@@ -6901,9 +6902,11 @@
     uint32_t imm32 = 0;
     uint64_t imm64 = 0;
     uint8_t temp8 = 0;
+    uint8_t temp8_2 = 0;
     uint8_t *temp8ptr = 0;
     uint16_t temp16 = 0;
     uint32_t temp32 = 0;
+    uint32_t temp32_2 = 0;
     uint32_t *temp32ptr = 0;
     uint64_t temp64 = 0;
     uint64_t *temp64ptr = 0;
@@ -7834,6 +7837,299 @@
             }
             break;
 
+
+            case 0xf3:
+                [self readByteIncIP:&innerOpByte];
+                switch (innerOpByte)
+                {
+                case 0x0f:
+
+                    [self readByteIncIP:&innerOpByte];
+                    switch (innerOpByte)
+                    {
+
+                    case 0x11:
+                        [self readByteIncIP:&modRMByte];
+                          mrm = [self decodeModRMByte:modRMByte];
+                          regPtr = [self getRegPointer:mrm.reg opSize:8];
+                          if (mrm.type == modrm_register) {
+                              self->state.eip = saved_ip;
+                              return 6;
+                          } else {
+                              addr = [self getModRMAddress:mrm opSize:8];
+                              if (!(rmReadPtr =
+                                        [self.task.mem getPointer:addr
+                                                             type:MEM_READ])) {
+                                  return INT_GPF;
+                              }
+                              memcpy(&rmReadValue, rmReadPtr, sizeof(uint8_t));
+                              rmWritePtr = [self.task.mem getPointer:addr
+                                                                type:MEM_WRITE];
+                          }
+                        break;
+
+                    case 0x18 ... 0x1f:
+                        [self readByteIncIP:&modRMByte];
+                          mrm = [self decodeModRMByte:modRMByte];
+                          regPtr = [self getRegPointer:mrm.reg opSize:8];
+                          if (mrm.type == modrm_register) {
+                              self->state.eip = saved_ip;
+                              return 6;
+                          } else {
+                              addr = [self getModRMAddress:mrm opSize:8];
+                              if (!(rmReadPtr =
+                                        [self.task.mem getPointer:addr
+                                                             type:MEM_READ])) {
+                                  return INT_GPF;
+                              }
+                              memcpy(&rmReadValue, rmReadPtr, sizeof(uint8_t));
+                              rmWritePtr = [self.task.mem getPointer:addr
+                                                                type:MEM_WRITE];
+                          }
+                        break;
+
+                    case 0xbc:
+                        [self readByteIncIP:&modRMByte];
+                          mrm = [self decodeModRMByte:modRMByte];
+                          regPtr = [self getRegPointer:mrm.reg opSize:8];
+                          if (mrm.type == modrm_register) {
+                              self->state.eip = saved_ip;
+                              return 6;
+                          } else {
+                              addr = [self getModRMAddress:mrm opSize:8];
+                              if (!(rmReadPtr =
+                                        [self.task.mem getPointer:addr
+                                                             type:MEM_READ])) {
+                                  return INT_GPF;
+                              }
+                              memcpy(&rmReadValue, rmReadPtr, sizeof(uint8_t));
+                              rmWritePtr = [self.task.mem getPointer:addr
+                                                                type:MEM_WRITE];
+                          }
+                            
+                        self->state.zf = rmReadValue == 0;
+                        self->state.zf_res = 0;
+                        if (!self->state.zf) {
+                            *(uint32_t *)regPtr = __builtin_ctz(rmReadValue);
+                        }
+                        break;
+                    case 0xbd:
+                        [self readByteIncIP:&modRMByte];
+                          mrm = [self decodeModRMByte:modRMByte];
+                          regPtr = [self getRegPointer:mrm.reg opSize:8];
+                          if (mrm.type == modrm_register) {
+                              self->state.eip = saved_ip;
+                              return 6;
+                          } else {
+                              addr = [self getModRMAddress:mrm opSize:8];
+                              if (!(rmReadPtr =
+                                        [self.task.mem getPointer:addr
+                                                             type:MEM_READ])) {
+                                  return INT_GPF;
+                              }
+                              memcpy(&rmReadValue, rmReadPtr, sizeof(uint8_t));
+                              rmWritePtr = [self.task.mem getPointer:addr
+                                                                type:MEM_WRITE];
+                          }
+                            
+                        self->state.zf = rmReadValue == 0;
+                        self->state.zf_res = 0;
+                        if (!self->state.zf) {
+                            *(uint32_t *)regPtr = __builtin_clz(rmReadValue);
+                        }
+                        break;
+
+                    default:
+                            self->state.eip = saved_ip;
+                            return 6;
+                        
+                    }
+                    break;
+
+                case 0x90:
+                    break;
+
+                case 0xa4:
+                    while (self->state.ecx != 0)
+                    {
+                        temp8 = [self.task userReadOneBytes:self->state.esi];
+                        [self.task userMemset:self->state.edi val:&temp8 count:1];
+                        
+                        if (!self->state.df) {
+                            self->state.esi += 1;
+                        } else {
+                            self->state.esi -= 1;
+                        }
+                        if (!self->state.df) {
+                            self->state.edi += 1;
+                        } else {
+                            self->state.edi -= 1;
+                        }
+                        self->state.ecx--;
+                    };
+                    break;
+                case 0xa5:
+                    while (self->state.ecx != 0)
+                     {
+                         temp32 = [self.task userReadFourBytes:self->state.esi];
+                         [self.task userMemset:self->state.edi val:&temp32 count:4];
+                         
+                         if (!self->state.df) {
+                             self->state.esi += 4;
+                         } else {
+                             self->state.esi -= 4;
+                         }
+                         if (!self->state.df) {
+                             self->state.edi += 4;
+                         } else {
+                             self->state.edi -= 4;
+                         }
+                         self->state.ecx--;
+                     };
+                    break;
+                case 0xa6:
+                    while (self->state.ecx != 0)
+                    {
+                        self->state.af_ops = 1;
+                        temp8 = [self.task userReadOneBytes:self->state.esi];
+                        temp8_2 = [self.task userReadOneBytes:self->state.edi];
+                        self->state.cf = __builtin_sub_overflow((uint8_t) temp8, (uint8_t) temp8_2, (uint8_t *)&self->state.res);
+                        self->state.of = __builtin_sub_overflow((int8_t) temp8, (int8_t) temp8_2, (int8_t *)&self->state.res);
+                        self->state.zf_res = self->state.sf_res = self->state.pf_res = 1;
+                        if (!self->state.df) {
+                            self->state.esi += 1;
+                        } else {
+                            self->state.esi -= 1;
+                        }
+                        if (!self->state.df) {
+                            self->state.edi += 1;
+                        } else {
+                            self->state.edi -= 1;
+                        }
+                        self->state.ecx--;
+                        if (!(self->state.zf_res ? self->state.res == 0 : self->state.zf)) {
+                            break;
+                        }
+                    };
+                    break;
+                case 0xa7:
+                    while (self->state.ecx != 0)
+                         {
+                             self->state.af_ops = 1;
+                             temp32 = [self.task userReadOneBytes:self->state.esi];
+                             temp32_2 = [self.task userReadOneBytes:self->state.edi];
+                             self->state.cf = __builtin_sub_overflow((uint32_t) temp32, (uint32_t) temp32_2, (uint32_t *)&self->state.res);
+                             self->state.of = __builtin_sub_overflow((int32_t) temp32, (int32_t) temp32_2, (int32_t *)&self->state.res);
+                             self->state.zf_res = self->state.sf_res = self->state.pf_res = 1;
+                             if (!self->state.df) {
+                                 self->state.esi += 4;
+                             } else {
+                                 self->state.esi -= 4;
+                             }
+                             if (!self->state.df) {
+                                 self->state.edi += 4;
+                             } else {
+                                 self->state.edi -= 4;
+                             }
+                             self->state.ecx--;
+                             if (!(self->state.zf_res ? self->state.res == 0 : self->state.zf)) {
+                                 break;
+                             }
+                         };
+                    break;
+                case 0xaa:
+                    while (self->state.ecx != 0)
+                    {
+                        [self.task userMemset:self->state.edi val:&self->state.al count:1];
+                        if (!self->state.df)
+                            self->state.edi += 1;
+                        else
+                            self->state.edi -= 1;
+                        self->state.ecx--;
+                    };
+                    break;
+                case 0xab:
+                    while (self->state.ecx != 0)
+                    {
+                        [self.task userMemset:self->state.edi val:&self->state.eax count:4];
+                        if (!self->state.df)
+                            self->state.edi += 4;
+                        else
+                            self->state.edi -= 4;
+                        self->state.ecx--;
+                    };
+                    break;
+                case 0xac:
+                    while (self->state.ecx != 0)
+                    {
+                        [self.task userMemset:self->state.esi val:&self->state.al count:1];
+                        if (!self->state.df)
+                            self->state.edi += 1;
+                        else
+                            self->state.edi -= 1;
+                        self->state.ecx--;
+                    };
+                    break;
+                case 0xad:
+                    while (self->state.ecx != 0)
+                    {
+                        [self.task userMemset:self->state.edi val:&self->state.eax count:4];
+                        if (!self->state.df)
+                            self->state.edi += 4;
+                        else
+                            self->state.edi -= 4;
+                        self->state.ecx--;
+                    };
+                    break;
+                case 0xae:
+                    while (self->state.ecx != 0)
+                    {
+                        self->state.af_ops = 1;
+                        temp8 = [self.task userReadOneBytes:self->state.edi];
+                        self->state.cf = __builtin_sub_overflow((uint8_t)temp8, (uint8_t)self->state.al, (uint8_t *) &self->state.res);
+                        self->state.cf = __builtin_sub_overflow((int8_t)temp8, (int8_t)self->state.al, (int8_t *) &self->state.res);
+                        self->state.zf_res = self->state.sf_res = self->state.pf_res = 1;
+                        if (!self->state.df) {
+                            self->state.edi += 1;
+                        } else {
+                            self->state.edi -= 1;
+                        }
+                        self->state.ecx--;
+                        if (!(self->state.zf_res ? self->state.res == 0 : self->state.zf)) {
+                            break;
+                        }
+                    };
+                    break;
+                case 0xaf:
+                    while (self->state.ecx != 0)
+                    {
+                        self->state.af_ops = 1;
+                        temp32 = [self.task userReadFourBytes:self->state.edi];
+                        self->state.cf = __builtin_sub_overflow((uint32_t)temp32, (uint32_t)self->state.al, (uint32_t *) &self->state.res);
+                        self->state.cf = __builtin_sub_overflow((int32_t)temp32, (int32_t)self->state.al, (int32_t *) &self->state.res);
+                        self->state.zf_res = self->state.sf_res = self->state.pf_res = 1;
+                        if (!self->state.df) {
+                            self->state.edi += 4;
+                        } else {
+                            self->state.edi -= 4;
+                        }
+                        self->state.ecx--;
+                        if (!(self->state.zf_res ? self->state.res == 0 : self->state.zf)) {
+                            break;
+                        }
+                    }
+                        break;
+
+                case 0xc3:
+                    [self.task userReadFourBytes:&self->state.eip];
+                    self->state.esp += 0;
+                    break;
+                default:
+                    self->state.eip = saved_ip;
+                    return 6;
+                }
+                break;
+            
         case 0xfe:
             [self readByteIncIP:&modRMByte];
             mrm = [self decodeModRMByte:modRMByte];
@@ -9903,7 +10199,7 @@
                         // The register contains a byte offset added to the
                         // address
                         if (!(rmReadPtr =
-                                  [self.task.mem getPointer:(addr + (imm8 / 8))
+                                  [self.task.mem getPointer:(addr + (imm8))
                                                        type:MEM_READ])) {
                             return INT_GPF;
                         }

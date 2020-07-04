@@ -345,8 +345,8 @@
             filePath = "x86UserModeEmu/cpu/CPU.m"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "14971"
-            endingLineNumber = "14971">
+            startingLineNumber = "15267"
+            endingLineNumber = "15267">
          </BreakpointContent>
       </BreakpointProxy>
    </Breakpoints>
