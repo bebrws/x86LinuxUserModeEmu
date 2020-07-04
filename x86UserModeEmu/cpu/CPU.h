@@ -326,11 +326,17 @@ static inline const char *reg32_name(enum reg32 reg) {
 
 - (int)step:(uint32_t) addrDefault;
 - (int)step16:(uint32_t) addrDefault;
+- (int)step32LockOps:(uint32_t)saved_ip addr:(uint32_t *)addr;
+- (int)step16LockOps:(uint32_t)saved_ip addr:(uint32_t *)addr;
 - (void)collapseFlags;
 - (id)initWithTask:(Task *)task;
 - (void)start;
 - (void)runLoop;
 - (void)test;
+- (modrm)decodeModRMByte:(char)modRMByte;
+- (void *)getRegPointer:(enum reg32)reg opSize:(int)opSize;
+- (addr_t)getModRMAddress:(modrm)modrm opSize:(int)opSize;
+- (dword_t)getRegisterValue:(enum reg32)reg opSize:(int)opSize;
 
 // syscalls
 
