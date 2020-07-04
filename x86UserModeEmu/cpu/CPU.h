@@ -337,6 +337,7 @@ static inline const char *reg32_name(enum reg32 reg) {
 - (void *)getRegPointer:(enum reg32)reg opSize:(int)opSize;
 - (addr_t)getModRMAddress:(modrm)modrm opSize:(int)opSize;
 - (dword_t)getRegisterValue:(enum reg32)reg opSize:(int)opSize;
+- (void *)getRegisterPointedMemory:(enum reg32) reg registerSize:(int)registerSize accessType:(int)accessType;
 
 // syscalls
 

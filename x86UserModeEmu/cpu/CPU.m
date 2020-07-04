@@ -7798,479 +7798,172 @@
 
                     break;
                 case 0xc1:
-//          if (!modrm_compute(cpu, tlb, &addr, &modrm, &modrm_regptr,
-//                             &modrm_base)) {
-//            self->state.segfault_addr = self->state.eip;
-//            self->state.eip = saved_ip;
-//            return 13;
-//          };
-//          if (modrm.type == modrm_register) {
-//            self->state.eip = saved_ip;
-//            return 6;
-//          };
-//          do {
-//            dword_t tmp =
-//                (*(uint32_t *)(((char *)cpu) + (modrm_regptr).reg32_id));
-//            (*(uint32_t *)(((char *)cpu) + (modrm_regptr).reg32_id)) =
-//                (modrm.type == modrm_reg
-//                     ? (*(uint32_t *)(((char *)cpu) + (modrm_base).reg32_id))
-//                     : ({
-//                         uint32_t val;
-//                         if (!tlb_read(tlb, addr, &val, 32 / 8)) {
-//                           self->state.eip = saved_ip;
-//                           self->state.segfault_addr = addr;
-//                           return 13;
-//                         }
-//                         val;
-//                       }));
-//            if (modrm.type == modrm_register) {
-//              (*(uint32_t *)(((char *)cpu) + (modrm_base).reg32_id)) = tmp;
-//            } else {
-//              ({
-//                uint32_t _val = tmp;
-//                if (!tlb_write(tlb, addr, &_val, 32 / 8)) {
-//                  self->state.eip = saved_ip;
-//                  self->state.segfault_addr = addr;
-//                  return 13;
-//                }
-//              });
-//            }
-//            (void)0;
-//          } while (0);
-//          self->state.op1 =
-//              (*(uint32_t *)(((char *)cpu) + (modrm_regptr).reg32_id));
-//          self->state.op2 =
-//              (modrm.type == modrm_reg
-//                   ? (*(uint32_t *)(((char *)cpu) + (modrm_base).reg32_id))
-//                   : ({
-//                       uint32_t val;
-//                       if (!tlb_read(tlb, addr, &val, 32 / 8)) {
-//                         self->state.eip = saved_ip;
-//                         self->state.segfault_addr = addr;
-//                         return 13;
-//                       }
-//                       val;
-//                     }));
-//          self->state.af_ops = 1;
-//          self->state.cf = ({
-//            int ov = __builtin_add_overflow(
-//                (uint32_t)((
-//                    modrm.type == modrm_reg
-//                        ? (*(uint32_t *)(((char *)cpu) + (modrm_base).reg32_id))
-//                        : ({
-//                            uint32_t val;
-//                            if (!tlb_read(tlb, addr, &val, 32 / 8)) {
-//                              self->state.eip = saved_ip;
-//                              self->state.segfault_addr = addr;
-//                              return 13;
-//                            }
-//                            val;
-//                          }))),
-//                (uint32_t)(
-//                    (*(uint32_t *)(((char *)cpu) + (modrm_regptr).reg32_id))),
-//                (uint32_t *)&self->state.res);
-//            self->state.res = (int32_t)self->state.res;
-//            ov;
-//          });
-//          self->state.of = ({
-//            int ov = __builtin_add_overflow(
-//                (int32_t)((
-//                    modrm.type == modrm_reg
-//                        ? (*(uint32_t *)(((char *)cpu) + (modrm_base).reg32_id))
-//                        : ({
-//                            uint32_t val;
-//                            if (!tlb_read(tlb, addr, &val, 32 / 8)) {
-//                              self->state.eip = saved_ip;
-//                              self->state.segfault_addr = addr;
-//                              return 13;
-//                            }
-//                            val;
-//                          }))),
-//                (int32_t)(
-//                    (*(uint32_t *)(((char *)cpu) + (modrm_regptr).reg32_id))),
-//                (int32_t *)&self->state.res);
-//            self->state.res = (int32_t)self->state.res;
-//            ov;
-//          });
-//          if (modrm.type == modrm_register) {
-//            (*(uint32_t *)(((char *)cpu) + (modrm_base).reg32_id)) =
-//                self->state.res;
-//          } else {
-//            ({
-//              uint32_t _val = self->state.res;
-//              if (!tlb_write(tlb, addr, &_val, 32 / 8)) {
-//                self->state.eip = saved_ip;
-//                self->state.segfault_addr = addr;
-//                return 13;
-//              }
-//            });
-//          }
-//          (void)0;
-//          self->state.zf_res = self->state.sf_res = self->state.pf_res = 1;
-                    break;
+          [self readByteIncIP:&modRMByte];
+            mrm = [self decodeModRMByte:modRMByte];
+            regPtr = [self getRegPointer:mrm.reg opSize:8];
+            if (mrm.type == modrm_register) {
+                self->state.eip = saved_ip;
+                return 6;
+            } else {
+                addr = [self getModRMAddress:mrm opSize:8];
+                if (!(rmReadPtr =
+                          [self.task.mem getPointer:addr
+                                               type:MEM_READ])) {
+                    return INT_GPF;
+                }
+                memcpy(&rmReadValue, rmReadPtr, sizeof(uint8_t));
+                rmWritePtr = [self.task.mem getPointer:addr
+                                                  type:MEM_WRITE];
+            }
+                    
+            temp32 = *(uint32_t *)regPtr;
+            *(uint32_t *)regPtr = rmReadValue;
+            *(uint32_t *)rmWritePtr = temp32;
+            
+
+          self->state.af_ops = 1;
+          self->state.cf = __builtin_add_overflow(rmReadValue, *(uint32_t *)regPtr, (uint32_t *)&self->state.res);
+          self->state.of = __builtin_add_overflow(rmReadValue, *(int32_t *)regPtr, (int32_t *)&self->state.res);
+          *(uint32_t *)regPtr = self->state.res;
+          self->state.zf_res = self->state.sf_res = self->state.pf_res = 1;
+            break;
 
                 default:
-//          self->state.eip = saved_ip;
+          self->state.eip = saved_ip;
                     return 6;
             }
             break;
 
         case 0xfe:
-            //        if (!modrm_compute(cpu, tlb, &addr, &modrm,
-            //        &modrm_regptr, &modrm_base))
-            //        {
-            //        self->state.segfault_addr = self->state.eip;
-            //        self->state.eip = saved_ip;
-            //        return 13;
-            //        };
-            //        if (modrm.type == modrm_register)
-            //        {
-            //        self->state.eip = saved_ip;
-            //        return 6;
-            //        };
-            //        switch (modrm.opcode)
-            //        {
-            //        case 0:
-            //          do {
-            //            int tmp = self->state.cf;
-            //            self->state.op1 = 1;
-            //            self->state.op2 =
-            //                (modrm.type == modrm_reg
-            //                     ? (*(uint8_t *)(((char *)cpu) +
-            //                     (modrm_base).reg8_id)) : ({
-            //                         uint8_t val;
-            //                         if (!tlb_read(tlb, addr, &val, 8 /
-            //                         8)) {
-            //                           self->state.eip = saved_ip;
-            //                           self->state.segfault_addr = addr;
-            //                           return 13;
-            //                         }
-            //                         val;
-            //                       }));
-            //            self->state.af_ops = 1;
-            //            self->state.cf = ({
-            //              int ov = __builtin_add_overflow(
-            //                  (uint8_t)((
-            //                      modrm.type == modrm_reg
-            //                          ? (*(uint8_t *)(((char *)cpu) +
-            //                          (modrm_base).reg8_id)) : ({
-            //                              uint8_t val;
-            //                              if (!tlb_read(tlb, addr, &val, 8
-            //                              / 8)) {
-            //                                self->state.eip = saved_ip;
-            //                                self->state.segfault_addr =
-            //                                addr; return 13;
-            //                              }
-            //                              val;
-            //                            }))),
-            //                  (uint8_t)(1), (uint8_t *)&self->state.res);
-            //              self->state.res = (int8_t)self->state.res;
-            //              ov;
-            //            });
-            //            self->state.of = ({
-            //              int ov = __builtin_add_overflow(
-            //                  (int8_t)((
-            //                      modrm.type == modrm_reg
-            //                          ? (*(uint8_t *)(((char *)cpu) +
-            //                          (modrm_base).reg8_id)) : ({
-            //                              uint8_t val;
-            //                              if (!tlb_read(tlb, addr, &val, 8
-            //                              / 8)) {
-            //                                self->state.eip = saved_ip;
-            //                                self->state.segfault_addr =
-            //                                addr; return 13;
-            //                              }
-            //                              val;
-            //                            }))),
-            //                  (int8_t)(1), (int8_t *)&self->state.res);
-            //              self->state.res = (int8_t)self->state.res;
-            //              ov;
-            //            });
-            //            if (modrm.type == modrm_register) {
-            //              (*(uint8_t *)(((char *)cpu) +
-            //              (modrm_base).reg8_id)) =
-            //                  self->state.res;
-            //            } else {
-            //              ({
-            //                uint8_t _val = self->state.res;
-            //                if (!tlb_write(tlb, addr, &_val, 8 / 8)) {
-            //                  self->state.eip = saved_ip;
-            //                  self->state.segfault_addr = addr;
-            //                  return 13;
-            //                }
-            //              });
-            //            }
-            //            (void)0;
-            //            self->state.zf_res = self->state.sf_res =
-            //            self->state.pf_res = 1; self->state.cf = tmp;
-            //          } while (0);
-            //          break;
-            //        case 1:
-            //          do {
-            //            int tmp = self->state.cf;
-            //            self->state.op1 = 1;
-            //            self->state.op2 =
-            //                (modrm.type == modrm_reg
-            //                     ? (*(uint8_t *)(((char *)cpu) +
-            //                     (modrm_base).reg8_id)) : ({
-            //                         uint8_t val;
-            //                         if (!tlb_read(tlb, addr, &val, 8 /
-            //                         8)) {
-            //                           self->state.eip = saved_ip;
-            //                           self->state.segfault_addr = addr;
-            //                           return 13;
-            //                         }
-            //                         val;
-            //                       }));
-            //            self->state.af_ops = 1;
-            //            self->state.of = ({
-            //              int ov = __builtin_sub_overflow(
-            //                  (int8_t)((
-            //                      modrm.type == modrm_reg
-            //                          ? (*(uint8_t *)(((char *)cpu) +
-            //                          (modrm_base).reg8_id)) : ({
-            //                              uint8_t val;
-            //                              if (!tlb_read(tlb, addr, &val, 8
-            //                              / 8)) {
-            //                                self->state.eip = saved_ip;
-            //                                self->state.segfault_addr =
-            //                                addr; return 13;
-            //                              }
-            //                              val;
-            //                            }))),
-            //                  (int8_t)(1), (int8_t *)&self->state.res);
-            //              self->state.res = (int8_t)self->state.res;
-            //              ov;
-            //            });
-            //            self->state.cf = ({
-            //              int ov = __builtin_sub_overflow(
-            //                  (uint8_t)((
-            //                      modrm.type == modrm_reg
-            //                          ? (*(uint8_t *)(((char *)cpu) +
-            //                          (modrm_base).reg8_id)) : ({
-            //                              uint8_t val;
-            //                              if (!tlb_read(tlb, addr, &val, 8
-            //                              / 8)) {
-            //                                self->state.eip = saved_ip;
-            //                                self->state.segfault_addr =
-            //                                addr; return 13;
-            //                              }
-            //                              val;
-            //                            }))),
-            //                  (uint8_t)(1), (uint8_t *)&self->state.res);
-            //              self->state.res = (int8_t)self->state.res;
-            //              ov;
-            //            });
-            //            if (modrm.type == modrm_register) {
-            //              (*(uint8_t *)(((char *)cpu) +
-            //              (modrm_base).reg8_id)) =
-            //                  self->state.res;
-            //            } else {
-            //              ({
-            //                uint8_t _val = self->state.res;
-            //                if (!tlb_write(tlb, addr, &_val, 8 / 8)) {
-            //                  self->state.eip = saved_ip;
-            //                  self->state.segfault_addr = addr;
-            //                  return 13;
-            //                }
-            //              });
-            //            }
-            //            (void)0;
-            //            self->state.zf_res = self->state.sf_res =
-            //            self->state.pf_res = 1; self->state.cf = tmp;
-            //          } while (0);
-            //          break;
-            //        default: {
-            //          self->state.eip = saved_ip;
-            //          return 6;
-            //        };
-            //        };
+            [self readByteIncIP:&modRMByte];
+            mrm = [self decodeModRMByte:modRMByte];
+            regPtr = [self getRegPointer:mrm.reg opSize:8];
+            if (mrm.type == modrm_register) {
+                self->state.eip = saved_ip;
+                return 6;
+            } else {
+                addr = [self getModRMAddress:mrm opSize:8];
+                if (!(rmReadPtr =
+                          [self.task.mem getPointer:addr
+                                               type:MEM_READ])) {
+                    return INT_GPF;
+                }
+                memcpy(&rmReadValue, rmReadPtr, sizeof(uint8_t));
+                rmWritePtr = [self.task.mem getPointer:addr
+                                                  type:MEM_WRITE];
+            }
+            switch (mrm.opcode)
+            {
+                case 0:
+                  
+                temp8 = self->state.cf;
+                
+                self->state.af_ops = 1;
+                self->state.cf = __builtin_add_overflow((uint8_t)rmReadValue, (uint8_t)1, (uint8_t *)&self->state.res);
+                self->state.of = __builtin_add_overflow((int8_t)rmReadValue, (int8_t)1, (int8_t *)&self->state.res);
+                
+                *(uint8_t *)rmWritePtr = self->state.res;
+                  
+                self->state.zf_res = self->state.sf_res = self->state.pf_res = 1; self->state.cf = temp8;
+                  
+                break;
+                        
+                case 1:
+                  [self readByteIncIP:&modRMByte];
+                  mrm = [self decodeModRMByte:modRMByte];
+                  regPtr = [self getRegPointer:mrm.reg opSize:8];
+                  if (mrm.type == modrm_register) {
+                      self->state.eip = saved_ip;
+                      return 6;
+                  } else {
+                      addr = [self getModRMAddress:mrm opSize:8];
+                      if (!(rmReadPtr =
+                                [self.task.mem getPointer:addr
+                                                     type:MEM_READ])) {
+                          return INT_GPF;
+                      }
+                      memcpy(&rmReadValue, rmReadPtr, sizeof(uint8_t));
+                      rmWritePtr = [self.task.mem getPointer:addr
+                                                        type:MEM_WRITE];
+                  }
+                  switch (mrm.opcode)
+                  {
+                  case 0:
+                    
+                  temp8 = self->state.cf;
+                  
+                  self->state.af_ops = 1;
+                  self->state.of = __builtin_sub_overflow((int8_t)rmReadValue, (int8_t)1, (int8_t *)&self->state.res);
+                  self->state.cf = __builtin_sub_overflow((uint8_t)rmReadValue, (uint8_t)1, (uint8_t *)&self->state.res);
+                  
+                  
+                  *(uint8_t *)rmWritePtr = self->state.res;
+                    
+                  self->state.zf_res = self->state.sf_res = self->state.pf_res = 1; self->state.cf = temp8;
+                    
+                  break;
+                default:
+                  self->state.eip = saved_ip;
+                  return 6;
+                
+                }
+            }
             break;
         case 0xff:
-            //        if (!modrm_compute(cpu, tlb, &addr, &modrm,
-            //        &modrm_regptr, &modrm_base))
-            //        {
-            //        self->state.segfault_addr = self->state.eip;
-            //        self->state.eip = saved_ip;
-            //        return 13;
-            //        };
-            //        if (modrm.type == modrm_register)
-            //        {
-            //        self->state.eip = saved_ip;
-            //        return 6;
-            //        };
-            //        switch (modrm.opcode)
-            //        {
-            //        case 0:
-            //          do {
-            //            int tmp = self->state.cf;
-            //            self->state.op1 = 1;
-            //            self->state.op2 =
-            //                (modrm.type == modrm_reg
-            //                     ? (*(uint32_t *)(((char *)cpu) +
-            //                     (modrm_base).reg32_id)) : ({
-            //                         uint32_t val;
-            //                         if (!tlb_read(tlb, addr, &val, 32 /
-            //                         8)) {
-            //                           self->state.eip = saved_ip;
-            //                           self->state.segfault_addr = addr;
-            //                           return 13;
-            //                         }
-            //                         val;
-            //                       }));
-            //            self->state.af_ops = 1;
-            //            self->state.cf = ({
-            //              int ov = __builtin_add_overflow(
-            //                  (uint32_t)((modrm.type == modrm_reg
-            //                                  ? (*(uint32_t *)(((char
-            //                                  *)cpu) +
-            //                                                   (modrm_base).reg32_id))
-            //                                  : ({
-            //                                      uint32_t val;
-            //                                      if (!tlb_read(tlb, addr,
-            //                                      &val, 32 / 8)) {
-            //                                        self->state.eip =
-            //                                        saved_ip;
-            //                                        self->state.segfault_addr
-            //                                        = addr; return 13;
-            //                                      }
-            //                                      val;
-            //                                    }))),
-            //                  (uint32_t)(1), (uint32_t
-            //                  *)&self->state.res);
-            //              self->state.res = (int32_t)self->state.res;
-            //              ov;
-            //            });
-            //            self->state.of = ({
-            //              int ov = __builtin_add_overflow(
-            //                  (int32_t)((modrm.type == modrm_reg
-            //                                 ? (*(uint32_t *)(((char
-            //                                 *)cpu) +
-            //                                                  (modrm_base).reg32_id))
-            //                                 : ({
-            //                                     uint32_t val;
-            //                                     if (!tlb_read(tlb, addr,
-            //                                     &val, 32 / 8)) {
-            //                                       self->state.eip =
-            //                                       saved_ip;
-            //                                       self->state.segfault_addr
-            //                                       = addr; return 13;
-            //                                     }
-            //                                     val;
-            //                                   }))),
-            //                  (int32_t)(1), (int32_t *)&self->state.res);
-            //              self->state.res = (int32_t)self->state.res;
-            //              ov;
-            //            });
-            //            if (modrm.type == modrm_register) {
-            //              (*(uint32_t *)(((char *)cpu) +
-            //              (modrm_base).reg32_id)) =
-            //                  self->state.res;
-            //            } else {
-            //              ({
-            //                uint32_t _val = self->state.res;
-            //                if (!tlb_write(tlb, addr, &_val, 32 / 8)) {
-            //                  self->state.eip = saved_ip;
-            //                  self->state.segfault_addr = addr;
-            //                  return 13;
-            //                }
-            //              });
-            //            }
-            //            (void)0;
-            //            self->state.zf_res = self->state.sf_res =
-            //            self->state.pf_res = 1; self->state.cf = tmp;
-            //          } while (0);
-            //          break;
-            //        case 1:
-            //          do {
-            //            int tmp = self->state.cf;
-            //            self->state.op1 = 1;
-            //            self->state.op2 =
-            //                (modrm.type == modrm_reg
-            //                     ? (*(uint32_t *)(((char *)cpu) +
-            //                     (modrm_base).reg32_id)) : ({
-            //                         uint32_t val;
-            //                         if (!tlb_read(tlb, addr, &val, 32 /
-            //                         8)) {
-            //                           self->state.eip = saved_ip;
-            //                           self->state.segfault_addr = addr;
-            //                           return 13;
-            //                         }
-            //                         val;
-            //                       }));
-            //            self->state.af_ops = 1;
-            //            self->state.of = ({
-            //              int ov = __builtin_sub_overflow(
-            //                  (int32_t)((modrm.type == modrm_reg
-            //                                 ? (*(uint32_t *)(((char
-            //                                 *)cpu) +
-            //                                                  (modrm_base).reg32_id))
-            //                                 : ({
-            //                                     uint32_t val;
-            //                                     if (!tlb_read(tlb, addr,
-            //                                     &val, 32 / 8)) {
-            //                                       self->state.eip =
-            //                                       saved_ip;
-            //                                       self->state.segfault_addr
-            //                                       = addr; return 13;
-            //                                     }
-            //                                     val;
-            //                                   }))),
-            //                  (int32_t)(1), (int32_t *)&self->state.res);
-            //              self->state.res = (int32_t)self->state.res;
-            //              ov;
-            //            });
-            //            self->state.cf = ({
-            //              int ov = __builtin_sub_overflow(
-            //                  (uint32_t)((modrm.type == modrm_reg
-            //                                  ? (*(uint32_t *)(((char
-            //                                  *)cpu) +
-            //                                                   (modrm_base).reg32_id))
-            //                                  : ({
-            //                                      uint32_t val;
-            //                                      if (!tlb_read(tlb, addr,
-            //                                      &val, 32 / 8)) {
-            //                                        self->state.eip =
-            //                                        saved_ip;
-            //                                        self->state.segfault_addr
-            //                                        = addr; return 13;
-            //                                      }
-            //                                      val;
-            //                                    }))),
-            //                  (uint32_t)(1), (uint32_t
-            //                  *)&self->state.res);
-            //              self->state.res = (int32_t)self->state.res;
-            //              ov;
-            //            });
-            //            if (modrm.type == modrm_register) {
-            //              (*(uint32_t *)(((char *)cpu) +
-            //              (modrm_base).reg32_id)) =
-            //                  self->state.res;
-            //            } else {
-            //              ({
-            //                uint32_t _val = self->state.res;
-            //                if (!tlb_write(tlb, addr, &_val, 32 / 8)) {
-            //                  self->state.eip = saved_ip;
-            //                  self->state.segfault_addr = addr;
-            //                  return 13;
-            //                }
-            //              });
-            //            }
-            //            (void)0;
-            //            self->state.zf_res = self->state.sf_res =
-            //            self->state.pf_res = 1; self->state.cf = tmp;
-            //          } while (0);
-            //          break;
-            //        default:
-            //          self->state.eip = saved_ip;
-            //          return 6;
-            //
-            //        };
+            [self readByteIncIP:&modRMByte];
+            mrm = [self decodeModRMByte:modRMByte];
+            regPtr = [self getRegPointer:mrm.reg opSize:32];
+            if (mrm.type == modrm_register) {
+                self->state.eip = saved_ip;
+                return 6;
+            } else {
+                addr = [self getModRMAddress:mrm opSize:32];
+                if (!(rmReadPtr =
+                          [self.task.mem getPointer:addr
+                                               type:MEM_READ])) {
+                    return INT_GPF;
+                }
+                memcpy(&rmReadValue, rmReadPtr, sizeof(uint32_t));
+                rmWritePtr = [self.task.mem getPointer:addr
+                                                  type:MEM_WRITE];
+            }
+            switch (mrm.opcode)
+            {
+            case 0:
+              temp8 = self->state.cf;
+              
+              self->state.af_ops = 1;
+              self->state.cf = __builtin_add_overflow((uint32_t)rmReadValue, (uint32_t)1, (uint32_t *)&self->state.res);
+              self->state.of = __builtin_add_overflow((int32_t)rmReadValue, (int32_t)1, (int32_t *)&self->state.res);
+              
+              *(uint32_t *)rmWritePtr = self->state.res;
+                
+              self->state.zf_res = self->state.sf_res = self->state.pf_res = 1; self->state.cf = temp32;
+                
+              break;
+            case 1:
+              temp32 = self->state.cf;
+              
+              self->state.af_ops = 1;
+              self->state.of = __builtin_sub_overflow((int32_t)rmReadValue, (int32_t)1, (int32_t *)&self->state.res);
+              self->state.cf = __builtin_sub_overflow((uint32_t)rmReadValue, (uint32_t)1, (uint32_t *)&self->state.res);
+              
+              
+              *(uint32_t *)rmWritePtr = self->state.res;
+                
+              self->state.zf_res = self->state.sf_res = self->state.pf_res = 1; self->state.cf = temp32;
+                
+              break;
+            default:
+              self->state.eip = saved_ip;
+              return 6;
+
+            };
             break;
 
         default:
 
-            //        self->state.eip = saved_ip;
+            self->state.eip = saved_ip;
             return 6;
     }
     return -1; // TODO: Important Maybe die here - this shouldnt happen

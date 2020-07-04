@@ -345,10 +345,8 @@
             filePath = "x86UserModeEmu/cpu/CPU.m"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "8289"
-            endingLineNumber = "8289"
-            landmarkName = "-step32LockOps:addr:"
-            landmarkType = "7">
+            startingLineNumber = "14971"
+            endingLineNumber = "14971">
          </BreakpointContent>
       </BreakpointProxy>
    </Breakpoints>
