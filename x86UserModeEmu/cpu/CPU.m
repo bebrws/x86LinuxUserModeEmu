@@ -667,7 +667,7 @@
     
     [self readByteIncIP:&firstOpByte];
     
-//    CPULog("%@", [self description]);
+    CPULog("%@", [self description]);
     
     
     // # ifdef BDEBUG
@@ -772,7 +772,7 @@
     uint32_t *rmWritePtr;
     enum reg32 opReg;
     
-    if (self->instructionCount >= 13123) {
+    if (self->instructionCount >= 14260) {
         // 12773
         CLog(@"break");
     }
