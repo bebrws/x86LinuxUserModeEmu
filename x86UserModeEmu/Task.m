@@ -328,6 +328,7 @@ int get_random(char *buf, size_t len)
     // TODO: Important mem clone!!!
     // task.mem = [mem clone];
     task.mem = [[Memory alloc] init];
+    task.mem.task = task;
     
     if (flags & CLONE_FILES_) {
         // TODO: Important
@@ -1410,6 +1411,7 @@ fail_free_mem:
     }
 
     Memory *newMem = [[Memory alloc] init];
+    newMem.task = self;
 
     self.mem.changesToMemory = 0;
 
@@ -1640,6 +1642,7 @@ fail_free_mem:
     cond_init(&self->waitingCondition);
 
     self.mem = [[Memory alloc] init]; // TODO: FIX: When creating a new child task it stops here
+    self.mem.task = self;
     
     return self;
 }

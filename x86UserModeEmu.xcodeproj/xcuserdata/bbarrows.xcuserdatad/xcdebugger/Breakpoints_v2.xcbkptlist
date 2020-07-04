@@ -418,15 +418,16 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "06A596BD-0C31-4AA8-A218-27FE2406DAA6"
-            shouldBeEnabled = "Yes"
+            uuid = "021131C8-279F-4EBD-9CA1-BEACF739AAFB"
+            shouldBeEnabled = "No"
+            condition = "self-&gt;instructionCount &gt;= 12771"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "x86UserModeEmu/cpu/CPU.m"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "720"
-            endingLineNumber = "720"
+            startingLineNumber = "780"
+            endingLineNumber = "780"
             landmarkName = "-step:"
             landmarkType = "7">
          </BreakpointContent>
@@ -434,16 +435,31 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "021131C8-279F-4EBD-9CA1-BEACF739AAFB"
+            uuid = "7509ACFC-522E-48CE-AB80-1642FC99AD74"
             shouldBeEnabled = "No"
-            condition = "self-&gt;instructionCount &gt;= 12647"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "x86UserModeEmu/cpu/CPU.m"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "776"
-            endingLineNumber = "776"
+            startingLineNumber = "777"
+            endingLineNumber = "777"
+            landmarkName = "-step:"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "896D268E-188A-4A47-82FC-AB570DB7FF1A"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "x86UserModeEmu/cpu/CPU.m"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "721"
+            endingLineNumber = "721"
             landmarkName = "-step:"
             landmarkType = "7">
          </BreakpointContent>

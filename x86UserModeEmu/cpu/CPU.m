@@ -772,7 +772,11 @@
     uint32_t *rmWritePtr;
     enum reg32 opReg;
     
-
+    if (self->instructionCount >= 12757) {
+        // 12773
+        CLog(@"break");
+    }
+    
     switch (firstOpByte) {
         // TODO: Implement a group
         // http://ref.x86asm.net/coder32.html#x30
@@ -3266,6 +3270,8 @@
             // PUSH    r16/32
             opReg = 0x7 & firstOpByte;
             regPtr = [self getRegPointer:opReg opSize:32];
+        
+            
             if ([self.task userWrite:self->state.esp - 4 buf:regPtr count:4]) {
                 SEGFAULT
             }
@@ -3745,7 +3751,7 @@
                 addr = [self getModRMAddress:mrm opSize:8];
                 rmWritePtr = [self.task.mem getPointer:addr type:MEM_WRITE];
             }
-            *((dword_t *)rmWritePtr) = *((dword_t *)regPtr);
+            *((uint8_t *)rmWritePtr) = *((uint8_t *)regPtr);
             break;
         case 0x89:
             // MOV    r/m16/32/64    r16/32/64
