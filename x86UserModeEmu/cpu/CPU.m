@@ -959,7 +959,7 @@
     uint32_t *rmWritePtr;
     enum reg32 opReg;
 
-    if (self->instructionCount >= 14260) {
+    if (self->instructionCount >= 14824) {
         // 12773
         CLog(@"break");
     }
@@ -3908,17 +3908,16 @@
         case 0x3c:
             // CMP    Al    imm8
             //
-            [self readByteIncIP:&modRMByte];
-            mrm = [self decodeModRMByte:modRMByte];
-            regPtr = [self getRegPointer:reg_eax opSize:8];
+//            [self readByteIncIP:&modRMByte];
+//            mrm = [self decodeModRMByte:modRMByte];
+//            regPtr = [self getRegPointer:reg_eax opSize:8];
 
             if ([self readByteIncIP:&imm8]) {
                 SEGFAULT
             }
 
-            self->state.cf = __builtin_sub_overflow(
-                *((uint8_t *)regPtr), (uint8_t)imm8, (uint8_t *)&temp8);
-            self->state.of = __builtin_sub_overflow(*((int8_t *)regPtr),
+            self->state.cf = __builtin_sub_overflow((uint8_t)self->state.al, (uint8_t)imm8, (uint8_t *)&temp8);
+            self->state.of = __builtin_sub_overflow((int8_t)self->state.al,
                                                     (int8_t)imm8, (int8_t *)&temp8);
             self->state.res = (int8_t)temp8;
             // sets cf and of
@@ -11865,18 +11864,16 @@
         case 0x3c:
             // CMP    Al    imm8
             //
-            [self readByteIncIP:&modRMByte];
-            mrm = [self decodeModRMByte:modRMByte];
-            regPtr = [self getRegPointer:reg_eax opSize:8];
+//            [self readByteIncIP:&modRMByte];
+//            mrm = [self decodeModRMByte:modRMByte];
+//            regPtr = [self getRegPointer:reg_eax opSize:8];
 
             if ([self readByteIncIP:&imm8]) {
                 SEGFAULT
             }
 
-            self->state.cf = __builtin_sub_overflow(
-                *((uint8_t *)regPtr), (uint8_t)imm8, (uint8_t *)&temp8);
-            self->state.of = __builtin_sub_overflow(
-                *((int8_t *)regPtr), (int8_t)imm8, (int8_t *)&temp8);
+            self->state.cf = __builtin_sub_overflow((uint8_t)self->state.al, (uint8_t)imm8, (uint8_t *)&temp8);
+            self->state.of = __builtin_sub_overflow((int8_t )self->state.al, (int8_t)imm8, (int8_t *)&temp8);
             self->state.res = (int8_t)temp8;
             // sets cf and of
 
